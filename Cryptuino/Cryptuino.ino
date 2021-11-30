@@ -191,20 +191,6 @@ void key_generate()
  * Main **********************************************************************
  *****************************************************************************/
 
-#if 0
-void test_cmpi(const char *s1, const char *s2)
-{
-  Serial.print(s1);
-  Serial.print(" ");
-  compareI(s1, s2)
-  ? Serial.print("==")
-  : Serial.print("!=");
-  Serial.print(" ");
-  Serial.print(s2);
-  Serial.println("");
-}
-#endif
-
 void setup() {
   Serial.begin(9600, SERIAL_8N1);
   while( !Serial ) {
@@ -249,11 +235,4 @@ void loop() {
   }
 
   rx_len = 0;
-
-  /*
-  const uint8_t  in = Serial.read();
-  const uint8_t out = toUpper(in);
-  Serial.write(out);
-  Serial.println("");
-  */
 }
