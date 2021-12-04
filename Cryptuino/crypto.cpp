@@ -29,61 +29,38 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <Arduino.h>
+
 #include "crypto.h"
+
+#include "aes.hpp"
 #include "key.h"
-#include "rx.h"
 #include "util.h"
 
-#define CMD_GENKEY   "genkey"
-#define CMD_SHOWKEY  "showkey"
+#define CRYPTO_PIN  7
 
-void setup() {
-  Serial.begin(9600, SERIAL_8N1);
-  while( !Serial ) {
-    ;
-  }
-  Serial.println("Welcome to Cryptuino!");
-  Serial.println("---------------------");
+void crypto_encrypt(const uint8_t *ascii)
+{
+  uint8_t data[AES_KEY_BYTES];
+  readAesData(data, ascii);
 
-  crypto_init();
-  key_init();
+  Serial.print("<");
+  outputAesData(data);
+  Serial.println("");
 
-  rx_len = 0;
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, key);
+
+  digitalWrite(CRYPTO_PIN, HIGH);
+  AES_ECB_encrypt(&ctx, data);
+  digitalWrite(CRYPTO_PIN, LOW);
+
+  Serial.print(">");
+  outputAesData(data);
+  Serial.println("");
 }
 
-void loop() {
-  if( Serial.available() < 1 ) {
-    return;
-  }
-
-  bool have_cmd = false;
-  while( Serial.available() > 0 ) {
-    const uint8_t c = Serial.read();
-    if( c == '\n' ) {
-      have_cmd = true;
-      break;
-    } else if( rx_len < RXBUF_SIZE ) {
-      rx_buffer[rx_len++] = c;
-    }
-  }
-
-  if( !have_cmd) {
-    return;
-  }
-
-  if(        rx_have_cmd(CMD_GENKEY) ) {
-    key_generate();
-  } else if( rx_have_cmd(CMD_SHOWKEY) ) {
-    key_show();
-  } else if( rx_have_aes_data() ) {
-    if(        rx_buffer[0] == '@' ) {
-      key_set(rx_buffer + 1);
-    } else if( rx_buffer[0] == '#' ) {
-      crypto_encrypt(rx_buffer + 1);
-    }
-  } else {
-    Serial.println("ERROR: Invalid command!");
-  }
-
-  rx_len = 0;
+void crypto_init()
+{
+  pinMode(CRYPTO_PIN, OUTPUT);
 }
