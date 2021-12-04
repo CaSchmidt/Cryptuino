@@ -29,59 +29,17 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "key.h"
-#include "rx.h"
-#include "util.h"
+#ifndef RX_H
+#define RX_H
 
-#define CMD_GENKEY   "genkey"
-#define CMD_SHOWKEY  "showkey"
+constexpr uint8_t RXBUF_SIZE = 128;
 
-void setup() {
-  Serial.begin(9600, SERIAL_8N1);
-  while( !Serial ) {
-    ;
-  }
-  Serial.println("Welcome to Cryptuino!");
-  Serial.println("---------------------");
+extern uint8_t rx_buffer[];
 
-  key_init();
+extern uint8_t rx_len;
 
-  rx_len = 0;
-}
+bool rx_have_aes_data();
 
-void loop() {
-  if( Serial.available() < 1 ) {
-    return;
-  }
+bool rx_have_cmd(const char *cmd);
 
-  bool have_cmd = false;
-  while( Serial.available() > 0 ) {
-    const uint8_t c = Serial.read();
-    if( c == '\n' ) {
-      have_cmd = true;
-      break;
-    } else if( rx_len < RXBUF_SIZE ) {
-      rx_buffer[rx_len++] = c;
-    }
-  }
-
-  if( !have_cmd) {
-    return;
-  }
-
-  if(        rx_have_cmd(CMD_GENKEY) ) {
-    key_generate();
-  } else if( rx_have_cmd(CMD_SHOWKEY) ) {
-    key_show();
-  } else if( rx_have_aes_data() ) {
-    if(        rx_buffer[0] == '@' ) {
-      key_set(rx_buffer + 1);
-    } else if( rx_buffer[0] == '#' ) {
-      /* ... */
-    }
-  } else {
-    Serial.println("ERROR: Invalid command!");
-  }
-
-  rx_len = 0;
-}
+#endif // RX_H
