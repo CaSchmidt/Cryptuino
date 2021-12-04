@@ -58,7 +58,7 @@ namespace impl {
     ? 0
     : 1 + length2(s + 1);
   }
-}
+} // namespace impl
 
 constexpr size_t length(const char *s)
 {
@@ -113,12 +113,23 @@ bool compareI(const char *s1, const char *s2, const size_t len = 0)
   return true;
 }
 
-void outputKey(const uint8_t *key)
+void outputAesData(const uint8_t *data)
 {
   for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
     Serial.write(' ');
-    Serial.write(toHexChar(key[i], true));
-    Serial.write(toHexChar(key[i]));
+    Serial.write(toHexChar(data[i], true));
+    Serial.write(toHexChar(data[i]));
+  }
+}
+
+void readAesData(uint8_t *data, const uint8_t *ascii)
+{
+  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
+    const uint8_t hi = fromHexChar(ascii[i*2]);
+    const uint8_t lo = fromHexChar(ascii[i*2 + 1]);
+
+    data[i]  = hi << 4;
+    data[i] |= lo & 0x0F;
   }
 }
 
@@ -140,12 +151,17 @@ bool rx_have_cmd(const char *cmd)
   return rx_len == len  &&  compareI((const char*)rx_buffer, cmd, len);
 }
 
+inline bool rx_have_aes_cmd()
+{
+  return rx_buffer[0] == '#'  ||  rx_buffer[0] == '@';
+}
+
 bool rx_have_aes_data()
 {
-  bool result = true;
-  if( rx_len != AES_KEY_BYTES*2 + 1  ||  rx_buffer[0] != '#' ) {
-    result = false;
+  if( rx_len != AES_KEY_BYTES*2 + 1  ||  !rx_have_aes_cmd() ) {
+    return false;
   }
+  bool result = true;
   for(uint8_t i = 1; i <= AES_KEY_BYTES*2; i++) {
     if( fromHexChar(rx_buffer[i]) == 0xFF ) {
       result = false;
@@ -172,8 +188,8 @@ void key_init()
 
 void key_show()
 {
-  Serial.print("Key =");
-  outputKey(key);
+  Serial.print("Current key");
+  outputAesData(key);
   Serial.println("");
 }
 
@@ -185,6 +201,14 @@ void key_generate()
     const uint8_t r = random(0, 256);
     key[i] = r;
   }
+}
+
+void key_set(const uint8_t *ascii)
+{
+  readAesData(key, ascii);
+  Serial.print("Installing key");
+  outputAesData(key);
+  Serial.println("");
 }
 
 /*****************************************************************************
@@ -228,8 +252,12 @@ void loop() {
     key_generate();
   } else if( rx_have_cmd(CMD_SHOWKEY) ) {
     key_show();
-
   } else if( rx_have_aes_data() ) {
+    if(        rx_buffer[0] == '@' ) {
+      key_set(rx_buffer + 1);
+    } else if( rx_buffer[0] == '#' ) {
+      /* ... */
+    }
   } else {
     Serial.println("ERROR: Invalid command!");
   }
