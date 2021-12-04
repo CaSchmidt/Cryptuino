@@ -73,44 +73,6 @@ bool rx_have_aes_data()
 }
 
 /*****************************************************************************
- * Key ***********************************************************************
- *****************************************************************************/
-
-uint8_t key[AES_KEY_BYTES];
-
-void key_init()
-{
-  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
-    key[i] = 0;
-  }
-}
-
-void key_show()
-{
-  Serial.print("Current key");
-  outputAesData(key);
-  Serial.println("");
-}
-
-void key_generate()
-{
-  Serial.println("Generating random key...");
-  randomSeed(analogRead(A0));
-  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
-    const uint8_t r = random(0, 256);
-    key[i] = r;
-  }
-}
-
-void key_set(const uint8_t *ascii)
-{
-  readAesData(key, ascii);
-  Serial.print("Installing key");
-  outputAesData(key);
-  Serial.println("");
-}
-
-/*****************************************************************************
  * Main **********************************************************************
  *****************************************************************************/
 

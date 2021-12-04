@@ -29,17 +29,42 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef KEY_H
-#define KEY_H
+#include <Arduino.h>
 
-constexpr uint8_t AES_KEY_BYTES = 16;
+#include "key.h"
 
-void key_generate();
+#include "util.h"
 
-void key_init();
+uint8_t key[AES_KEY_BYTES];
 
-void key_show();
+void key_generate()
+{
+  Serial.println("Generating random key...");
+  randomSeed(analogRead(A0));
+  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
+    const uint8_t r = random(0, 256);
+    key[i] = r;
+  }
+}
 
-void key_set(const uint8_t *ascii);
+void key_init()
+{
+  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
+    key[i] = 0;
+  }
+}
 
-#endif // KEY_H
+void key_show()
+{
+  Serial.print("Current key");
+  outputAesData(key);
+  Serial.println("");
+}
+
+void key_set(const uint8_t *ascii)
+{
+  readAesData(key, ascii);
+  Serial.print("Setting key");
+  outputAesData(key);
+  Serial.println("");
+}
