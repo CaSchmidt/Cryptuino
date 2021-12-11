@@ -59,7 +59,7 @@ void loop() {
   bool have_cmd = false;
   while( Serial.available() > 0 ) {
     const uint8_t c = Serial.read();
-    if( c == '\n' ) {
+    if( c == '\n'  ||  c == '\r' ) {
       have_cmd = true;
       break;
     } else if( rx_len < RXBUF_SIZE ) {
@@ -67,7 +67,7 @@ void loop() {
     }
   }
 
-  if( !have_cmd) {
+  if( !have_cmd  ||  rx_len < 1 ) {
     return;
   }
 
