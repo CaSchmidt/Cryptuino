@@ -281,7 +281,6 @@ bool readWaveform(ViSession vi, const char ch, const ViUInt32 numSamplesWant,
   status = viSetAttribute(vi, VI_ATTR_RD_BUF_OPER_MODE, VI_FLUSH_DISABLE);
   INSTR_ERROR("viSetAttribute(RD_BUF_OPER_MODE)");
 
-#if 1
   status = viWrite(vi, (unsigned char*)"CURVE?", 6, VI_NULL);
   INSTR_ERROR("viWrite(curve)");
 
@@ -292,62 +291,6 @@ bool readWaveform(ViSession vi, const char ch, const ViUInt32 numSamplesWant,
   if( !instr::readSamples<int16_t>(vi, samples, numSamples, info) ) {
     return false;
   }
-#endif
-
-#if 0
-  char c;
-  status = viScanf(vi, (ViChar*)"%c", &c);
-  INSTR_ERROR("viScanf()");
-  if( c != '#' ) {
-    fprintf(stderr, "ERROR: Expected '#', got '%c'!\n", c);
-    return false;
-  }
-
-  status = viScanf(vi, (ViChar*)"%c", &c);
-  INSTR_ERROR("viScanf()");
-  if( !isDigit(c) ) {
-    fprintf(stderr, "ERROR: Digit expected, got '%c'!\n", c);
-    return false;
-  }
-
-  std::array<char,10> digitsStr;
-  digitsStr.fill(0);
-
-  const int numDigits = c - '0';
-  for(int i = 0; i < numDigits; i++) {
-    status = viScanf(vi, (ViChar*)"%c", &c);
-    if( !isDigit(c) ) {
-      fprintf(stderr, "ERROR: Digit sequence expected, got '%c'!\n", c);
-      return false;
-    }
-    digitsStr[i] = c;
-    INSTR_ERROR("viScanf()");
-  }
-
-  printf("elements = %s\n", digitsStr.data());
-#endif
-
-#if 0
-  ByteArray rawData;
-  try {
-    rawData.resize(numSamples*2, 0);
-  } catch(...) {
-    fprintf(stderr, "ERROR: raw.resize()\n");
-    return false;
-  }
-
-  ViUInt32 got = 0;
-  status = viBufRead(vi, rawData.data(), (ViUInt32)rawData.size(), &got);
-  WF_ERROR("viBufRead()");
-
-  const ViUInt32 numSamplesGot = got/2;
-  printf("got samples = %lu\n", numSamplesGot);
-
-  const int16_t *rawSamples = reinterpret_cast<const int16_t*>(rawData.data());
-  for(ViUInt32 i = 0; i < numSamplesGot; i++) {
-    samples[2 + i] = (double(rawSamples[i]) - yOff)*yMult + yZero;
-  }
-#endif
 
   if( !instr::flush(vi) ) {
     return false;
