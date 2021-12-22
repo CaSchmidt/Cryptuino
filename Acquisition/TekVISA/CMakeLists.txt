@@ -9,6 +9,21 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FormatOutputName)
 
+### 3rd Party Dependencies ###################################################
+
+add_subdirectory(../../3rdparty/zlib1211
+  ${CMAKE_CURRENT_BINARY_DIR}/zlib1211
+  )
+
+set(MATIO_MAT73  OFF CACHE BOOL "" FORCE)
+set(MATIO_SHARED OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(../../3rdparty/matio1521
+  ${CMAKE_CURRENT_BINARY_DIR}/mat1521
+  )
+
+format_output_name(matio "matio")
+
 ### VISA Library #############################################################
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
