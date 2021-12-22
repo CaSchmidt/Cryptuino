@@ -36,6 +36,7 @@
 #include <array>
 #include <vector>
 
+#include <matio.h>
 #include <visa.h>
 
 using   ByteArray = std::vector<uint8_t>;
@@ -299,15 +300,57 @@ bool readWaveform(ViSession vi, const char ch, const ViUInt32 numSamplesWant,
   return true;
 }
 
-bool writeSamples(const char *filename, const SampleArray& samples)
+void writeMatVector(mat_t *file, const char *varname,
+                    const std::size_t numSamples, const double *data)
 {
-  FILE *file = fopen(filename, "wb");
-  if( file == NULL ) {
-    fprintf(stderr, "ERROR: Unable to write file \"%s\"!\n", filename);
+  std::array<std::size_t,2> dims;
+  dims[0] = numSamples;
+  dims[1] = 1;
+
+  matvar_t *var = Mat_VarCreate(varname, MAT_C_DOUBLE, MAT_T_DOUBLE,
+                                dims.size(), dims.data(), const_cast<double*>(data),
+                                MAT_F_DONT_COPY_DATA);
+  if( var != NULL ) {
+    Mat_VarWrite(file, var, MAT_COMPRESSION_ZLIB);
+    Mat_VarFree(var);
+  }
+}
+
+bool writeMatSamples(const char *filename, const SampleArray& samples)
+{
+  const std::size_t numSamples = samples.size() - 2;
+
+  // (1) Time vector /////////////////////////////////////////////////////////
+
+  SampleArray time;
+  try {
+    time.resize(numSamples, 0);
+  } catch (...) {
     return false;
   }
-  fwrite(samples.data(), sizeof(SampleArray::value_type), samples.size(), file);
-  fclose(file);
+
+  const double xIncr = samples[0];
+  const double xZero = samples[1];
+  for(SampleArray::size_type i = 0; i < time.size(); i++) {
+    time[i] = double(i)*xIncr + xZero;
+  }
+
+  // (2) MAT file ////////////////////////////////////////////////////////////
+
+  mat_t *file = Mat_CreateVer(filename, NULL, MAT_FT_DEFAULT);
+  if( file == NULL ) {
+    return false;
+  }
+
+  // (3) Write vectors ///////////////////////////////////////////////////////
+
+  writeMatVector(file, "sig", numSamples, samples.data() + 2);
+  writeMatVector(file, "tim", numSamples, time.data());
+
+  // Done! ///////////////////////////////////////////////////////////////////
+
+  Mat_Close(file);
+
   return true;
 }
 
@@ -367,7 +410,7 @@ int main(int argc, char **argv)
 
   SampleArray samples;
   readWaveform(vi, channel, numSamples, samples);
-  writeSamples("output.bin", samples);
+  writeMatSamples("output.mat", samples);
 
   viClose(vi);
   viClose(rm);

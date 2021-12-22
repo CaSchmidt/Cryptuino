@@ -56,7 +56,7 @@ target_include_directories(GrabVISA
   PRIVATE ${TekVISA_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(GrabVISA ${VISA_LIBS})
+target_link_libraries(GrabVISA matio ${VISA_LIBS})
 
 ### Query ####################################################################
 
