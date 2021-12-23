@@ -86,12 +86,20 @@ namespace instr {
 
   using WaveformInfo = WaveformInfo_T<float>;
 
-  bool flush(ViSession vi)
+  bool flush(ViSession vi, const bool rd_discard = true, const bool wr_discard = false)
   {
     ViStatus status;
 
-    status = viFlush(vi, VI_WRITE_BUF | VI_READ_BUF_DISCARD);
-    INSTR_ERROR("viFlush(WRITE_BUF|READ_BUF_DISCARD)");
+    ViUInt16 mask = 0;
+    mask |= rd_discard
+        ? VI_READ_BUF_DISCARD
+        : VI_READ_BUF;
+    mask |= wr_discard
+        ? VI_WRITE_BUF_DISCARD
+        : VI_WRITE_BUF;
+
+    status = viFlush(vi, mask);
+    INSTR_ERROR("viFlush()");
 
     return true;
   }
