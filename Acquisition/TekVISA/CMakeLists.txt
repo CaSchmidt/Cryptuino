@@ -24,6 +24,10 @@ add_subdirectory(../../3rdparty/matio1521
 
 format_output_name(matio "matio")
 
+add_subdirectory(../../csUtil/csUtil
+  ${CMAKE_CURRENT_BINARY_DIR}/csUtil
+  )
+
 ### VISA Library #############################################################
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -44,12 +48,9 @@ add_executable(GrabVISA
 
 format_output_name(GrabVISA "GrabVISA")
 
-set_property(TARGET GrabVISA
-  PROPERTY CXX_STANDARD 17
-  )
-
-set_property(TARGET GrabVISA
-  PROPERTY CXX_STANDARD_REQUIRED ON
+set_target_properties(GrabVISA PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
   )
 
 target_include_directories(GrabVISA
