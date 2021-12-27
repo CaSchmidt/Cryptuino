@@ -40,9 +40,23 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
     )
 endif()
 
+### Common Sources ###########################################################
+
+list(APPEND common_HEADERS
+  include/instrument.h
+  include/util.h
+  )
+
+list(APPEND common_SOURCES
+  src/instrument.cpp
+  src/util.cpp
+  )
+
 ### Grab #####################################################################
 
 add_executable(GrabVISA
+  ${common_HEADERS}
+  ${common_SOURCES}
   src/main_grab.cpp
   )
 
@@ -54,10 +68,11 @@ set_target_properties(GrabVISA PROPERTIES
   )
 
 target_include_directories(GrabVISA
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${TekVISA_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(GrabVISA matio ${VISA_LIBS})
+target_link_libraries(GrabVISA csUtil matio ${VISA_LIBS})
 
 ### Query ####################################################################
 
