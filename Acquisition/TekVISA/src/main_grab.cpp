@@ -47,7 +47,7 @@ bool writeMatVector(const csILogger *logger, mat_t *file,
   dims[1] = 1;
 
   matvar_t *var = Mat_VarCreate(varname, MAT_C_DOUBLE, MAT_T_DOUBLE,
-                                dims.size(), dims.data(), const_cast<double*>(data),
+                                int(dims.size()), dims.data(), const_cast<double*>(data),
                                 MAT_F_DONT_COPY_DATA);
   if( var == NULL ) {
     logger->logError(u8"Mat_VarCreate()");

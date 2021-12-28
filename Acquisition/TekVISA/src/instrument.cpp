@@ -126,7 +126,7 @@ namespace priv {
     const T *rawSamples = reinterpret_cast<const T*>(raw.data());
 
     ViUInt32 numBytesRead = 0;
-    const ViStatus status = viRead(vi, raw.data(), raw.size(), &numBytesRead);
+    const ViStatus status = viRead(vi, raw.data(), ViUInt32(raw.size()), &numBytesRead);
     if( handleError(logger, vi, status, "viRead(raw)") ) {
       return false;
     }
