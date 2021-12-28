@@ -32,12 +32,20 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
+#include <list>
+#include <string>
+
 #include "util.h"
+
+using RsrcString = std::basic_string<ViChar>;
+using   RsrcList = std::list<RsrcString>;
 
 class csILogger;
 
 bool flush(const csILogger *logger, ViSession vi,
            const bool rd_discard = true, const bool wr_discard = false);
+
+RsrcList queryInstruments(const csILogger *logger, ViSession rm);
 
 bool readWaveform(const csILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleArray& samples);

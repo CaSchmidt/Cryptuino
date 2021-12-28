@@ -235,6 +235,43 @@ bool flush(const csILogger *logger, ViSession vi,
   return true;
 }
 
+RsrcList queryInstruments(const csILogger *logger, ViSession rm)
+{
+  std::array<ViChar,1024> buffer;
+  ViUInt32          numResources;
+  ViFindList           resources;
+  ViStatus                status;
+
+  buffer.fill(0);
+  status = viFindRsrc(rm, (ViChar*)"?*INSTR", &resources, &numResources, buffer.data());
+  if( handleError(logger, rm, status, "viFindRsrc(?*INSTR)") ) {
+    return RsrcList();
+  }
+
+  if( numResources < 1 ) {
+    viClose(resources);
+    return RsrcList();
+  }
+
+  RsrcList result;
+  for(ViUInt32 i = 0; i < numResources; i++) {
+    result.push_back(RsrcString(buffer.data()));
+
+    if( i < numResources - 1 ) {
+      buffer.fill(0);
+      status = viFindNext(resources, buffer.data());
+      if( handleError(logger, rm, status, "viFindNext()") ) {
+        viClose(resources);
+        return RsrcList();
+      }
+    }
+  }
+
+  viClose(resources);
+
+  return result;
+}
+
 bool readWaveform(const csILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleArray& samples)
 {
