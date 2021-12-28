@@ -354,3 +354,34 @@ bool setBufferAttributes(const csILogger *logger, ViSession vi,
 
   return true;
 }
+
+bool setSingleShotAcquisition(csILogger *logger, ViSession vi)
+{
+  ViStatus status;
+
+  if( !setBufferAttributes(logger, vi, true, true) ) {
+    return false;
+  }
+
+  status = viPrintf(vi, (ViChar*)"ACQuire:STATE STOP\n");
+  if( handleError(logger, vi, status, "ACQuire:STATE STOP") ) {
+    return false;
+  }
+
+  status = viPrintf(vi, (ViChar*)"ACQuire:MODe SAMple\n");
+  if( handleError(logger, vi, status, "ACQuire:MODe SAMple") ) {
+    return false;
+  }
+
+  status = viPrintf(vi, (ViChar*)"ACQuire:STOPAfter SEQuence\n");
+  if( handleError(logger, vi, status, "ACQuire:STOPAfter SEQuence") ) {
+    return false;
+  }
+
+  status = viPrintf(vi, (ViChar*)"ACQuire:STATE RUN\n");
+  if( handleError(logger, vi, status, "ACQuire:STATE RUN") ) {
+    return false;
+  }
+
+  return true;
+}
