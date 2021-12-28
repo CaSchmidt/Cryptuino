@@ -303,8 +303,8 @@ bool readWaveform(const csILogger *logger, ViSession vi,
     return false;
   }
 
-  status = viPrintf(vi, (ViChar*)"CURVE?\n");
-  if( handleError(logger, vi, status, "CURVE?") ) {
+  status = viPrintf(vi, (ViChar*)"CURVe?\n");
+  if( handleError(logger, vi, status, "CURVe?") ) {
     return false;
   }
 
