@@ -29,30 +29,14 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <array>
+#ifndef BUFFER_H
+#define BUFFER_H
 
-#include <csUtil/csILogger.h>
-#include <csUtil/csTypeTraits.h>
+#include <cstdint>
 
-#include "util.h"
+#include <vector>
 
-bool handleError(const csILogger *logger, const ViObject obj,
-                 const ViStatus status, const char *reason)
-{
-  const bool is_error = status < VI_SUCCESS;
-  if( is_error ) {
-    std::array<ViChar,1024> buffer;
-    buffer.fill(0);
-    viStatusDesc(obj, status, buffer.data());
+using   ByteArray = std::vector<uint8_t>;
+using SampleArray = std::vector<double>;
 
-    std::u8string msg;
-    if( reason != nullptr ) {
-      msg += cs::UTF8(reason);
-      msg += u8": ";
-    }
-    msg += cs::UTF8(buffer.data());
-
-    logger->logError(msg);
-  }
-  return is_error;
-}
+#endif // BUFFER_H

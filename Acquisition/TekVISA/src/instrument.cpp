@@ -235,6 +235,27 @@ bool flush(const csILogger *logger, ViSession vi,
   return true;
 }
 
+bool handleError(const csILogger *logger, const ViObject obj,
+                 const ViStatus status, const char *reason)
+{
+  const bool is_error = status < VI_SUCCESS;
+  if( is_error ) {
+    std::array<ViChar,1024> buffer;
+    buffer.fill(0);
+    viStatusDesc(obj, status, buffer.data());
+
+    std::u8string msg;
+    if( reason != nullptr ) {
+      msg += cs::UTF8(reason);
+      msg += u8": ";
+    }
+    msg += cs::UTF8(buffer.data());
+
+    logger->logError(msg);
+  }
+  return is_error;
+}
+
 RsrcList queryInstruments(const csILogger *logger, ViSession rm)
 {
   std::array<ViChar,1024> buffer;

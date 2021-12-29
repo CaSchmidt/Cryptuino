@@ -35,7 +35,9 @@
 #include <list>
 #include <string>
 
-#include "util.h"
+#include <visa.h>
+
+#include "buffer.h"
 
 using RsrcString = std::basic_string<ViChar>;
 using   RsrcList = std::list<RsrcString>;
@@ -44,6 +46,9 @@ class csILogger;
 
 bool flush(const csILogger *logger, ViSession vi,
            const bool rd_discard = true, const bool wr_discard = false);
+
+bool handleError(const csILogger *logger, const ViObject obj,
+                 const ViStatus status, const char *reason);
 
 RsrcList queryInstruments(const csILogger *logger, ViSession rm);
 
