@@ -60,7 +60,7 @@ bool writeMatVector(const csILogger *logger, mat_t *file,
   return true;
 }
 
-bool writeMatSamples(const csILogger *logger, const char *filename, const SampleArray& samples)
+bool writeMatSamples(const csILogger *logger, const char *filename, const SampleBuffer& samples)
 {
   if( samples.empty() ) {
     logger->logError(u8"samples.empty()");
@@ -71,7 +71,7 @@ bool writeMatSamples(const csILogger *logger, const char *filename, const Sample
 
   // (1) Time vector /////////////////////////////////////////////////////////
 
-  SampleArray time;
+  SampleBuffer time;
   try {
     time.resize(numSamples, 0);
   } catch (...) {
@@ -81,7 +81,7 @@ bool writeMatSamples(const csILogger *logger, const char *filename, const Sample
 
   const double xIncr = samples[0];
   const double xZero = samples[1];
-  for(SampleArray::size_type i = 0; i < time.size(); i++) {
+  for(SampleBuffer::size_type i = 0; i < time.size(); i++) {
     time[i] = double(i)*xIncr + xZero;
   }
 
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  SampleArray samples;
+  SampleBuffer samples;
   readWaveform(&logger, vi, channel, numSamples, samples);
   writeMatSamples(&logger, "output.mat", samples);
 

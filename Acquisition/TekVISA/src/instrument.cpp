@@ -102,7 +102,7 @@ namespace priv {
    */
   template<typename T>
   bool readSamples(const csILogger *logger, ViSession vi,
-                   SampleArray& samples, const ViUInt32 numSamples, const WaveformInfo& info)
+                   SampleBuffer& samples, const ViUInt32 numSamples, const WaveformInfo& info)
   {
     constexpr std::size_t RAWVALUE_SIZE = sizeof(T);
 
@@ -116,7 +116,7 @@ namespace priv {
     samples[0] = info.xIncr;
     samples[1] = info.xZero;
 
-    ByteArray raw;
+    ByteBuffer raw;
     try {
       raw.resize(numSamples*RAWVALUE_SIZE, 0);
     } catch(...) {
@@ -294,7 +294,7 @@ RsrcList queryInstruments(const csILogger *logger, ViSession rm)
 }
 
 bool readWaveform(const csILogger *logger, ViSession vi,
-                  const char ch, const ViUInt32 numSamplesWant, SampleArray& samples)
+                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples)
 {
   ViStatus status;
 

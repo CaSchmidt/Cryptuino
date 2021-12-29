@@ -36,7 +36,7 @@
 
 #include <vector>
 
-using   ByteArray = std::vector<uint8_t>;
-using SampleArray = std::vector<double>;
+using   ByteBuffer = std::vector<uint8_t>;
+using SampleBuffer = std::vector<double>;
 
 #endif // BUFFER_H

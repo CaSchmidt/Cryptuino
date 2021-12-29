@@ -53,7 +53,7 @@ bool handleError(const csILogger *logger, const ViObject obj,
 RsrcList queryInstruments(const csILogger *logger, ViSession rm);
 
 bool readWaveform(const csILogger *logger, ViSession vi,
-                  const char ch, const ViUInt32 numSamplesWant, SampleArray& samples);
+                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples);
 
 bool setBufferAttributes(const csILogger *logger, ViSession vi,
                          const bool rd_flush = false, const bool wr_flush = false);
