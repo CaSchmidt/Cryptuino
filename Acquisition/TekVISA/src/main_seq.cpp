@@ -38,25 +38,13 @@
 
 #include <csUtil/csDualLogger.h>
 #include <csUtil/csLogger.h>
+#include <csUtil/csSerial.h>
 #include <csUtil/csStringUtil.h>
+
+#include "util.h"
 
 template<typename T>
 using if_int_bool = std::enable_if_t<std::is_integral_v<T>,bool>;
-
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
-{
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
-
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
-
-  return cnt;
-}
 
 struct Options {
   bool isValid() const
@@ -137,6 +125,9 @@ bool parseOptions(Options& options, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+  constexpr unsigned int TOUT_INSTRUMENT = 2;
+  constexpr unsigned int TOUT_SERIAL = 2;
+
   // (1) Options /////////////////////////////////////////////////////////////
 
   Options options;
@@ -160,13 +151,31 @@ int main(int argc, char **argv)
 
   const csILogger *logger = &log_dual;
 
-  // (3) Sequence ////////////////////////////////////////////////////////////
+  // (3) Setup ///////////////////////////////////////////////////////////////
+
+  Randomizer randomizer;
+
+  csSerial serial;
+  if( !serial.open(cs::UTF8(options.serialDevice.data()), options.serialRate) ) {
+    const std::string msg = std::format("Unable to open serial device \"{}\"!",
+                                        options.serialDevice);
+    logger->logError(cs::UTF8(msg.data()));
+    return EXIT_FAILURE;
+  }
+
+  txAesCmd('@', serial, randomizer);
+  rxAesCmd(logger, serial, TOUT_SERIAL);
+
+  // (4) Sequence ////////////////////////////////////////////////////////////
 
   const int maxIter       = options.count - 1;
   const int numIterDigits = countDigits(maxIter);
   for(int i = 0; i <= maxIter; i++) {
     const std::string progress = std::format("{:0{}}/{}", i, numIterDigits, maxIter);
     logger->logText(cs::UTF8(progress.data()));
+
+    txAesCmd('#', serial, randomizer);
+    rxAesCmd(logger, serial, TOUT_SERIAL);
   }
 
   // Done! ///////////////////////////////////////////////////////////////////
