@@ -102,12 +102,6 @@ set_target_properties(SeqVISA PROPERTIES
   CXX_STANDARD_REQUIRED ON
   )
 
-if(MSVC)
-  target_compile_options(SeqVISA
-    PRIVATE /std:c++latest
-    )
-endif()
-
 target_include_directories(SeqVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${TekVISA_SOURCE_DIR}/3rdparty/TekVISA/include
