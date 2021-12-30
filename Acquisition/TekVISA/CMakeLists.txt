@@ -45,10 +45,12 @@ endif()
 list(APPEND common_HEADERS
   include/buffer.h
   include/instrument.h
+  include/util.h
   )
 
 list(APPEND common_SOURCES
   src/instrument.cpp
+  src/util.cpp
   )
 
 ### Grab #####################################################################
