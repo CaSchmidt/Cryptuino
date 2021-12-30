@@ -86,3 +86,31 @@ target_include_directories(QueryVISA
   )
 
 target_link_libraries(QueryVISA ${VISA_LIBS})
+
+### Sequence #################################################################
+
+add_executable(SeqVISA
+  ${common_HEADERS}
+  ${common_SOURCES}
+  src/main_seq.cpp
+  )
+
+format_output_name(SeqVISA "SeqVISA")
+
+set_target_properties(SeqVISA PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
+  )
+
+if(MSVC)
+  target_compile_options(SeqVISA
+    PRIVATE /std:c++latest
+    )
+endif()
+
+target_include_directories(SeqVISA
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PRIVATE ${TekVISA_SOURCE_DIR}/3rdparty/TekVISA/include
+  )
+
+target_link_libraries(SeqVISA csUtil matio ${VISA_LIBS})
