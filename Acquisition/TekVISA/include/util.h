@@ -35,6 +35,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <functional>
 #include <random>
 #include <type_traits>
 
@@ -68,6 +69,23 @@ private:
 
   std::uniform_int_distribution<unsigned> _dist;
   std::mt19937 _gen;
+};
+
+class ScopeGuard {
+public:
+  using guard_func = std::function<void(void)>;
+
+  ScopeGuard(const guard_func& f) noexcept;
+  ~ScopeGuard() noexcept;
+
+private:
+  ScopeGuard() noexcept = delete;
+  ScopeGuard(const ScopeGuard&) noexcept = delete;
+  ScopeGuard& operator=(const ScopeGuard&) noexcept = delete;
+  ScopeGuard(ScopeGuard&&) noexcept = delete;
+  ScopeGuard& operator=(ScopeGuard&&) noexcept = delete;
+
+  guard_func _f;
 };
 
 class csILogger;

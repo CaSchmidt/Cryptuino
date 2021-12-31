@@ -116,3 +116,15 @@ void Randomizer::generate(uint8_t *ptr, const std::size_t len) const
     ptr[i] = static_cast<uint8_t>(_dist(thiz->_gen));
   }
 }
+
+////// ScopeGuard - public ///////////////////////////////////////////////////
+
+ScopeGuard::ScopeGuard(const guard_func& f) noexcept
+  : _f(f)
+{
+}
+
+ScopeGuard::~ScopeGuard() noexcept
+{
+  _f();
+}
