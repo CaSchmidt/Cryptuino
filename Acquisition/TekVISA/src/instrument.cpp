@@ -404,7 +404,7 @@ bool setBufferAttributes(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool setSingleShotAcquisition(csILogger *logger, ViSession vi)
+bool setSingleShotAcquisition(const csILogger *logger, ViSession vi)
 {
   ViStatus status;
 

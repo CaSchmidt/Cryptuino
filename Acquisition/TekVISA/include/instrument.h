@@ -64,6 +64,6 @@ bool readWaveform(const csILogger *logger, ViSession vi,
 bool setBufferAttributes(const csILogger *logger, ViSession vi,
                          const bool rd_flush = false, const bool wr_flush = false);
 
-bool setSingleShotAcquisition(csILogger *logger, ViSession vi);
+bool setSingleShotAcquisition(const csILogger *logger, ViSession vi);
 
 #endif // INSTRUMENT_H
