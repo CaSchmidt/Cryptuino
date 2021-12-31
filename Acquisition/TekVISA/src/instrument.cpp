@@ -298,6 +298,10 @@ bool queryRecordLength(const csILogger *logger, ViSession vi,
 {
   ViStatus status;
 
+  if( !setBufferAttributes(logger, vi, true, true) ) {
+    return false;
+  }
+
   status = viQueryf(vi, (ViChar*)"HORizontal:RECOrdlength?\n", (ViChar*)"%ld", length);
   if( handleError(logger, vi, status, "HORizontal:RECOrdlength?") ) {
     return false;
@@ -310,6 +314,10 @@ bool querySampleRate(const csILogger *logger, ViSession vi,
                      float *rate)
 {
   ViStatus status;
+
+  if( !setBufferAttributes(logger, vi, true, true) ) {
+    return false;
+  }
 
   status = viQueryf(vi, (ViChar*)"HORizontal:SAMPLERate?\n", (ViChar*)"%f", rate);
   if( handleError(logger, vi, status, "HORizontal:SAMPLERate?") ) {
