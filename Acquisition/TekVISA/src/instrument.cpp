@@ -313,7 +313,9 @@ bool readWaveform(const csILogger *logger, ViSession vi,
     return false;
   }
 
-  const ViUInt32 numSamples = std::min<ViUInt32>(numSamplesHave, numSamplesWant);
+  const ViUInt32 numSamples = numSamplesWant > 0
+      ? std::min<ViUInt32>(numSamplesHave, numSamplesWant)
+      : numSamplesHave;
 
   if( !priv::initializeData(logger, vi, ch, numSamples) ) {
     return false;
