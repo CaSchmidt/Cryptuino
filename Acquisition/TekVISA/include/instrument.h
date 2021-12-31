@@ -52,6 +52,12 @@ bool handleError(const csILogger *logger, const ViObject obj,
 
 RsrcList queryInstruments(const csILogger *logger, ViSession rm);
 
+bool queryRecordLength(const csILogger *logger, ViSession vi,
+                       ViUInt32 *length);
+
+bool querySampleRate(const csILogger *logger, ViSession vi,
+                     float *rate);
+
 bool readWaveform(const csILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples);
 

@@ -293,6 +293,32 @@ RsrcList queryInstruments(const csILogger *logger, ViSession rm)
   return result;
 }
 
+bool queryRecordLength(const csILogger *logger, ViSession vi,
+                       ViUInt32 *length)
+{
+  ViStatus status;
+
+  status = viQueryf(vi, (ViChar*)"HORizontal:RECOrdlength?\n", (ViChar*)"%ld", length);
+  if( handleError(logger, vi, status, "HORizontal:RECOrdlength?") ) {
+    return false;
+  }
+
+  return true;
+}
+
+bool querySampleRate(const csILogger *logger, ViSession vi,
+                     float *rate)
+{
+  ViStatus status;
+
+  status = viQueryf(vi, (ViChar*)"HORizontal:SAMPLERate?\n", (ViChar*)"%f", rate);
+  if( handleError(logger, vi, status, "HORizontal:SAMPLERate?") ) {
+    return false;
+  }
+
+  return true;
+}
+
 bool readWaveform(const csILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples)
 {
