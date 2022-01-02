@@ -43,6 +43,7 @@
 # include <matio.h>
 #endif
 
+#define HAVE_STD_FORMAT
 #include <csUtil/csDualLogger.h>
 #include <csUtil/csLogger.h>
 #include <csUtil/csSerial.h>
@@ -134,20 +135,6 @@ bool parseOptions(Options& options, int argc, char **argv)
   return options.isValid();
 }
 
-template<typename... Args>
-inline void logText(const csILogger *logger, const char8_t *fmt, Args&&... args)
-{
-  const std::string msg = std::vformat(cs::CSTR(fmt), std::make_format_args(args...));
-  logger->logText(cs::UTF8(msg.data()));
-}
-
-template<typename... Args>
-inline void logError(const csILogger *logger, const char8_t *fmt, Args&&... args)
-{
-  const std::string msg = std::vformat(cs::CSTR(fmt), std::make_format_args(args...));
-  logger->logError(cs::UTF8(msg.data()));
-}
-
 #ifdef HAVE_INSTRUMENT
 bool writeMatVector(const csILogger *logger, mat_t *file,
                     const std::string& varname, const std::size_t numSamples, const double *data)
@@ -160,7 +147,7 @@ bool writeMatVector(const csILogger *logger, mat_t *file,
                                 int(dims.size()), dims.data(), const_cast<double*>(data),
                                 MAT_F_DONT_COPY_DATA);
   if( var == NULL ) {
-    logError(logger, u8"Mat_VarCreate({})", varname);
+    logger->logErrorf(u8"Mat_VarCreate({})", varname);
     return false;
   }
 
@@ -176,7 +163,7 @@ bool writeMatSamples(const csILogger *logger, mat_t *matfile,
   // (1) Sanity check ////////////////////////////////////////////////////////
 
   if( samples.size() < 3 ) {
-    logError(logger, u8"No samples for \"{}\"!", varname);
+    logger->logErrorf(u8"No samples for \"{}\"!", varname);
     return false;
   }
   const SampleBuffer::size_type numSamples = samples.size() - 2;
@@ -187,7 +174,7 @@ bool writeMatSamples(const csILogger *logger, mat_t *matfile,
   try {
     time.resize(numSamples, 0);
   } catch (...) {
-    logError(logger, u8"Unable to create time data for \"{}\"!", varname);
+    logger->logErrorf(u8"Unable to create time data for \"{}\"!", varname);
     return false;
   }
 
@@ -200,11 +187,11 @@ bool writeMatSamples(const csILogger *logger, mat_t *matfile,
   // (3) Output //////////////////////////////////////////////////////////////
 
   if( !writeMatVector(logger, matfile, varname, numSamples, samples.data() + 2) ) {
-    logError(logger, u8"Unable to write data for \"{}\"!", varname);
+    logger->logErrorf(u8"Unable to write data for \"{}\"!", varname);
     return false;
   }
   if( !writeMatVector(logger, matfile, "t_" + varname, numSamples, time.data()) ) {
-    logError(logger, u8"Unable to write time data for \"{}\"!", varname);
+    logger->logErrorf(u8"Unable to write time data for \"{}\"!", varname);
     return false;
   }
 
@@ -244,7 +231,7 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
     return false;
   }
 
-  logText(logger, u8"Wrote file \"{}\".", filename);
+  logger->logTextf(u8"Wrote file \"{}\".", filename);
 
   return true;
 }
@@ -311,20 +298,20 @@ int main(int argc, char **argv)
   if( !queryRecordLength(logger, vi, &length) ) {
     return EXIT_FAILURE;
   }
-  logText(logger, u8"HORizontal:RECOrdlength = {}", length);
+  logger->logTextf(u8"HORizontal:RECOrdlength = {}", length);
 
   float rate = 0;
   if( !querySampleRate(logger, vi, &rate) ) {
     return EXIT_FAILURE;
   }
-  logText(logger, u8"HORizontal:SAMPLERate = {}", rate);
+  logger->logTextf(u8"HORizontal:SAMPLERate = {}", rate);
 #endif
 
   Randomizer randomizer;
 
   csSerial serial;
   if( !serial.open(cs::UTF8(options.serialDevice.data()), options.serialRate) ) {
-    logError(logger, u8"Unable to open serial device \"{}\"!", options.serialDevice);
+    logger->logErrorf(u8"Unable to open serial device \"{}\"!", options.serialDevice);
     return EXIT_FAILURE;
   }
 
@@ -336,7 +323,7 @@ int main(int argc, char **argv)
   const int maxIter       = options.count - 1;
   const int numIterDigits = countDigits(maxIter);
   for(int i = 0; i <= maxIter; i++) {
-    logText(logger, u8"{:0{}}/{}", i, numIterDigits, maxIter);
+    logger->logTextf(u8"{:0{}}/{}", i, numIterDigits, maxIter);
 
     // (4.1) Arm instrument //////////////////////////////////////////////////
 
