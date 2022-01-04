@@ -32,10 +32,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <array>
-#include <charconv>
-#include <format>
-#include <string>
+#include <iostream>
 
 #define HAVE_INSTRUMENT
 
@@ -47,93 +44,13 @@
 #include <csUtil/csDualLogger.h>
 #include <csUtil/csLogger.h>
 #include <csUtil/csSerial.h>
-#include <csUtil/csStringUtil.h>
 #include <csUtil/csTime.h>
 
+#include "CmdOptions.h"
 #ifdef HAVE_INSTRUMENT
 # include "instrument.h"
 #endif
 #include "util.h"
-
-template<typename T>
-using if_int_bool = std::enable_if_t<std::is_integral_v<T>,bool>;
-
-struct Options {
-  bool isValid() const
-  {
-    return count > 0  &&  serialDevice.size() > 0  &&  serialRate > 0;
-  }
-
-  void print(FILE *file = stdout) const
-  {
-    fprintf(file, "count      = %d\n", count);
-    fprintf(file, "ser-device = %s\n", serialDevice.data());
-    fprintf(file, "ser-rate   = %d\n", serialRate);
-  }
-
-  int count{0};
-  std::string serialDevice;
-  int serialRate{0};
-};
-
-inline bool isOption(const char *arg, const char *opt)
-{
-  return cs::startsWith(arg, cs::length(arg), opt, cs::length(opt));
-}
-
-inline const char *getOptionString(const char *arg, const char *opt)
-{
-  return isOption(arg, opt)
-      ? arg + cs::length(opt)
-      : nullptr;
-}
-
-template<typename T>
-inline if_int_bool<T> parseIntOption(const char *opt, T& value, const T defValue = T{0})
-{
-  value = defValue;
-  const std::from_chars_result result =
-      std::from_chars(opt, opt + cs::length(opt), value, 10);
-  return result.ec == std::errc{};
-}
-
-bool parseOptions(Options& options, int argc, char **argv)
-{
-  options = Options();
-
-  const int numArgs = argc - 1;
-  if( numArgs < 1 ) {
-    fprintf(stdout, "%s <OPTIONS>\n\n", argv[0]);
-    fprintf(stdout, "OPTIONS:\n\n");
-    fprintf(stdout, "--count=INT\n");
-    fprintf(stdout, "--ser-device=STRING\n");
-    fprintf(stdout, "--ser-rate=INT\n");
-    return false;
-  }
-
-  for(int i = 0; i < numArgs; i++) {
-    const char *arg = argv[i + 1];
-
-    const char *opt = nullptr;
-    if(        (opt = getOptionString(arg, "--count=")) != nullptr ) {
-      parseIntOption(opt, options.count);
-    } else if( (opt = getOptionString(arg, "--ser-device=")) != nullptr ) {
-      options.serialDevice = opt;
-    } else if( (opt = getOptionString(arg, "--ser-rate=")) != nullptr ) {
-      parseIntOption(opt, options.serialRate);
-    } else {
-      fprintf(stderr, "ERROR: Unknown option \"%s\"!\n", arg);
-      return false;
-    }
-  }
-
-  if( !options.isValid() ) {
-    fprintf(stderr, "ERROR: Invalid or missing option!\n");
-    return false;
-  }
-
-  return options.isValid();
-}
 
 #ifdef HAVE_INSTRUMENT
 bool writeMatVector(const csILogger *logger, mat_t *file,
@@ -209,10 +126,10 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
     return false;
   }
   ScopeGuard guard([&](void) -> void {
-        if( matfile != NULL ) {
-          Mat_Close(matfile);
-          matfile = NULL;
-        }
+    if( matfile != NULL ) {
+      Mat_Close(matfile);
+      matfile = NULL;
+    }
   });
 
   SampleBuffer trace;
@@ -237,6 +154,33 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
 }
 #endif
 
+CmdOptionsPtr options()
+{
+  CmdOptionsPtr opts = CmdOptions::make();
+
+  CmdOptionPtr ptr;
+
+  ptr = CmdStringValueOption::make("ser-device", std::string(), true, true,
+                                   [](const std::string& s) -> bool { return s.size() > 0; });
+  opts->add(ptr);
+
+  ptr = CmdStringValueOption::make("channels", std::string(), true, false,
+                                   [](const std::string& s) -> bool {
+    return s.size() == 2  &&  cs::isDigit(s[0])  &&  cs::isDigit(s[1]);
+  }, "12");
+  opts->add(ptr);
+
+  ptr = CmdIntValueOption::make("ser-rate", std::string(), true, false,
+                                [](const int i) -> bool { return i > 0; }, 9600);
+  opts->add(ptr);
+
+  ptr = CmdIntValueOption::make("count", std::string(), true, true,
+                                [](const int i) -> bool { return i > 0; });
+  opts->add(ptr);
+
+  return opts;
+}
+
 int main(int argc, char **argv)
 {
 #ifdef HAVE_INSTRUMENT
@@ -246,11 +190,14 @@ int main(int argc, char **argv)
 
   // (1) Options /////////////////////////////////////////////////////////////
 
-  Options options;
-  if( !parseOptions(options, argc, argv) ) {
+  CmdOptionsPtr opts = options();
+  if( !opts->parse(std::cerr, argc, argv) ) {
     return EXIT_FAILURE;
   }
-  options.print();
+
+  const int              count = opts->value<int>("count");
+  const std::string ser_device = opts->value<std::string>("ser-device");
+  const int         ser_rate   = opts->value<int>("ser-rate");
 
   // (2) Logging /////////////////////////////////////////////////////////////
 
@@ -310,8 +257,8 @@ int main(int argc, char **argv)
   Randomizer randomizer;
 
   csSerial serial;
-  if( !serial.open(cs::UTF8(options.serialDevice.data()), options.serialRate) ) {
-    logger->logErrorf(u8"Unable to open serial device \"{}\"!", options.serialDevice);
+  if( !serial.open(cs::UTF8(ser_device.data()), ser_rate) ) {
+    logger->logErrorf(u8"Unable to open serial device \"{}\"!", ser_device);
     return EXIT_FAILURE;
   }
 
@@ -320,7 +267,7 @@ int main(int argc, char **argv)
 
   // (4) Sequence ////////////////////////////////////////////////////////////
 
-  const int maxIter       = options.count - 1;
+  const int maxIter       = count - 1;
   const int numIterDigits = countDigits(maxIter);
   for(int i = 0; i <= maxIter; i++) {
     logger->logTextf(u8"{:0{}}/{}", i, numIterDigits, maxIter);
