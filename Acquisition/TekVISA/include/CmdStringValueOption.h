@@ -71,9 +71,4 @@ private:
   std::string _value;
 };
 
-inline std::string CMD_STRING_VALUE(const CmdOption *opt)
-{
-  return dynamic_cast<const CmdStringValueOption*>(opt)->value();
-}
-
 #endif // CMDSTRINGVALUEOPTION_H
