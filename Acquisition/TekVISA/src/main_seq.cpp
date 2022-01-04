@@ -116,10 +116,10 @@ bool writeMatSamples(const csILogger *logger, mat_t *matfile,
 }
 
 bool writeMatOutput(const csILogger *logger, ViSession vi,
-                    const std::string& filename)
+                    const std::string& filename, const std::string& channels)
 {
-  constexpr char CH_TRACE   = '1';
-  constexpr char CH_TRIGGER = '2';
+  const char ch_trace   = channels[0];
+  const char ch_trigger = channels[1];
 
   mat_t *matfile = Mat_CreateVer(filename.data(), NULL, MAT_FT_DEFAULT);
   if( matfile == NULL ) {
@@ -133,7 +133,7 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
   });
 
   SampleBuffer trace;
-  if( !readWaveform(logger, vi, CH_TRACE, 0, trace) ) {
+  if( !readWaveform(logger, vi, ch_trace, 0, trace) ) {
     return false;
   }
   if( !writeMatSamples(logger, matfile, "trace", trace) ) {
@@ -141,7 +141,7 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
   }
 
   SampleBuffer trigger;
-  if( !readWaveform(logger, vi, CH_TRIGGER, 0, trigger) ) {
+  if( !readWaveform(logger, vi, ch_trigger, 0, trigger) ) {
     return false;
   }
   if( !writeMatSamples(logger, matfile, "trigger", trigger) ) {
@@ -195,6 +195,9 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
+#ifdef HAVE_INSTRUMENT
+  const std::string   channels = opts->value<std::string>("channels");
+#endif
   const int              count = opts->value<int>("count");
   const std::string ser_device = opts->value<std::string>("ser-device");
   const int         ser_rate   = opts->value<int>("ser-rate");
@@ -291,7 +294,7 @@ int main(int argc, char **argv)
 
 #ifdef HAVE_INSTRUMENT
     const std::string filename = std::format("{:0{}}.mat", i, numIterDigits);
-    writeMatOutput(logger, vi, filename);
+    writeMatOutput(logger, vi, filename, channels);
 #endif
   }
 
