@@ -29,8 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef CMDINTEGRALVALUEOPTION_H
-#define CMDINTEGRALVALUEOPTION_H
+#ifndef CMDINTEGRALOPTION_H
+#define CMDINTEGRALOPTION_H
 
 #include <array>
 #include <charconv>
@@ -41,7 +41,7 @@
 #include "CmdOption.h"
 
 template<typename T>
-class CmdIntegralValueOption : public CmdOption {
+class CmdIntegralOption : public CmdOption {
 private:
   struct ctor_tag {
     ctor_tag() noexcept
@@ -52,9 +52,9 @@ private:
 public:
   using Validator = std::function<bool(const T)>;
 
-  CmdIntegralValueOption(const std::string& name,
-                         const Validator& validator, const T defValue,
-                         const ctor_tag&) noexcept
+  CmdIntegralOption(const std::string& name,
+                    const Validator& validator, const T defValue,
+                    const ctor_tag&) noexcept
     : CmdOption(name)
     , _defValue(defValue)
     , _validator(validator)
@@ -64,7 +64,7 @@ public:
     initializePrefix();
   }
 
-  ~CmdIntegralValueOption() noexcept
+  ~CmdIntegralOption() noexcept
   {
   }
 
@@ -76,13 +76,13 @@ public:
   static CmdOptionPtr make(const std::string& name,
                            const Validator& validator, const T defValue = T{0})
   {
-    return std::make_unique<CmdIntegralValueOption>(name,
-                                                    validator, defValue,
-                                                    ctor_tag());
+    return std::make_unique<CmdIntegralOption>(name,
+                                               validator, defValue,
+                                               ctor_tag());
   }
 
 private:
-  CmdIntegralValueOption() noexcept = delete;
+  CmdIntegralOption() noexcept = delete;
 
   void initializeDefaultValue()
   {
@@ -148,7 +148,7 @@ private:
   T           _value{0};
 };
 
-using CmdIntValueOption  = CmdIntegralValueOption<int>;
-using CmdUIntValueOption = CmdIntegralValueOption<unsigned int>;
+using CmdIntOption  = CmdIntegralOption<int>;
+using CmdUIntOption = CmdIntegralOption<unsigned int>;
 
-#endif // CMDINTEGRALVALUEOPTION_H
+#endif // CMDINTEGRALOPTION_H

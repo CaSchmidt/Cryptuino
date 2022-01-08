@@ -29,57 +29,44 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <csUtil/csStringUtil.h>
+#ifndef CMDSTRINGOPTION_H
+#define CMDSTRINGOPTION_H
 
-#include "CmdStringValueOption.h"
+#include <functional>
 
-////// public ////////////////////////////////////////////////////////////////
+#include "CmdOption.h"
 
-CmdStringValueOption::CmdStringValueOption(const std::string& name,
-                                           const Validator& validator, const std::string& defValue,
-                                           const ctor_tag&) noexcept
-  : CmdOption(name)
-  , _defValue(defValue)
-  , _validator(validator)
-  , _value(defValue)
-{
-  initializePrefix();
-}
+class CmdStringOption : public CmdOption {
+private:
+  struct ctor_tag {
+    ctor_tag() noexcept
+    {
+    }
+  };
 
-CmdStringValueOption::~CmdStringValueOption() noexcept
-{
-}
+public:
+  using Validator = std::function<bool(const std::string&)>;
 
-std::string CmdStringValueOption::value() const
-{
-  return _value;
-}
+  CmdStringOption(const std::string& name,
+                       const Validator& validator, const std::string& defValue,
+                       const ctor_tag&) noexcept;
+  ~CmdStringOption() noexcept;
 
-CmdOptionPtr CmdStringValueOption::make(const std::string& name,
-                                        const Validator& validator, const std::string& defValue)
-{
-  return std::make_unique<CmdStringValueOption>(name,
-                                                validator, defValue,
-                                                ctor_tag());
-}
+  std::string value() const;
 
-////// private ///////////////////////////////////////////////////////////////
+  static CmdOptionPtr make(const std::string& name,
+                           const Validator& validator, const std::string& defValue = std::string());
 
-const char *CmdStringValueOption::impl_defaultValue() const
-{
-  return _defValue.data();
-}
+private:
+  CmdStringOption() noexcept = delete;
 
-bool CmdStringValueOption::impl_parse(const char *value)
-{
-  if( cs::length(value) < 1 ) {
-    return false;
-  }
-  _value = value;
-  return isValid();
-}
+  const char *impl_defaultValue() const final;
+  bool impl_parse(const char *value) final;
+  bool impl_isValid() const final;
 
-bool CmdStringValueOption::impl_isValid() const
-{
-  return _validator(_value);
-}
+  std::string _defValue;
+  Validator   _validator;
+  std::string _value;
+};
+
+#endif // CMDSTRINGOPTION_H

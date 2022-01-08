@@ -44,10 +44,10 @@ endif()
 
 list(APPEND common_HEADERS
   include/buffer.h
-  include/CmdIntegralValueOption.h
+  include/CmdIntegralOption.h
   include/CmdOption.h
   include/CmdOptions.h
-  include/CmdStringValueOption.h
+  include/CmdStringOption.h
   include/instrument.h
   include/util.h
   )
@@ -55,7 +55,7 @@ list(APPEND common_HEADERS
 list(APPEND common_SOURCES
   src/CmdOption.cpp
   src/CmdOptions.cpp
-  src/CmdStringValueOption.cpp
+  src/CmdStringOption.cpp
   src/instrument.cpp
   src/util.cpp
   )

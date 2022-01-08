@@ -34,8 +34,8 @@
 
 #include <map>
 
-#include "CmdIntegralValueOption.h"
-#include "CmdStringValueOption.h"
+#include "CmdIntegralOption.h"
+#include "CmdStringOption.h"
 
 using CmdOptionsPtr = std::unique_ptr<class CmdOptions>;
 
@@ -83,13 +83,13 @@ public:
   template<typename T>
   inline std::enable_if_t<!std::is_same_v<T,bool>  &&  std::is_integral_v<T>,T> value(const std::string& name) const
   {
-    return dynamic_cast<const CmdIntegralValueOption<T>*>(get(name))->value();
+    return dynamic_cast<const CmdIntegralOption<T>*>(get(name))->value();
   }
 
   template<typename T>
   inline std::enable_if_t<std::is_same_v<T,std::string>,T> value(const std::string& name) const
   {
-    return dynamic_cast<const CmdStringValueOption*>(get(name))->value();
+    return dynamic_cast<const CmdStringOption*>(get(name))->value();
   }
 
   static CmdOptionsPtr make();
