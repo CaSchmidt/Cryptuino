@@ -41,14 +41,35 @@ CmdOption::~CmdOption() noexcept
 {
 }
 
+std::string CmdOption::help() const
+{
+  return _help;
+}
+
+void CmdOption::setHelp(const std::string& help)
+{
+  _help = help;
+}
+
 bool CmdOption::isLongFormat() const
 {
   return _isLongFormat;
 }
 
+void CmdOption::setLongFormat(const bool on)
+{
+  _isLongFormat = on;
+  initializePrefix();
+}
+
 bool CmdOption::isRequired() const
 {
   return _isRequired;
+}
+
+void CmdOption::setRequired(const bool on)
+{
+  _isRequired = on;
 }
 
 const char *CmdOption::name() const
@@ -58,12 +79,12 @@ const char *CmdOption::name() const
 
 bool CmdOption::isOption(const char *arg) const
 {
-  return cs::startsWith(arg, impl_argPrefix());
+  return cs::startsWith(arg, _prefix.data());
 }
 
 bool CmdOption::parse(const char *arg)
 {
-  return isOption(arg)  &&  impl_parse(arg + cs::length(impl_argPrefix()));
+  return isOption(arg)  &&  impl_parse(arg + _prefix.size());
 }
 
 bool CmdOption::isValid() const
@@ -79,9 +100,9 @@ void CmdOption::printUsage(std::ostream& strm) const
     strm << "  ? ";
   }
 
-  strm << impl_argPrefix();
+  strm << _prefix;
 
-  if( impl_defaultValue() != nullptr ) {
+  if( isValueOption() ) {
     strm << "<" << impl_defaultValue() << ">";
   }
 
@@ -106,4 +127,32 @@ CmdOption::CmdOption(const std::string& name, const std::string& help,
   , _isRequired(isRequired)
   , _name(name)
 {
+}
+
+void CmdOption::initializePrefix()
+{
+  try {
+    _prefix.clear();
+    _prefix.reserve(32);
+
+    _prefix = '-';
+    if( isLongFormat() ) {
+      _prefix += '-';
+    }
+
+    _prefix += _name;
+
+    if( isValueOption() ) {
+      _prefix += '=';
+    }
+  } catch(...) {
+    _prefix.clear();
+  }
+}
+
+////// private ///////////////////////////////////////////////////////////////
+
+bool CmdOption::isValueOption() const
+{
+  return impl_defaultValue() != nullptr;
 }

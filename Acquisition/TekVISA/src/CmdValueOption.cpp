@@ -56,10 +56,3 @@ CmdValueOption::CmdValueOption(const std::string& name, const std::string& help,
     _prefix.clear();
   }
 }
-
-////// private ///////////////////////////////////////////////////////////////
-
-const char *CmdValueOption::impl_argPrefix() const
-{
-  return _prefix.data();
-}

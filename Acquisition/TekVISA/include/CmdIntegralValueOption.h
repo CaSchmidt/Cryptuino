@@ -61,20 +61,8 @@ public:
     , _validator(validator)
     , _value(defValue)
   {
-    try {
-      std::array<char,32> buffer;
-      buffer.fill(0);
-
-      char *first = buffer.data();
-      char  *last = first + buffer.size();
-      const std::to_chars_result result = std::to_chars(first, last, _defValue, 10);
-
-      if( result.ec == std::errc{} ) {
-        _defValueStr = buffer.data();
-      }
-    } catch(...) {
-      _defValueStr.clear();
-    }
+    initializeDefaultValue();
+    initializePrefix();
   }
 
   ~CmdIntegralValueOption() noexcept
@@ -98,6 +86,24 @@ public:
 
 private:
   CmdIntegralValueOption() noexcept = delete;
+
+  void initializeDefaultValue()
+  {
+    try {
+      std::array<char,32> buffer;
+      buffer.fill(0);
+
+      char *first = buffer.data();
+      char  *last = first + buffer.size();
+      const std::to_chars_result result = std::to_chars(first, last, _defValue, 10);
+
+      if( result.ec == std::errc{} ) {
+        _defValueStr = buffer.data();
+      }
+    } catch(...) {
+      _defValueStr.clear();
+    }
+  }
 
   const char *impl_defaultValue() const final
   {

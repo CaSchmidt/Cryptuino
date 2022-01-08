@@ -45,8 +45,6 @@ protected:
 private:
   CmdValueOption() noexcept = delete;
 
-  const char *impl_argPrefix() const final;
-
   std::string _prefix;
 };
 

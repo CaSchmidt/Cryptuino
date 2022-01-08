@@ -42,8 +42,14 @@ class CmdOption {
 public:
   virtual ~CmdOption() noexcept;
 
+  std::string help() const;
+  void setHelp(const std::string& help);
+
   bool isLongFormat() const;
+  void setLongFormat(const bool on);
+
   bool isRequired() const;
+  void setRequired(const bool on);
 
   const char *name() const;
 
@@ -59,18 +65,22 @@ protected:
   CmdOption(const std::string& name, const std::string& help,
             const bool isLongFormat, const bool isRequired) noexcept;
 
+  void initializePrefix();
+
 private:
   CmdOption() noexcept = delete;
 
-  virtual const char *impl_argPrefix() const = 0;
+  bool isValueOption() const;
+
   virtual const char *impl_defaultValue() const = 0;
   virtual bool impl_parse(const char *value) = 0;
   virtual bool impl_isValid() const = 0;
 
   std::string _help;
   bool _isLongFormat{false};
-  bool _isRequired{false};
+  bool _isRequired{true};
   std::string _name;
+  std::string _prefix;
 };
 
 #endif // CMDOPTION_H

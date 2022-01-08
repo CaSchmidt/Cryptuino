@@ -44,6 +44,7 @@ CmdStringValueOption::CmdStringValueOption(const std::string& name, const std::s
   , _validator(validator)
   , _value(defValue)
 {
+  initializePrefix();
 }
 
 CmdStringValueOption::~CmdStringValueOption() noexcept
