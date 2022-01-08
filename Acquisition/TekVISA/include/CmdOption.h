@@ -62,8 +62,7 @@ public:
   static bool isValidName(const char *s);
 
 protected:
-  CmdOption(const std::string& name, const std::string& help,
-            const bool isLongFormat, const bool isRequired) noexcept;
+  CmdOption(const std::string& name) noexcept;
 
   void initializePrefix();
 

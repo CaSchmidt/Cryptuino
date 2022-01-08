@@ -64,6 +64,8 @@ public:
 
   void printUsage(std::ostream& strm, int argc, char **argv) const;
 
+  void setLongFormat(const bool on);
+
   const CmdOption *get(const std::string& name) const;
 
   /*

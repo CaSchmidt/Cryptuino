@@ -35,11 +35,10 @@
 
 ////// public ////////////////////////////////////////////////////////////////
 
-CmdStringValueOption::CmdStringValueOption(const std::string& name, const std::string& help,
-                                           const bool isLongFormat, const bool isRequired,
+CmdStringValueOption::CmdStringValueOption(const std::string& name,
                                            const Validator& validator, const std::string& defValue,
                                            const ctor_tag&) noexcept
-  : CmdOption(name, help, isLongFormat, isRequired)
+  : CmdOption(name)
   , _defValue(defValue)
   , _validator(validator)
   , _value(defValue)
@@ -56,12 +55,10 @@ std::string CmdStringValueOption::value() const
   return _value;
 }
 
-CmdOptionPtr CmdStringValueOption::make(const std::string& name, const std::string& help,
-                                        const bool isLongFormat, const bool isRequired,
+CmdOptionPtr CmdStringValueOption::make(const std::string& name,
                                         const Validator& validator, const std::string& defValue)
 {
-  return std::make_unique<CmdStringValueOption>(name, help,
-                                                isLongFormat, isRequired,
+  return std::make_unique<CmdStringValueOption>(name,
                                                 validator, defValue,
                                                 ctor_tag());
 }

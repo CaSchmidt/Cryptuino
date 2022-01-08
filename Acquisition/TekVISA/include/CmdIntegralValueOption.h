@@ -52,11 +52,10 @@ private:
 public:
   using Validator = std::function<bool(const T)>;
 
-  CmdIntegralValueOption(const std::string& name, const std::string& help,
-                         const bool isLongFormat, const bool isRequired,
+  CmdIntegralValueOption(const std::string& name,
                          const Validator& validator, const T defValue,
                          const ctor_tag&) noexcept
-    : CmdOption(name, help, isLongFormat, isRequired)
+    : CmdOption(name)
     , _defValue(defValue)
     , _validator(validator)
     , _value(defValue)
@@ -74,12 +73,10 @@ public:
     return _value;
   }
 
-  static CmdOptionPtr make(const std::string& name, const std::string& help,
-                           const bool isLongFormat, const bool isRequired,
+  static CmdOptionPtr make(const std::string& name,
                            const Validator& validator, const T defValue = T{0})
   {
-    return std::make_unique<CmdIntegralValueOption>(name, help,
-                                                    isLongFormat, isRequired,
+    return std::make_unique<CmdIntegralValueOption>(name,
                                                     validator, defValue,
                                                     ctor_tag());
   }

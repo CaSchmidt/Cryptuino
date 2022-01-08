@@ -117,6 +117,13 @@ void CmdOptions::printUsage(std::ostream& strm, int /*argc*/, char **argv) const
   strm << std::endl;
 }
 
+void CmdOptions::setLongFormat(const bool on)
+{
+  for(OptionIter it = _options.begin(); it != _options.end(); ++it) {
+    it->second->setLongFormat(on);
+  }
+}
+
 const CmdOption *CmdOptions::get(const std::string& name) const
 {
   const ConstOptionIter it = _options.find(name);

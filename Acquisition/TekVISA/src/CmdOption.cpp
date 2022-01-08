@@ -120,12 +120,8 @@ bool CmdOption::isValidName(const char *s)
 
 ////// protected /////////////////////////////////////////////////////////////
 
-CmdOption::CmdOption(const std::string& name, const std::string& help,
-                     const bool isLongFormat, const bool isRequired) noexcept
-  : _help(help)
-  , _isLongFormat(isLongFormat)
-  , _isRequired(isRequired)
-  , _name(name)
+CmdOption::CmdOption(const std::string& name) noexcept
+  : _name(name)
 {
 }
 
