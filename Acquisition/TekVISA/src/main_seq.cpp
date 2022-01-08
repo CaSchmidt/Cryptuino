@@ -90,7 +90,7 @@ bool writeMatSamples(const csILogger *logger, mat_t *matfile,
   SampleBuffer time;
   try {
     time.resize(numSamples, 0);
-  } catch (...) {
+  } catch(...) {
     logger->logErrorf(u8"Unable to create time data for \"{}\"!", varname);
     return false;
   }

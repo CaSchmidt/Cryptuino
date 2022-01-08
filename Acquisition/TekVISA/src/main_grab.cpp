@@ -74,7 +74,7 @@ bool writeMatSamples(const csILogger *logger, const char *filename, const Sample
   SampleBuffer time;
   try {
     time.resize(numSamples, 0);
-  } catch (...) {
+  } catch(...) {
     logger->logError(u8"time.resize()");
     return false;
   }
