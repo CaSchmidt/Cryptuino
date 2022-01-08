@@ -34,9 +34,9 @@
 
 #include <functional>
 
-#include "CmdValueOption.h"
+#include "CmdOption.h"
 
-class CmdStringValueOption : public CmdValueOption {
+class CmdStringValueOption : public CmdOption {
 private:
   struct ctor_tag {
     ctor_tag() noexcept

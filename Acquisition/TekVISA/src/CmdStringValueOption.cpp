@@ -39,7 +39,7 @@ CmdStringValueOption::CmdStringValueOption(const std::string& name, const std::s
                                            const bool isLongFormat, const bool isRequired,
                                            const Validator& validator, const std::string& defValue,
                                            const ctor_tag&) noexcept
-  : CmdValueOption(name, help, isLongFormat, isRequired)
+  : CmdOption(name, help, isLongFormat, isRequired)
   , _defValue(defValue)
   , _validator(validator)
   , _value(defValue)

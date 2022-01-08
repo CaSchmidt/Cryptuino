@@ -48,7 +48,6 @@ list(APPEND common_HEADERS
   include/CmdOption.h
   include/CmdOptions.h
   include/CmdStringValueOption.h
-  include/CmdValueOption.h
   include/instrument.h
   include/util.h
   )
@@ -57,7 +56,6 @@ list(APPEND common_SOURCES
   src/CmdOption.cpp
   src/CmdOptions.cpp
   src/CmdStringValueOption.cpp
-  src/CmdValueOption.cpp
   src/instrument.cpp
   src/util.cpp
   )

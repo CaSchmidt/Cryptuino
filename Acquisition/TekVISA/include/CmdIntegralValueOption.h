@@ -38,10 +38,10 @@
 
 #include <csUtil/csStringUtil.h>
 
-#include "CmdValueOption.h"
+#include "CmdOption.h"
 
 template<typename T>
-class CmdIntegralValueOption : public CmdValueOption {
+class CmdIntegralValueOption : public CmdOption {
 private:
   struct ctor_tag {
     ctor_tag() noexcept
@@ -56,7 +56,7 @@ public:
                          const bool isLongFormat, const bool isRequired,
                          const Validator& validator, const T defValue,
                          const ctor_tag&) noexcept
-    : CmdValueOption(name, help, isLongFormat, isRequired)
+    : CmdOption(name, help, isLongFormat, isRequired)
     , _defValue(defValue)
     , _validator(validator)
     , _value(defValue)
