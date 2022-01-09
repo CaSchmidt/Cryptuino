@@ -43,8 +43,6 @@
 template<typename T>
 class CmdIntegralOption : public CmdOption {
 private:
-  static_assert( !std::is_same_v<T,bool>  &&  std::is_integral_v<T> );
-
   struct ctor_tag {
     ctor_tag() noexcept
     {
@@ -52,12 +50,13 @@ private:
   };
 
 public:
-  using Validator = std::function<bool(const T)>;
+  using value_type = std::enable_if_t<!std::is_same_v<T,bool>  &&  std::is_integral_v<T>,T>;
+  using valid_func = std::function<bool(const value_type)>;
 
   CmdIntegralOption(const ctor_tag&,
                     const std::string& name,
-                    const Validator& validator,
-                    const T defValue = T{0}) noexcept
+                    const valid_func& validator,
+                    const value_type defValue = value_type{0}) noexcept
     : CmdOption(name)
     , _defValue(defValue)
     , _validator(validator)
@@ -71,13 +70,14 @@ public:
   {
   }
 
-  T value() const
+  value_type value() const
   {
     return _value;
   }
 
   static CmdOptionPtr make(const std::string& name,
-                           const Validator& validator, const T defValue = T{0})
+                           const valid_func& validator,
+                           const value_type defValue = value_type{0})
   {
     return std::make_unique<CmdIntegralOption>(ctor_tag(), name, validator, defValue);
   }
@@ -143,10 +143,10 @@ private:
     return _validator(_value);
   }
 
-  T           _defValue{0};
+  value_type  _defValue{0};
   std::string _defValueStr;
-  Validator   _validator;
-  T           _value{0};
+  valid_func  _validator;
+  value_type  _value{0};
 };
 
 using CmdIntOption  = CmdIntegralOption<int>;

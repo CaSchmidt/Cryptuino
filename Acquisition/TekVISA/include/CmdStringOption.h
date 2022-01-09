@@ -45,19 +45,20 @@ private:
   };
 
 public:
-  using Validator = std::function<bool(const std::string&)>;
+  using value_type = std::string;
+  using valid_func = std::function<bool(const value_type&)>;
 
   CmdStringOption(const ctor_tag&,
                   const std::string& name,
-                  const Validator& validator,
-                  const std::string& defValue = std::string()) noexcept;
+                  const valid_func& validator,
+                  const value_type& defValue = value_type()) noexcept;
   ~CmdStringOption() noexcept;
 
-  std::string value() const;
+  value_type value() const;
 
   static CmdOptionPtr make(const std::string& name,
-                           const Validator& validator,
-                           const std::string& defValue = std::string());
+                           const valid_func& validator,
+                           const value_type& defValue = value_type());
 
 private:
   CmdStringOption() noexcept = delete;
@@ -66,9 +67,9 @@ private:
   bool impl_parse(const char *value) final;
   bool impl_isValid() const final;
 
-  std::string _defValue;
-  Validator   _validator;
-  std::string _value;
+  value_type _defValue;
+  valid_func _validator;
+  value_type _value;
 };
 
 #endif // CMDSTRINGOPTION_H
