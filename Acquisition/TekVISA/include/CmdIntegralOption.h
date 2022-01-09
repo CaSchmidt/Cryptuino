@@ -54,9 +54,10 @@ private:
 public:
   using Validator = std::function<bool(const T)>;
 
-  CmdIntegralOption(const std::string& name,
-                    const Validator& validator, const T defValue,
-                    const ctor_tag&) noexcept
+  CmdIntegralOption(const ctor_tag&,
+                    const std::string& name,
+                    const Validator& validator,
+                    const T defValue = T{0}) noexcept
     : CmdOption(name)
     , _defValue(defValue)
     , _validator(validator)
@@ -78,9 +79,7 @@ public:
   static CmdOptionPtr make(const std::string& name,
                            const Validator& validator, const T defValue = T{0})
   {
-    return std::make_unique<CmdIntegralOption>(name,
-                                               validator, defValue,
-                                               ctor_tag());
+    return std::make_unique<CmdIntegralOption>(ctor_tag(), name, validator, defValue);
   }
 
 private:

@@ -47,15 +47,17 @@ private:
 public:
   using Validator = std::function<bool(const std::string&)>;
 
-  CmdStringOption(const std::string& name,
-                       const Validator& validator, const std::string& defValue,
-                       const ctor_tag&) noexcept;
+  CmdStringOption(const ctor_tag&,
+                  const std::string& name,
+                  const Validator& validator,
+                  const std::string& defValue = std::string()) noexcept;
   ~CmdStringOption() noexcept;
 
   std::string value() const;
 
   static CmdOptionPtr make(const std::string& name,
-                           const Validator& validator, const std::string& defValue = std::string());
+                           const Validator& validator,
+                           const std::string& defValue = std::string());
 
 private:
   CmdStringOption() noexcept = delete;

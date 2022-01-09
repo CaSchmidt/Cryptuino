@@ -35,9 +35,10 @@
 
 ////// public ////////////////////////////////////////////////////////////////
 
-CmdStringOption::CmdStringOption(const std::string& name,
-                                 const Validator& validator, const std::string& defValue,
-                                 const ctor_tag&) noexcept
+CmdStringOption::CmdStringOption(const ctor_tag&,
+                                 const std::string& name,
+                                 const Validator& validator,
+                                 const std::string& defValue) noexcept
   : CmdOption(name)
   , _defValue(defValue)
   , _validator(validator)
@@ -56,11 +57,10 @@ std::string CmdStringOption::value() const
 }
 
 CmdOptionPtr CmdStringOption::make(const std::string& name,
-                                   const Validator& validator, const std::string& defValue)
+                                   const Validator& validator,
+                                   const std::string& defValue)
 {
-  return std::make_unique<CmdStringOption>(name,
-                                           validator, defValue,
-                                           ctor_tag());
+  return std::make_unique<CmdStringOption>(ctor_tag(), name, validator, defValue);
 }
 
 ////// private ///////////////////////////////////////////////////////////////
