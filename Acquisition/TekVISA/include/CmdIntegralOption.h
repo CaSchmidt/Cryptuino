@@ -43,6 +43,8 @@
 template<typename T>
 class CmdIntegralOption : public CmdOption {
 private:
+  static_assert( !std::is_same_v<T,bool>  &&  std::is_integral_v<T> );
+
   struct ctor_tag {
     ctor_tag() noexcept
     {
