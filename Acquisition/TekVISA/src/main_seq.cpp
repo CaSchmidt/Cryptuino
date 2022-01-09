@@ -160,24 +160,24 @@ CmdOptionsPtr options()
 
   CmdOptionPtr ptr;
 
-  ptr = CmdStringOption::make("ser-device",
-                              [](const std::string& s) -> bool { return s.size() > 0; });
+  ptr = make_option<CmdStringOption>("ser-device",
+                                     [](const std::string& s) -> bool { return s.size() > 0; });
   opts->add(ptr);
 
-  ptr = CmdStringOption::make("channels",
-                              [](const std::string& s) -> bool {
+  ptr = make_option<CmdStringOption>("channels",
+                                     [](const std::string& s) -> bool {
     return s.size() == 2  &&  cs::isDigit(s[0])  &&  cs::isDigit(s[1]);
   }, "12");
   ptr->setRequired(false);
   opts->add(ptr);
 
-  ptr = CmdIntOption::make("ser-rate",
-                           [](const int i) -> bool { return i > 0; }, 9600);
+  ptr = make_option<CmdIntOption>("ser-rate",
+                                  [](const int i) -> bool { return i > 0; }, 9600);
   ptr->setRequired(false);
   opts->add(ptr);
 
-  ptr = CmdIntOption::make("count",
-                           [](const int i) -> bool { return i > 0; });
+  ptr = make_option<CmdIntOption>("count",
+                                  [](const int i) -> bool { return i > 0; });
   opts->add(ptr);
 
   opts->setLongFormat(true);

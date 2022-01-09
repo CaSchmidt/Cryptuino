@@ -63,7 +63,6 @@ public:
     , _value(defValue)
   {
     initializeDefaultValue();
-    initializePrefix();
   }
 
   ~CmdIntegralOption() noexcept
@@ -73,13 +72,6 @@ public:
   value_type value() const
   {
     return _value;
-  }
-
-  static CmdOptionPtr make(const std::string& name,
-                           const valid_func& validator,
-                           const value_type defValue = value_type{0})
-  {
-    return std::make_unique<CmdIntegralOption>(ctor_tag(), name, validator, defValue);
   }
 
 private:
@@ -147,6 +139,9 @@ private:
   std::string _defValueStr;
   valid_func  _validator;
   value_type  _value{0};
+
+  template<typename DerivedT, typename... Args>
+  friend CmdOptionPtr make_option(const std::string& name, Args&&... args);
 };
 
 using CmdIntOption  = CmdIntegralOption<int>;

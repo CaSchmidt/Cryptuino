@@ -35,6 +35,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 
 using CmdOptionPtr = std::unique_ptr<class CmdOption>;
 
@@ -64,11 +65,10 @@ public:
 protected:
   CmdOption(const std::string& name) noexcept;
 
-  void initializePrefix();
-
 private:
   CmdOption() noexcept = delete;
 
+  void initializePrefix();
   bool isValueOption() const;
 
   virtual const char *impl_defaultValue() const = 0;
@@ -80,6 +80,24 @@ private:
   bool _isRequired{true};
   std::string _name;
   std::string _prefix;
+
+  template<typename DerivedT, typename... Args>
+  friend CmdOptionPtr make_option(const std::string& name, Args&&... args);
 };
+
+// cf. "C++ Core Guidelines", C.50
+template<typename DerivedT, typename... Args>
+CmdOptionPtr make_option(const std::string& name, Args&&... args)
+{
+  using ctor_tag = typename DerivedT::ctor_tag;
+  CmdOptionPtr ptr;
+  try {
+    ptr = std::make_unique<DerivedT>(ctor_tag{}, name, std::forward<Args>(args)...);
+  } catch(...) {
+    return CmdOptionPtr();
+  }
+  ptr->initializePrefix();
+  return ptr;
+}
 
 #endif // CMDOPTION_H

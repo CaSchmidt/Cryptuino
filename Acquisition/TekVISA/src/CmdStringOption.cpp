@@ -44,7 +44,6 @@ CmdStringOption::CmdStringOption(const ctor_tag&,
   , _validator(validator)
   , _value(defValue)
 {
-  initializePrefix();
 }
 
 CmdStringOption::~CmdStringOption() noexcept
@@ -54,13 +53,6 @@ CmdStringOption::~CmdStringOption() noexcept
 CmdStringOption::value_type CmdStringOption::value() const
 {
   return _value;
-}
-
-CmdOptionPtr CmdStringOption::make(const std::string& name,
-                                   const valid_func& validator,
-                                   const value_type& defValue)
-{
-  return std::make_unique<CmdStringOption>(ctor_tag(), name, validator, defValue);
 }
 
 ////// private ///////////////////////////////////////////////////////////////

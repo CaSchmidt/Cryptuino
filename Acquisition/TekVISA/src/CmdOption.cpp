@@ -125,6 +125,8 @@ CmdOption::CmdOption(const std::string& name) noexcept
 {
 }
 
+////// private ///////////////////////////////////////////////////////////////
+
 void CmdOption::initializePrefix()
 {
   try {
@@ -145,8 +147,6 @@ void CmdOption::initializePrefix()
     _prefix.clear();
   }
 }
-
-////// private ///////////////////////////////////////////////////////////////
 
 bool CmdOption::isValueOption() const
 {

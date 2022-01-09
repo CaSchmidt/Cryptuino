@@ -56,10 +56,6 @@ public:
 
   value_type value() const;
 
-  static CmdOptionPtr make(const std::string& name,
-                           const valid_func& validator,
-                           const value_type& defValue = value_type());
-
 private:
   CmdStringOption() noexcept = delete;
 
@@ -70,6 +66,9 @@ private:
   value_type _defValue;
   valid_func _validator;
   value_type _value;
+
+  template<typename DerivedT, typename... Args>
+  friend CmdOptionPtr make_option(const std::string& name, Args&&... args);
 };
 
 #endif // CMDSTRINGOPTION_H
