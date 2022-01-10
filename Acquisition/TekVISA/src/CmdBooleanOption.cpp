@@ -29,75 +29,44 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef CMDOPTIONS_H
-#define CMDOPTIONS_H
-
-#include <map>
+#include <csUtil/csStringUtil.h>
 
 #include "CmdBooleanOption.h"
-#include "CmdIntegralOption.h"
-#include "CmdStringOption.h"
 
-using CmdOptionsPtr = std::unique_ptr<class CmdOptions>;
+////// public ////////////////////////////////////////////////////////////////
 
-class CmdOptions {
-private:
-  struct ctor_tag {
-    ctor_tag() noexcept
-    {
-    }
-  };
+CmdBooleanOption::CmdBooleanOption(const ctor_tag&,
+                                   const std::string& name) noexcept
+  : CmdOption(name)
+{
+}
 
-public:
-  using      Options    = std::map<std::string,CmdOptionPtr>;
-  using      OptionIter = Options::iterator;
-  using ConstOptionIter = Options::const_iterator;
+CmdBooleanOption::~CmdBooleanOption() noexcept
+{
+}
 
-  CmdOptions(const ctor_tag&) noexcept;
-  ~CmdOptions() noexcept;
+CmdBooleanOption::value_type CmdBooleanOption::value() const
+{
+  return _value;
+}
 
-  void clear();
+////// private ///////////////////////////////////////////////////////////////
 
-  bool add(CmdOptionPtr& ptr);
+const char *CmdBooleanOption::impl_defaultValue() const
+{
+  return nullptr;
+}
 
-  bool isValid(std::ostream& strm) const;
-  bool parse(std::ostream& strm, int argc, char **argv);
-
-  void printUsage(std::ostream& strm, int argc, char **argv) const;
-
-  void setLongFormat(const bool on);
-
-  const CmdOption *get(const std::string& name) const;
-
-  template<typename T>
-  inline std::enable_if_t<std::is_same_v<T,bool>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdBooleanOption*>(get(name))->value();
+bool CmdBooleanOption::impl_parse(const char *value)
+{
+  if( cs::length(value) > 0 ) {
+    return false;
   }
+  _value = true;
+  return true;
+}
 
-  /*
-  template<typename T>
-  inline std::enable_if_t<std::is_floating_point_v<T>,T> value(const std::string& name) const
-  {
-  }
-  */
-
-  template<typename T>
-  inline std::enable_if_t<!std::is_same_v<T,bool>  &&  std::is_integral_v<T>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdIntegralOption<T>*>(get(name))->value();
-  }
-
-  template<typename T>
-  inline std::enable_if_t<std::is_same_v<T,std::string>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdStringOption*>(get(name))->value();
-  }
-
-  static CmdOptionsPtr make();
-
-private:
-  Options _options;
-};
-
-#endif // CMDOPTIONS_H
+bool CmdBooleanOption::impl_isValid() const
+{
+  return true;
+}

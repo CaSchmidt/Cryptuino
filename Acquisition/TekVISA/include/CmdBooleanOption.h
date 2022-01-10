@@ -29,18 +29,12 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef CMDOPTIONS_H
-#define CMDOPTIONS_H
+#ifndef CMDBOOLEANOPTION_H
+#define CMDBOOLEANOPTION_H
 
-#include <map>
+#include "CmdOption.h"
 
-#include "CmdBooleanOption.h"
-#include "CmdIntegralOption.h"
-#include "CmdStringOption.h"
-
-using CmdOptionsPtr = std::unique_ptr<class CmdOptions>;
-
-class CmdOptions {
+class CmdBooleanOption : public CmdOption {
 private:
   struct ctor_tag {
     ctor_tag() noexcept
@@ -49,55 +43,25 @@ private:
   };
 
 public:
-  using      Options    = std::map<std::string,CmdOptionPtr>;
-  using      OptionIter = Options::iterator;
-  using ConstOptionIter = Options::const_iterator;
+  using value_type = bool;
 
-  CmdOptions(const ctor_tag&) noexcept;
-  ~CmdOptions() noexcept;
+  CmdBooleanOption(const ctor_tag&,
+                   const std::string& name) noexcept;
+  ~CmdBooleanOption() noexcept;
 
-  void clear();
-
-  bool add(CmdOptionPtr& ptr);
-
-  bool isValid(std::ostream& strm) const;
-  bool parse(std::ostream& strm, int argc, char **argv);
-
-  void printUsage(std::ostream& strm, int argc, char **argv) const;
-
-  void setLongFormat(const bool on);
-
-  const CmdOption *get(const std::string& name) const;
-
-  template<typename T>
-  inline std::enable_if_t<std::is_same_v<T,bool>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdBooleanOption*>(get(name))->value();
-  }
-
-  /*
-  template<typename T>
-  inline std::enable_if_t<std::is_floating_point_v<T>,T> value(const std::string& name) const
-  {
-  }
-  */
-
-  template<typename T>
-  inline std::enable_if_t<!std::is_same_v<T,bool>  &&  std::is_integral_v<T>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdIntegralOption<T>*>(get(name))->value();
-  }
-
-  template<typename T>
-  inline std::enable_if_t<std::is_same_v<T,std::string>,T> value(const std::string& name) const
-  {
-    return dynamic_cast<const CmdStringOption*>(get(name))->value();
-  }
-
-  static CmdOptionsPtr make();
+  value_type value() const;
 
 private:
-  Options _options;
+  CmdBooleanOption() noexcept = delete;
+
+  value_type _value{false};
+
+  const char *impl_defaultValue() const final;
+  bool impl_parse(const char *value) final;
+  bool impl_isValid() const final;
+
+  template<typename DerivedT, typename... Args>
+  friend CmdOptionPtr make_option(const std::string& name, Args&&... args);
 };
 
-#endif // CMDOPTIONS_H
+#endif // CMDBOOLEANOPTION_H

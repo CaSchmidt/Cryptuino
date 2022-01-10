@@ -180,6 +180,10 @@ CmdOptionsPtr options()
                                   [](const int i) -> bool { return i > 0; });
   opts->add(ptr);
 
+  ptr = make_option<CmdBooleanOption>("no-instrument");
+  ptr->setRequired(false);
+  opts->add(ptr);
+
   opts->setLongFormat(true);
 
   return opts;
@@ -202,9 +206,10 @@ int main(int argc, char **argv)
 #ifdef HAVE_INSTRUMENT
   const std::string   channels = opts->value<std::string>("channels");
 #endif
-  const int              count = opts->value<int>("count");
-  const std::string ser_device = opts->value<std::string>("ser-device");
-  const int         ser_rate   = opts->value<int>("ser-rate");
+  const int              count =  opts->value<int>("count");
+  const std::string ser_device =  opts->value<std::string>("ser-device");
+  const int         ser_rate   =  opts->value<int>("ser-rate");
+  const bool    use_instrument = !opts->value<bool>("no-instrument");
 
   // (2) Logging /////////////////////////////////////////////////////////////
 

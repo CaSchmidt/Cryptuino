@@ -44,6 +44,7 @@ endif()
 
 list(APPEND common_HEADERS
   include/buffer.h
+  include/CmdBooleanOption.h
   include/CmdIntegralOption.h
   include/CmdOption.h
   include/CmdOptions.h
@@ -53,6 +54,7 @@ list(APPEND common_HEADERS
   )
 
 list(APPEND common_SOURCES
+  src/CmdBooleanOption.cpp
   src/CmdOption.cpp
   src/CmdOptions.cpp
   src/CmdStringOption.cpp
