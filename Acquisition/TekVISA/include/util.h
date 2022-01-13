@@ -29,8 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef ACQ_UTIL_H
+#define ACQ_UTIL_H
 
 #include <cstddef>
 #include <cstdint>
@@ -38,6 +38,8 @@
 #include <functional>
 #include <random>
 #include <type_traits>
+
+#include <visa.h>
 
 template<typename T>
 inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
@@ -62,12 +64,14 @@ public:
   void generate(uint8_t *ptr, const std::size_t len) const;
 
 private:
+  using distribution_t = std::uniform_int_distribution<unsigned>;
+
   Randomizer(const Randomizer&) noexcept = delete;
   Randomizer& operator=(const Randomizer&) noexcept = delete;
   Randomizer(Randomizer&&) noexcept = delete;
   Randomizer& operator=(Randomizer&&) noexcept = delete;
 
-  std::uniform_int_distribution<unsigned> _dist;
+  distribution_t _dist;
   std::mt19937 _gen;
 };
 
@@ -91,7 +95,13 @@ private:
 class csILogger;
 class csSerial;
 
+bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
+bool initializeInstrument(const csILogger *logger, ViSession& rm, ViSession& vi);
+
 void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
 void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
 
-#endif // UTIL_H
+bool writeMatOutput(const csILogger *logger, ViSession vi,
+                    const std::string& filename, const std::string& channels);
+
+#endif // ACQ_UTIL_H
