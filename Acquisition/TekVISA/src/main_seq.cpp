@@ -73,6 +73,16 @@ CmdOptionsPtr options()
   ptr->setRequired(false);
   opts->add(ptr);
 
+  ptr = make_option<CmdUIntOption>("tout-instrument",
+                                   [](const unsigned int i) -> bool { return i > 0; }, 2);
+  ptr->setRequired(false);
+  opts->add(ptr);
+
+  ptr = make_option<CmdUIntOption>("tout-serial",
+                                   [](const unsigned int i) -> bool {return i > 0; }, 2);
+  ptr->setRequired(false);
+  opts->add(ptr);
+
   opts->setLongFormat(true);
 
   return opts;
@@ -80,9 +90,6 @@ CmdOptionsPtr options()
 
 int main(int argc, char **argv)
 {
-  constexpr unsigned int TOUT_INSTRUMENT = 2;
-  constexpr unsigned int TOUT_SERIAL = 2;
-
   // (1) Options /////////////////////////////////////////////////////////////
 
   CmdOptionsPtr opts = options();
@@ -90,11 +97,13 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  const std::string   channels = opts->value<std::string>("channels");
-  const int              count =  opts->value<int>("count");
-  const std::string ser_device =  opts->value<std::string>("ser-device");
-  const int         ser_rate   =  opts->value<int>("ser-rate");
-  const bool    use_instrument = !opts->value<bool>("no-instrument");
+  const std::string         channels =  opts->value<std::string>("channels");
+  const int                    count =  opts->value<int>("count");
+  const std::string       ser_device =  opts->value<std::string>("ser-device");
+  const int               ser_rate   =  opts->value<int>("ser-rate");
+  const unsigned int tout_instrument =  opts->value<unsigned int>("tout-instrument");
+  const unsigned int tout_serial     =  opts->value<unsigned int>("tout-serial");
+  const bool          use_instrument = !opts->value<bool>("no-instrument");
 
   // (2) Logging /////////////////////////////////////////////////////////////
 
@@ -133,7 +142,7 @@ int main(int argc, char **argv)
   }
 
   txAesCmd('@', serial, randomizer);
-  rxAesCmd(logger, serial, TOUT_SERIAL);
+  rxAesCmd(logger, serial, tout_serial);
 
   // (4) Sequence ////////////////////////////////////////////////////////////
 
@@ -145,7 +154,7 @@ int main(int argc, char **argv)
     // (4.1) Arm instrument //////////////////////////////////////////////////
 
     if( use_instrument ) {
-      armInstrument(logger, vi, TOUT_INSTRUMENT);
+      armInstrument(logger, vi, tout_instrument);
     }
 
     // (4.2) Request encryption //////////////////////////////////////////////
@@ -154,7 +163,7 @@ int main(int argc, char **argv)
 
     // (4.3) Wait for response ///////////////////////////////////////////////
 
-    rxAesCmd(logger, serial, TOUT_SERIAL);
+    rxAesCmd(logger, serial, tout_serial);
 
     // (4.4) Store samples ///////////////////////////////////////////////////
 
