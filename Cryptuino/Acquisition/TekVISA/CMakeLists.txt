@@ -11,20 +11,20 @@ include(FormatOutputName)
 
 ### 3rd Party Dependencies ###################################################
 
-add_subdirectory(../../3rdparty/zlib1211
+add_subdirectory(../../../3rdparty/zlib1211
   ${CMAKE_CURRENT_BINARY_DIR}/zlib1211
   )
 
 set(MATIO_MAT73  OFF CACHE BOOL "" FORCE)
 set(MATIO_SHARED OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(../../3rdparty/matio1521
+add_subdirectory(../../../3rdparty/matio1521
   ${CMAKE_CURRENT_BINARY_DIR}/mat1521
   )
 
 format_output_name(matio "matio")
 
-add_subdirectory(../../csUtil/csUtil
+add_subdirectory(../../../csUtil/csUtil
   ${CMAKE_CURRENT_BINARY_DIR}/csUtil
   )
 

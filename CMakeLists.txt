@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-project(Acquisition-dev)
+project(Cryptuino-dev)
 
 file(MAKE_DIRECTORY
   ${CMAKE_CURRENT_BINARY_DIR}/bin
@@ -12,4 +12,4 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_PDB_OUTPUT_DIRECTORY     ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-add_subdirectory(TekVISA)
+add_subdirectory(Cryptuino/Acquisition/TekVISA)
