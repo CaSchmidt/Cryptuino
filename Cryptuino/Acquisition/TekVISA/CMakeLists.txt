@@ -13,21 +13,11 @@ endif()
 ### Common Sources ###########################################################
 
 list(APPEND common_HEADERS
-  include/buffer.h
-  include/CmdBooleanOption.h
-  include/CmdIntegralOption.h
-  include/CmdOption.h
-  include/CmdOptions.h
-  include/CmdStringOption.h
   include/instrument.h
   include/util.h
   )
 
 list(APPEND common_SOURCES
-  src/CmdBooleanOption.cpp
-  src/CmdOption.cpp
-  src/CmdOptions.cpp
-  src/CmdStringOption.cpp
   src/instrument.cpp
   src/util.cpp
   )
@@ -52,7 +42,7 @@ target_include_directories(GrabVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(GrabVISA csUtil matio ${VISA_LIBS})
+target_link_libraries(GrabVISA CryptuinoUtil matio ${VISA_LIBS})
 
 ### Query ####################################################################
 
@@ -66,7 +56,7 @@ target_include_directories(QueryVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(QueryVISA ${VISA_LIBS})
+target_link_libraries(QueryVISA CryptuinoUtil ${VISA_LIBS})
 
 ### Sequence #################################################################
 
@@ -88,4 +78,4 @@ target_include_directories(SeqVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(SeqVISA csUtil matio ${VISA_LIBS})
+target_link_libraries(SeqVISA CryptuinoUtil matio ${VISA_LIBS})

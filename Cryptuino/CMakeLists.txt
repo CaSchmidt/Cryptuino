@@ -30,4 +30,5 @@ add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/csUtil/csUtil
 
 ### Projects #################################################################
 
+add_subdirectory(Libraries/CryptuinoUtil)
 add_subdirectory(Acquisition/TekVISA)
