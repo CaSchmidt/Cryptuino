@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,43 +29,31 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef ACQ_UTIL_H
-#define ACQ_UTIL_H
+#ifndef RANDOMIZER_H
+#define RANDOMIZER_H
 
 #include <cstddef>
 #include <cstdint>
 
-#include <type_traits>
+#include <random>
 
-#include <visa.h>
+class Randomizer {
+public:
+  Randomizer() noexcept;
+  ~Randomizer() noexcept;
 
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
-{
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
+  void generate(uint8_t *ptr, const std::size_t len) const;
 
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
+private:
+  using distribution_t = std::uniform_int_distribution<unsigned>;
 
-  return cnt;
-}
+  Randomizer(const Randomizer&) noexcept = delete;
+  Randomizer& operator=(const Randomizer&) noexcept = delete;
+  Randomizer(Randomizer&&) noexcept = delete;
+  Randomizer& operator=(Randomizer&&) noexcept = delete;
 
-class csILogger;
-class csSerial;
+  distribution_t _dist;
+  std::mt19937 _gen;
+};
 
-class Randomizer;
-
-bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
-bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi);
-
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
-
-bool writeMatOutput(const csILogger *logger, ViSession vi,
-                    const std::string& filename, const std::string& channels);
-
-#endif // ACQ_UTIL_H
+#endif // RANDOMIZER_H

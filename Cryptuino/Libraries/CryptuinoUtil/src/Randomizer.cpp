@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,43 +29,30 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef ACQ_UTIL_H
-#define ACQ_UTIL_H
+#include "Randomizer.h"
 
-#include <cstddef>
-#include <cstdint>
+////// public ////////////////////////////////////////////////////////////////
 
-#include <type_traits>
-
-#include <visa.h>
-
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
+Randomizer::Randomizer() noexcept
 {
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
+  constexpr distribution_t::result_type MIN =   0;
+  constexpr distribution_t::result_type MAX = 255;
 
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
+  _dist = distribution_t(MIN, MAX);
 
-  return cnt;
+  std::random_device device;
+  _gen.seed(device());
 }
 
-class csILogger;
-class csSerial;
+Randomizer::~Randomizer() noexcept
+{
+}
 
-class Randomizer;
+void Randomizer::generate(uint8_t *ptr, const std::size_t len) const
+{
+  Randomizer *thiz = const_cast<Randomizer*>(this); // BETRAYAL!
 
-bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
-bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi);
-
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
-
-bool writeMatOutput(const csILogger *logger, ViSession vi,
-                    const std::string& filename, const std::string& channels);
-
-#endif // ACQ_UTIL_H
+  for(std::size_t i = 0; i < len; i++) {
+    ptr[i] = static_cast<uint8_t>(_dist(thiz->_gen));
+  }
+}

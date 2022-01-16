@@ -7,6 +7,8 @@ list(APPEND CryptuinoUtil_HEADERS
   include/CmdOption.h
   include/CmdOptions.h
   include/CmdStringOption.h
+  include/Randomizer.h
+  include/ScopeGuard.h
   )
 
 list(APPEND CryptuinoUtil_SOURCES
@@ -14,6 +16,8 @@ list(APPEND CryptuinoUtil_SOURCES
   src/CmdOption.cpp
   src/CmdOptions.cpp
   src/CmdStringOption.cpp
+  src/Randomizer.cpp
+  src/ScopeGuard.cpp
   )
 
 ### Target ###################################################################

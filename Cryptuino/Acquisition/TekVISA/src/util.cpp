@@ -42,6 +42,8 @@
 #include "util.h"
 
 #include "instrument.h"
+#include "Randomizer.h"
+#include "ScopeGuard.h"
 
 ////// Private ///////////////////////////////////////////////////////////////
 
@@ -245,42 +247,4 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
   logger->logTextf(u8"Wrote file \"{}\".", filename);
 
   return true;
-}
-
-////// Randomizer - public ///////////////////////////////////////////////////
-
-Randomizer::Randomizer() noexcept
-{
-  constexpr distribution_t::result_type MIN =   0;
-  constexpr distribution_t::result_type MAX = 255;
-
-  _dist = distribution_t(MIN, MAX);
-
-  std::random_device device;
-  _gen.seed(device());
-}
-
-Randomizer::~Randomizer() noexcept
-{
-}
-
-void Randomizer::generate(uint8_t *ptr, const std::size_t len) const
-{
-  Randomizer *thiz = const_cast<Randomizer*>(this); // BETRAYAL!
-
-  for(std::size_t i = 0; i < len; i++) {
-    ptr[i] = static_cast<uint8_t>(_dist(thiz->_gen));
-  }
-}
-
-////// ScopeGuard - public ///////////////////////////////////////////////////
-
-ScopeGuard::ScopeGuard(const guard_func& f) noexcept
-  : _f(f)
-{
-}
-
-ScopeGuard::~ScopeGuard() noexcept
-{
-  _f();
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,43 +29,26 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef ACQ_UTIL_H
-#define ACQ_UTIL_H
+#ifndef SCOPEGUARD_H
+#define SCOPEGUARD_H
 
-#include <cstddef>
-#include <cstdint>
+#include <functional>
 
-#include <type_traits>
+class ScopeGuard {
+public:
+  using guard_func = std::function<void(void)>;
 
-#include <visa.h>
+  ScopeGuard(const guard_func& f) noexcept;
+  ~ScopeGuard() noexcept;
 
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
-{
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
+private:
+  ScopeGuard() noexcept = delete;
+  ScopeGuard(const ScopeGuard&) noexcept = delete;
+  ScopeGuard& operator=(const ScopeGuard&) noexcept = delete;
+  ScopeGuard(ScopeGuard&&) noexcept = delete;
+  ScopeGuard& operator=(ScopeGuard&&) noexcept = delete;
 
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
+  guard_func _f;
+};
 
-  return cnt;
-}
-
-class csILogger;
-class csSerial;
-
-class Randomizer;
-
-bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
-bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi);
-
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
-
-bool writeMatOutput(const csILogger *logger, ViSession vi,
-                    const std::string& filename, const std::string& channels);
-
-#endif // ACQ_UTIL_H
+#endif // SCOPEGUARD_H

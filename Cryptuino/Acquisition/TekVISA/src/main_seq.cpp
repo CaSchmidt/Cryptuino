@@ -40,6 +40,8 @@
 #include <csUtil/csSerial.h>
 
 #include "CmdOptions.h"
+#include "Randomizer.h"
+#include "ScopeGuard.h"
 #include "util.h"
 
 CmdOptionsPtr options()
