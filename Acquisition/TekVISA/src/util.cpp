@@ -143,41 +143,41 @@ bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tou
   return true;
 }
 
-bool initializeInstrument(const csILogger *logger, ViSession& rm, ViSession& vi)
+bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi)
 {
   ViStatus status;
 
-  rm = vi = VI_NULL; // cf. VI_WARN_NULL_OBJECT
+  *rm = *vi = VI_NULL; // cf. VI_WARN_NULL_OBJECT
 
-  status = viOpenDefaultRM(&rm);
-  if( handleError(logger, rm, status, "viOpenDefaultRM()") ) {
+  status = viOpenDefaultRM(rm);
+  if( handleError(logger, *rm, status, "viOpenDefaultRM()") ) {
     return false;
   }
 
-  const RsrcList resources = queryInstruments(logger, rm);
+  const RsrcList resources = queryInstruments(logger, *rm);
   if( resources.empty() ) {
     logger->logError(u8"No instruments found!");
-    viClose(rm);
+    viClose(*rm);
     return false;
   }
   const std::string instrument = resources.front(); // pick one...
 
-  status = viOpen(rm, const_cast<char*>(instrument.data()), VI_NULL, VI_NULL, &vi);
-  if( handleError(logger, rm, status, "viOpen()") ) {
-    viClose(rm);
+  status = viOpen(*rm, const_cast<char*>(instrument.data()), VI_NULL, VI_NULL, vi);
+  if( handleError(logger, *rm, status, "viOpen()") ) {
+    viClose(*rm);
     return false;
   }
 
   ViUInt32 length = 0;
-  if( !queryRecordLength(logger, vi, &length) ) {
-    viClose(rm);
+  if( !queryRecordLength(logger, *vi, &length) ) {
+    viClose(*rm);
     return false;
   }
   logger->logTextf(u8"HORizontal:RECOrdlength = {}", length);
 
   float rate = 0;
-  if( !querySampleRate(logger, vi, &rate) ) {
-    viClose(rm);
+  if( !querySampleRate(logger, *vi, &rate) ) {
+    viClose(*rm);
     return false;
   }
   logger->logTextf(u8"HORizontal:SAMPLERate = {}", rate);

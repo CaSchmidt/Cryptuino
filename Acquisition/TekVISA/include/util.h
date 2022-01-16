@@ -96,7 +96,7 @@ class csILogger;
 class csSerial;
 
 bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
-bool initializeInstrument(const csILogger *logger, ViSession& rm, ViSession& vi);
+bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi);
 
 void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
 void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);

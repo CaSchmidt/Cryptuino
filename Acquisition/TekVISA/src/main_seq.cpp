@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 
   ViSession rm = VI_NULL; // cf. VI_WARN_NULL_OBJECT
   ViSession vi = VI_NULL;
-  if( use_instrument  &&  !initializeInstrument(logger, rm, vi) ) {
+  if( use_instrument  &&  !initializeInstrument(logger, &rm, &vi) ) {
     return EXIT_FAILURE;
   }
   ScopeGuard guard_rm([&](void) -> void {
