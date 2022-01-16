@@ -38,7 +38,6 @@
 #include <csUtil/csDualLogger.h>
 #include <csUtil/csLogger.h>
 #include <csUtil/csSerial.h>
-#include <csUtil/csTime.h>
 
 #include "CmdOptions.h"
 #include "util.h"
