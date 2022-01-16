@@ -92,23 +92,23 @@ bool CmdOption::isValid() const
   return impl_isValid();
 }
 
-void CmdOption::printUsage(std::ostream& strm) const
+void CmdOption::printUsage(std::ostream& output) const
 {
   if( isRequired() ) {
-    strm << "    ";
+    output << "    ";
   } else {
-    strm << "  ? ";
+    output << "  ? ";
   }
 
-  strm << _prefix;
+  output << _prefix;
 
   if( isValueOption() ) {
-    strm << "<" << impl_defaultValue() << ">";
+    output << "<" << impl_defaultValue() << ">";
   }
 
-  strm << "    " << _help;
+  output << "    " << _help;
 
-  strm << std::endl;
+  output << std::endl;
 }
 
 bool CmdOption::isValidName(const char *s)

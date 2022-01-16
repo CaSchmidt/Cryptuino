@@ -60,10 +60,10 @@ public:
 
   bool add(CmdOptionPtr& ptr);
 
-  bool isValid(std::ostream& strm) const;
-  bool parse(std::ostream& strm, int argc, char **argv);
+  bool isValid(std::ostream& output) const;
+  bool parse(int argc, char **argv, std::ostream& output);
 
-  void printUsage(std::ostream& strm, int argc, char **argv) const;
+  void printUsage(int argc, char **argv, std::ostream& strm) const;
 
   void setLongFormat(const bool on);
 

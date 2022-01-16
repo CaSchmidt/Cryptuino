@@ -93,7 +93,7 @@ int main(int argc, char **argv)
   // (1) Options /////////////////////////////////////////////////////////////
 
   CmdOptionsPtr opts = options();
-  if( !opts->parse(std::cerr, argc, argv) ) {
+  if( !opts->parse(argc, argv, std::cerr) ) {
     return EXIT_FAILURE;
   }
 

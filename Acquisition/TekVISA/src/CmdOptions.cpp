@@ -58,23 +58,23 @@ bool CmdOptions::add(CmdOptionPtr& ptr)
   return result.second;
 }
 
-bool CmdOptions::isValid(std::ostream& strm) const
+bool CmdOptions::isValid(std::ostream& output) const
 {
   for(ConstOptionIter it = _options.cbegin(); it != _options.cend(); ++it) {
     const CmdOption *opt = it->second.get();
     if( !opt->isValid() ) {
-      strm << "ERROR: Invalid value for option " << std::quoted(opt->name()) << "!" << std::endl;
+      output << "ERROR: Invalid value for option " << std::quoted(opt->name()) << "!" << std::endl;
       return false;
     }
   }
   return true;
 }
 
-bool CmdOptions::parse(std::ostream& strm, int argc, char **argv)
+bool CmdOptions::parse(int argc, char **argv, std::ostream& output)
 {
   const int numArgs = argc - 1;
   if( numArgs < 1 ) {
-    printUsage(strm, argc, argv);
+    printUsage(argc, argv, output);
     return false;
   }
 
@@ -91,7 +91,7 @@ bool CmdOptions::parse(std::ostream& strm, int argc, char **argv)
       have_arg = true;
 
       if( !opt->parse(arg) ) {
-        strm << "ERROR: Invalid value for option " << std::quoted(opt->name()) << "!" << std::endl;
+        output << "ERROR: Invalid value for option " << std::quoted(opt->name()) << "!" << std::endl;
         return false;
       }
 
@@ -99,22 +99,22 @@ bool CmdOptions::parse(std::ostream& strm, int argc, char **argv)
     } // For each option
 
     if( !have_arg ) {
-      strm << "ERROR: Unknown argument " << std::quoted(arg) << "!" << std::endl;
+      output << "ERROR: Unknown argument " << std::quoted(arg) << "!" << std::endl;
       return false;
     }
   } // For each argument
 
-  return isValid(strm);
+  return isValid(output);
 }
 
-void CmdOptions::printUsage(std::ostream& strm, int /*argc*/, char **argv) const
+void CmdOptions::printUsage(int /*argc*/, char **argv, std::ostream& output) const
 {
-  strm << "Usage: " << argv[0] << std::endl;
-  strm << std::endl;
+  output << "Usage: " << argv[0] << std::endl;
+  output << std::endl;
   for(ConstOptionIter it = _options.cbegin(); it != _options.cend(); ++it) {
-    it->second->printUsage(strm);
+    it->second->printUsage(output);
   }
-  strm << std::endl;
+  output << std::endl;
 }
 
 void CmdOptions::setLongFormat(const bool on)
