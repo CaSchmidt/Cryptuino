@@ -29,15 +29,10 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef ACQ_UTIL_H
-#define ACQ_UTIL_H
-
-#include <cstddef>
-#include <cstdint>
+#ifndef ACQUTIL_H
+#define ACQUTIL_H
 
 #include <type_traits>
-
-#include <visa.h>
 
 template<typename T>
 inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
@@ -62,4 +57,4 @@ class Randomizer;
 void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
 void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
 
-#endif // ACQ_UTIL_H
+#endif // ACQUTIL_H

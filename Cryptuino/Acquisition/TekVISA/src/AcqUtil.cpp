@@ -39,11 +39,9 @@
 #include <csUtil/csStringUtil.h>
 #include <csUtil/csTime.h>
 
-#include "util.h"
+#include "AcqUtil.h"
 
-#include "instrument.h"
 #include "Randomizer.h"
-#include "ScopeGuard.h"
 
 ////// Private ///////////////////////////////////////////////////////////////
 

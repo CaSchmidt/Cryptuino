@@ -43,7 +43,7 @@
 #include "instrutil.h"
 #include "Randomizer.h"
 #include "ScopeGuard.h"
-#include "util.h"
+#include "AcqUtil.h"
 
 CmdOptionsPtr options()
 {

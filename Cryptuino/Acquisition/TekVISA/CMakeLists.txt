@@ -13,15 +13,15 @@ endif()
 ### Common Sources ###########################################################
 
 list(APPEND common_HEADERS
+  include/AcqUtil.h
   include/instrument.h
   include/instrutil.h
-  include/util.h
   )
 
 list(APPEND common_SOURCES
+  src/AcqUtil.cpp
   src/instrument.cpp
   src/instrutil.cpp
-  src/util.cpp
   )
 
 ### Grab #####################################################################
