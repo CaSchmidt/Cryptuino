@@ -14,11 +14,13 @@ endif()
 
 list(APPEND common_HEADERS
   include/instrument.h
+  include/instrutil.h
   include/util.h
   )
 
 list(APPEND common_SOURCES
   src/instrument.cpp
+  src/instrutil.cpp
   src/util.cpp
   )
 

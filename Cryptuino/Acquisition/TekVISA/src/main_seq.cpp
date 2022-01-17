@@ -40,6 +40,7 @@
 #include <csUtil/csSerial.h>
 
 #include "CmdOptions.h"
+#include "instrutil.h"
 #include "Randomizer.h"
 #include "ScopeGuard.h"
 #include "util.h"

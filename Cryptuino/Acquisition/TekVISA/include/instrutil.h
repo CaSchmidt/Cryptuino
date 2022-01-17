@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,37 +29,19 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef ACQ_UTIL_H
-#define ACQ_UTIL_H
+#ifndef INSTRUTIL_H
+#define INSTRUTIL_H
 
-#include <cstddef>
-#include <cstdint>
-
-#include <type_traits>
+#include <string>
 
 #include <visa.h>
 
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
-{
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
-
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
-
-  return cnt;
-}
-
 class csILogger;
-class csSerial;
 
-class Randomizer;
+bool armInstrument(const csILogger *logger, ViSession vi, const unsigned int tout);
+bool initializeInstrument(const csILogger *logger, ViSession *rm, ViSession *vi);
 
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
+bool writeMatOutput(const csILogger *logger, ViSession vi,
+                    const std::string& filename, const std::string& channels);
 
-#endif // ACQ_UTIL_H
+#endif // INSTRUTIL_H
