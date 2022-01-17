@@ -14,14 +14,14 @@ endif()
 
 list(APPEND common_HEADERS
   include/AcqUtil.h
-  include/instrument.h
-  include/instrutil.h
+  include/Instrument.h
+  include/InstrUtil.h
   )
 
 list(APPEND common_SOURCES
   src/AcqUtil.cpp
-  src/instrument.cpp
-  src/instrutil.cpp
+  src/Instrument.cpp
+  src/InstrUtil.cpp
   )
 
 ### Grab #####################################################################

@@ -34,7 +34,7 @@
 #include <csUtil/csCharUtil.h>
 #include <csUtil/csILogger.h>
 
-#include "instrument.h"
+#include "Instrument.h"
 
 #include "util.h"
 

@@ -37,9 +37,9 @@
 
 #include <matio.h>
 
-#include "instrutil.h"
+#include "InstrUtil.h"
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "ScopeGuard.h"
 
 ////// Private ///////////////////////////////////////////////////////////////

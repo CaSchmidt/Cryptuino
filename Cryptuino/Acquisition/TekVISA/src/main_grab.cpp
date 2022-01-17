@@ -37,7 +37,7 @@
 #include <csUtil/csLogger.h>
 #include <matio.h>
 
-#include "instrument.h"
+#include "Instrument.h"
 
 bool writeMatVector(const csILogger *logger, mat_t *file,
                     const char *varname, const std::size_t numSamples, const double *data)
