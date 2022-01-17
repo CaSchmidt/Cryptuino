@@ -29,8 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef ARDUTIL_H
+#define ARDUTIL_H
 
 bool compareI(const char *s1, const char *s2, const size_t len = 0);
 
@@ -62,4 +62,4 @@ uint8_t toLower(const uint8_t in);
 
 uint8_t toUpper(const uint8_t in);
 
-#endif // UTIL_H
+#endif // ARDUTIL_H

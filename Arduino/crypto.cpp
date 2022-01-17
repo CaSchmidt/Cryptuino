@@ -34,8 +34,8 @@
 #include "crypto.h"
 
 #include "aes.hpp"
+#include "ardutil.h"
 #include "key.h"
-#include "util.h"
 
 #define CRYPTO_PIN  7
 

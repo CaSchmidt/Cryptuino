@@ -33,8 +33,8 @@
 
 #include "rx.h"
 
+#include "ardutil.h"
 #include "key.h"
-#include "util.h"
 
 uint8_t rx_buffer[RXBUF_SIZE];
 

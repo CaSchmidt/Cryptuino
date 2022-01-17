@@ -33,7 +33,7 @@
 
 #include "key.h"
 
-#include "util.h"
+#include "ardutil.h"
 
 uint8_t key[AES_KEY_BYTES];
 

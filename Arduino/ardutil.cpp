@@ -29,61 +29,86 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "crypto.h"
+#include <Arduino.h>
+
+#include "ardutil.h"
+
 #include "key.h"
-#include "rx.h"
-#include "util.h"
 
-#define CMD_GENKEY   "genkey"
-#define CMD_SHOWKEY  "showkey"
-
-void setup() {
-  Serial.begin(9600, SERIAL_8N1);
-  while( !Serial ) {
-    ;
+bool compareI(const char *s1, const char *s2, const size_t len)
+{
+  if( s1 == nullptr  ||  s2 == nullptr ) {
+    return false; 
   }
-  Serial.println("Welcome to Cryptuino!");
-  Serial.println("---------------------");
-
-  crypto_init();
-  key_init();
-
-  rx_len = 0;
+  const size_t l1 = len < 1
+  ? length(s1)
+  : len;
+  const size_t l2 = len < 1
+  ? length(s2)
+  : len;
+  if( l1 != l2  ||  l1 == 0 ) {
+    return false;
+  }
+  for(size_t i = 0; i < l1; i++) {
+    if( toLower(s1[i]) != toLower(s2[i]) ) {
+      return false;
+    }
+  }
+  return true;
 }
 
-void loop() {
-  if( Serial.available() < 1 ) {
-    return;
+uint8_t fromHexChar(const char c)
+{
+  if(        '0' <= c  &&  c <= '9' ) {
+    return c - '0';
+  } else if( 'a' <= c  &&  c <= 'f' ) {
+    return c - 'a' + 10;
+  } else if( 'A' <= c  &&  c <= 'F' ) {
+    return c - 'A' + 10;
   }
+  return 0xFF;
+}
 
-  bool have_cmd = false;
-  while( Serial.available() > 0 ) {
-    const uint8_t c = Serial.read();
-    if( c == '\n'  ||  c == '\r' ) {
-      have_cmd = true;
-      break;
-    } else if( rx_len < RXBUF_SIZE ) {
-      rx_buffer[rx_len++] = c;
-    }
+void outputAesData(const uint8_t *data)
+{
+  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
+    Serial.write(' ');
+    Serial.write(toHexChar(data[i], true));
+    Serial.write(toHexChar(data[i]));
   }
+}
 
-  if( !have_cmd  ||  rx_len < 1 ) {
-    return;
+void readAesData(uint8_t *data, const uint8_t *ascii)
+{
+  for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
+    const uint8_t hi = fromHexChar(ascii[i*2]);
+    const uint8_t lo = fromHexChar(ascii[i*2 + 1]);
+
+    data[i]  = hi << 4;
+    data[i] |= lo & 0x0F;
   }
+}
 
-  if(        rx_have_cmd(CMD_GENKEY) ) {
-    key_generate();
-  } else if( rx_have_cmd(CMD_SHOWKEY) ) {
-    key_show();
-  } else if( rx_have_aes_data() ) {
-    if(        rx_buffer[0] == '@' ) {
-      key_set(rx_buffer + 1);
-    } else if( rx_buffer[0] == '#' ) {
-      crypto_encrypt(rx_buffer + 1);
-    }
-  } else {
-    Serial.println("ERROR: Invalid command!");
-  }
+char toHexChar(const uint8_t in, const bool hi_nibble)
+{
+  const uint8_t nibble = hi_nibble
+  ? in >>   4
+  : in & 0x0F;
+  return nibble >= 10
+  ? nibble - 10 + 'A'
+  : nibble + '0';
+}
 
-  rx_len = 0;
+uint8_t toLower(const uint8_t in)
+{
+  return 'A' <= in  &&  in <= 'Z'
+  ? in - 'A' + 'a'
+  : in;
+}
+
+uint8_t toUpper(const uint8_t in)
+{
+  return 'a' <= in  &&  in <= 'z'
+  ? in - 'a' + 'A'
+  : in;
 }
