@@ -1,7 +1,7 @@
 ### Sources ##################################################################
 
 list(APPEND CryptuinoUtil_HEADERS
-  include/buffer.h
+  include/Buffer.h
   include/CmdBooleanOption.h
   include/CmdIntegralOption.h
   include/CmdOption.h

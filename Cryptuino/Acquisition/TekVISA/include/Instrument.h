@@ -37,7 +37,7 @@
 
 #include <visa.h>
 
-#include "buffer.h"
+#include "Buffer.h"
 
 using RsrcString = std::basic_string<ViChar>;
 using   RsrcList = std::list<RsrcString>;
