@@ -102,19 +102,19 @@ namespace priv {
    */
   template<typename T>
   bool readSamples(const csILogger *logger, ViSession vi,
-                   SampleBuffer& samples, const ViUInt32 numSamples, const WaveformInfo& info)
+                   SampleBuffer *samples, const ViUInt32 numSamples, const WaveformInfo& info)
   {
     constexpr std::size_t RAWVALUE_SIZE = sizeof(T);
 
     try {
-      samples.resize(numSamples + 2, 0);
+      samples->resize(numSamples + 2, 0);
     } catch(...) {
       logger->logError(u8"samples.resize()");
       return false;
     }
 
-    samples[0] = info.xIncr;
-    samples[1] = info.xZero;
+    samples->at(0) = info.xIncr;
+    samples->at(1) = info.xZero;
 
     ByteBuffer raw;
     try {
@@ -137,40 +137,40 @@ namespace priv {
 
     const ViUInt32 numSamplesRead = numBytesRead/RAWVALUE_SIZE;
     for(ViUInt32 i = 0; i < numSamplesRead; i++) {
-      samples[2 + i] = (double(rawSamples[i]) - yOff)*yMult + yZero;
+      samples->at(2 + i) = (double(rawSamples[i]) - yOff)*yMult + yZero;
     }
 
     return true;
   }
 
   bool readWaveformInfo(const csILogger *logger, ViSession vi,
-                        WaveformInfo& info)
+                        WaveformInfo *info)
   {
     static_assert( sizeof(WaveformInfo::value_type) == 4 );
 
     ViStatus status;
 
-    status = viQueryf(vi, (ViChar*)"WFMOutpre:XINcr?\n", (ViChar*)"%f", &info.xIncr);
+    status = viQueryf(vi, (ViChar*)"WFMOutpre:XINcr?\n", (ViChar*)"%f", &info->xIncr);
     if( handleError(logger, vi, status, "WFMOutpre:XINcr?") ) {
       return false;
     }
 
-    status = viQueryf(vi, (ViChar*)"WFMOutpre:XZEro?\n", (ViChar*)"%f", &info.xZero);
+    status = viQueryf(vi, (ViChar*)"WFMOutpre:XZEro?\n", (ViChar*)"%f", &info->xZero);
     if( handleError(logger, vi, status, "WFMOutpre:XZEro?") ) {
       return false;
     }
 
-    status = viQueryf(vi, (ViChar*)"WFMOutpre:YMUlt?\n", (ViChar*)"%f", &info.yMult);
+    status = viQueryf(vi, (ViChar*)"WFMOutpre:YMUlt?\n", (ViChar*)"%f", &info->yMult);
     if( handleError(logger, vi, status, "WFMOutpre:YMUlt?") ) {
       return false;
     }
 
-    status = viQueryf(vi, (ViChar*)"WFMOutpre:YOFf?\n", (ViChar*)"%f", &info.yOff);
+    status = viQueryf(vi, (ViChar*)"WFMOutpre:YOFf?\n", (ViChar*)"%f", &info->yOff);
     if( handleError(logger, vi, status, "WFMOutpre:YOFf?") ) {
       return false;
     }
 
-    status = viQueryf(vi, (ViChar*)"WFMOutpre:YZEro?\n", (ViChar*)"%f", &info.yZero);
+    status = viQueryf(vi, (ViChar*)"WFMOutpre:YZEro?\n", (ViChar*)"%f", &info->yZero);
     if( handleError(logger, vi, status, "WFMOutpre:YZEro?") ) {
       return false;
     }
@@ -328,7 +328,7 @@ bool querySampleRate(const csILogger *logger, ViSession vi,
 }
 
 bool readWaveform(const csILogger *logger, ViSession vi,
-                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples)
+                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer *samples)
 {
   ViStatus status;
 
@@ -356,7 +356,7 @@ bool readWaveform(const csILogger *logger, ViSession vi,
   }
 
   priv::WaveformInfo info;
-  if( !priv::readWaveformInfo(logger, vi, info) ) {
+  if( !priv::readWaveformInfo(logger, vi, &info) ) {
     return false;
   }
 

@@ -177,7 +177,7 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
   });
 
   SampleBuffer trace;
-  if( !readWaveform(logger, vi, ch_trace, 0, trace) ) {
+  if( !readWaveform(logger, vi, ch_trace, 0, &trace) ) {
     return false;
   }
   if( !writeMatSamples(logger, matfile, "trace", trace) ) {
@@ -185,7 +185,7 @@ bool writeMatOutput(const csILogger *logger, ViSession vi,
   }
 
   SampleBuffer trigger;
-  if( !readWaveform(logger, vi, ch_trigger, 0, trigger) ) {
+  if( !readWaveform(logger, vi, ch_trigger, 0, &trigger) ) {
     return false;
   }
   if( !writeMatSamples(logger, matfile, "trigger", trigger) ) {

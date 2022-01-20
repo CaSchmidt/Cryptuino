@@ -59,7 +59,7 @@ bool querySampleRate(const csILogger *logger, ViSession vi,
                      float *rate);
 
 bool readWaveform(const csILogger *logger, ViSession vi,
-                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer& samples);
+                  const char ch, const ViUInt32 numSamplesWant, SampleBuffer *samples);
 
 bool setBufferAttributes(const csILogger *logger, ViSession vi,
                          const bool rd_flush = false, const bool wr_flush = false);

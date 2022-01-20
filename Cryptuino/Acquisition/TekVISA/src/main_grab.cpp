@@ -166,7 +166,7 @@ int main(int argc, char **argv)
   }
 
   SampleBuffer samples;
-  readWaveform(&logger, vi, channel, numSamples, samples);
+  readWaveform(&logger, vi, channel, numSamples, &samples);
   writeMatSamples(&logger, "output.mat", samples);
 
   viClose(vi);
