@@ -7,6 +7,7 @@ list(APPEND CryptuinoUtil_HEADERS
   include/CmdOption.h
   include/CmdOptions.h
   include/CmdStringOption.h
+  include/HexChar.h
   include/Randomizer.h
   include/ScopeGuard.h
   )
