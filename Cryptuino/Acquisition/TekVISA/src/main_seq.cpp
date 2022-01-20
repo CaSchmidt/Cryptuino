@@ -33,6 +33,7 @@
 #include <cstdlib>
 
 #include <iostream>
+#include <type_traits>
 
 #define HAVE_STD_FORMAT
 #include <csUtil/csDualLogger.h>
@@ -43,7 +44,22 @@
 #include "InstrUtil.h"
 #include "Randomizer.h"
 #include "ScopeGuard.h"
-#include "AcqUtil.h"
+#include "Serial.h"
+
+template<typename T>
+inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
+{
+  constexpr T  TEN = 10;
+  constexpr T ZERO =  0;
+
+  int cnt = 0;
+  do {
+    cnt++;
+    value /= TEN;
+  } while( value != ZERO );
+
+  return cnt;
+}
 
 CmdOptionsPtr options()
 {

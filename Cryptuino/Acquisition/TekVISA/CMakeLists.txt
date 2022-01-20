@@ -13,13 +13,11 @@ endif()
 ### Common Sources ###########################################################
 
 list(APPEND common_HEADERS
-  include/AcqUtil.h
   include/Instrument.h
   include/InstrUtil.h
   )
 
 list(APPEND common_SOURCES
-  src/AcqUtil.cpp
   src/Instrument.cpp
   src/InstrUtil.cpp
   )
@@ -80,4 +78,4 @@ target_include_directories(SeqVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(SeqVISA CryptuinoUtil matio ${VISA_LIBS})
+target_link_libraries(SeqVISA AcquisitionUtil matio ${VISA_LIBS})
