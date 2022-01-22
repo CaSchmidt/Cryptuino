@@ -28,6 +28,10 @@ add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/csUtil/csUtil
   ${CMAKE_CURRENT_BINARY_DIR}/csUtil
   )
 
+add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/3rdparty/tinyaes10
+  ${CMAKE_CURRENT_BINARY_DIR}/tinyaes10
+  )
+
 ### Projects #################################################################
 
 add_subdirectory(Libraries/CryptuinoUtil)
