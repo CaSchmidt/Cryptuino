@@ -41,10 +41,10 @@
 #include <csUtil/csSerial.h>
 
 #include "CmdOptions.h"
-#include "InstrUtil.h"
+#include "MatOutput.h"
 #include "Randomizer.h"
-#include "ScopeGuard.h"
 #include "Serial.h"
+#include "TekVISA.h"
 
 template<typename T>
 inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
@@ -140,16 +140,10 @@ int main(int argc, char **argv)
 
   // (3) Setup ///////////////////////////////////////////////////////////////
 
-  ViSession rm = VI_NULL; // cf. VI_WARN_NULL_OBJECT
-  ViSession vi = VI_NULL;
-  if( use_instrument  &&  !initializeInstrument(logger, &rm, &vi) ) {
+  InstrumentPtr instrument = make_instrument<TekVISA>();
+  if( use_instrument  &&  !instrument->connect(logger) ) {
     return EXIT_FAILURE;
   }
-  ScopeGuard guard_rm([&](void) -> void {
-    if( rm != VI_NULL ) {
-      viClose(rm);
-    }
-  });
 
   Randomizer randomizer;
 
@@ -172,7 +166,7 @@ int main(int argc, char **argv)
     // (4.1) Arm instrument //////////////////////////////////////////////////
 
     if( use_instrument ) {
-      armInstrument(logger, vi, tout_instrument);
+      instrument->setupTrigger(logger, tout_instrument);
     }
 
     // (4.2) Request encryption //////////////////////////////////////////////
@@ -187,7 +181,7 @@ int main(int argc, char **argv)
 
     if( use_instrument ) {
       const std::string filename = std::format("{:0{}}.mat", i, numIterDigits);
-      writeMatOutput(logger, vi, filename, channels);
+      writeMatOutput(logger, instrument, filename, channels);
     }
   }
 

@@ -1,13 +1,13 @@
 ### VISA Library #############################################################
 
+set(VISA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA)
+
+set(VISA_INCLUDES ${VISA_DIR}/include)
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-  list(APPEND VISA_LIBS
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/lib32/tkVisa32.lib
-    )
+  set(VISA_LIBS ${VISA_DIR}/lib32/tkVisa32.lib)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  list(APPEND VISA_LIBS
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/lib64/tkVisa64.lib
-    )
+  set(VISA_LIBS ${VISA_DIR}/lib64/tkVisa64.lib)
 endif()
 
 ### Common Sources ###########################################################
@@ -20,6 +20,40 @@ list(APPEND common_HEADERS
 list(APPEND common_SOURCES
   src/Instrument.cpp
   src/InstrUtil.cpp
+  )
+
+### Library ##################################################################
+
+list(APPEND TekVISA_HEADERS
+  include/Instrument.h
+  include/TekVISA.h
+  )
+
+list(APPEND TekVISA_SOURCES
+  src/Instrument.cpp
+  src/TekVISA.cpp
+  )
+
+add_library(TekVISA STATIC
+  ${TekVISA_HEADERS}
+  ${TekVISA_SOURCES}
+  )
+
+format_output_name(TekVISA "TekVISA")
+
+target_include_directories(TekVISA
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${VISA_INCLUDES}
+  )
+
+set_target_properties(TekVISA PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
+  )
+
+target_link_libraries(TekVISA
+  PUBLIC  AcquisitionUtil
+  PRIVATE ${VISA_LIBS}
   )
 
 ### Grab #####################################################################
@@ -61,8 +95,6 @@ target_link_libraries(QueryVISA CryptuinoUtil ${VISA_LIBS})
 ### Sequence #################################################################
 
 add_executable(SeqVISA
-  ${common_HEADERS}
-  ${common_SOURCES}
   src/main_seq.cpp
   )
 
@@ -78,4 +110,4 @@ target_include_directories(SeqVISA
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/TekVISA/include
   )
 
-target_link_libraries(SeqVISA AcquisitionUtil matio ${VISA_LIBS})
+target_link_libraries(SeqVISA TekVISA)
