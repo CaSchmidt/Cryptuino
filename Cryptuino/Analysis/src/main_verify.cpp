@@ -129,7 +129,7 @@ void printHex(const ByteBuffer& buffer, const bool eol = true)
 }
 
 int main(int /*argc*/, char **argv)
-{  
+{
   const char *STR_setkey = "Setting key ";
 
   const csLogger con_logger;
