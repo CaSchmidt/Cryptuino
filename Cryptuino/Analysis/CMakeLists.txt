@@ -1,6 +1,8 @@
 ### Verify ###################################################################
 
 add_executable(VerifySeq
+  include/Campaign.h
+  src/Campaign.cpp
   src/main_verify.cpp
   )
 

@@ -47,7 +47,7 @@
 #include <csUtil/csLogger.h>
 #include <csUtil/csStringUtil.h>
 
-#include "Buffer.h"
+#include "Campaign.h"
 #include "HexChar.h"
 
 template<typename T>
@@ -128,18 +128,8 @@ void printHex(const ByteBuffer& buffer, const bool eol = true)
   }
 }
 
-struct Entry {
-  std::string  name{};
-  ByteBuffer  plain{};
-  ByteBuffer cipher{};
-
-  Entry() noexcept = default;
-};
-
-using Entries = std::list<Entry>;
-
-int main(int argc, char **argv)
-{
+int main(int /*argc*/, char **argv)
+{  
   const char *STR_setkey = "Setting key ";
 
   const csLogger con_logger;
@@ -159,16 +149,19 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  const ByteBuffer key = extractHexBytes(*iter, STR_setkey);
+  Campaign campaign;
 
-  Entries entries;
+  campaign.key = extractHexBytes(*iter, STR_setkey);
 
-  Entry entry;
-  for(; iter != lines.end(); ++iter) {
-    const std::string line = *iter;
+  CampaignEntry entry;
+  for(++iter; iter != lines.end(); ++iter) {
+    const std::string& line = *iter;
 
     if( cs::isDigit(line[0]) ) {
-      entry = Entry(); // Reset
+      if( !entry.isEmpty() ) {
+        campaign.entries.push_back(std::move(entry));
+      }
+      entry = CampaignEntry(); // Reset
 
       entry.name.reserve(16);
       for(ConstStringIter chit = line.cbegin(); cs::isDigit(*chit); ++chit) {
@@ -181,38 +174,36 @@ int main(int argc, char **argv)
     } else if( line.starts_with('>') ) {
       entry.cipher = extractHexBytes(line, "> ");
 
-      entries.push_back(std::move(entry));
-
     }
   } // for each line
+  if( !entry.isEmpty() ) {
+    campaign.entries.push_back(std::move(entry));
+  }
 
-  if( entries.empty() ) {
+  if( campaign.isEmpty() ) {
     logger->logError(u8"No entries!");
     return EXIT_FAILURE;
   }
 
-  const std::string maxIter = entries.back().name;
-
-#ifdef HAVE_AES
-  if( key.size() != 16 ) {
-    logger->logError(u8"Invalid AES key!");
+  if( !campaign.isValid() ) {
+    logger->logError(u8"Invalid AES key/data size!");
     return EXIT_FAILURE;
   }
+
+  const std::string maxIter = campaign.lastName();
+
+#ifdef HAVE_AES
   AES_ctx ctx;
-  AES_init_ctx(&ctx, key.data());
+  AES_init_ctx(&ctx, campaign.key.data());
 #endif
 
-  printf("Setting key"); printHex(key);
-  for(const Entry& entry : entries) {
+  printf("Setting key"); printHex(campaign.key);
+  for(const CampaignEntry& entry : campaign.entries) {
     printf("%s/%s\n", entry.name.data(), maxIter.data());
     printf("<"); printHex(entry.plain);
 #ifdef HAVE_AES
     {
       ByteBuffer aesdata = entry.plain;
-      if( aesdata.size() != 16 ) {
-        logger->logError(u8"Invalid AES data!");
-        return EXIT_FAILURE;
-      }
       AES_ECB_encrypt(&ctx, aesdata.data());
       printf(">"); printHex(aesdata);
     }
