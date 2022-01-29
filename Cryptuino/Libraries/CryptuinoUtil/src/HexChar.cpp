@@ -29,35 +29,40 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef HEXCHAR_H
-#define HEXCHAR_H
+#include <csUtil/csStringUtil.h>
+#include <csUtil/csNumeric.h>
 
-#include <string>
+#include "HexChar.h"
 
-#include "Buffer.h"
+////// Public ////////////////////////////////////////////////////////////////
 
-inline uint8_t fromHexChar(const char ch)
+ByteBuffer extractHexBytes(std::string text, const char *prefix)
 {
-  if(        'a' <= ch  &&  ch <= 'f' ) {
-    return ch - 'a' + 10;
-  } else if( 'A' <= ch  &&  ch <= 'F' ) {
-    return ch - 'A' + 10;
-  } else if( '0' <= ch  &&  ch <= '9' ) {
-    return ch - '0';
+  const std::size_t numPrefix = cs::length(prefix);
+  if( numPrefix > 0 ) {
+    text.erase(0, numPrefix);
   }
-  return 0xFF;
+
+  cs::removeAll(text, cs::lambda_is_space<char>());
+  if( cs::isOdd(text.size()) ) {
+    return ByteBuffer();
+  }
+
+  ByteBuffer buffer;
+  try {
+    buffer.resize(text.size()/2);
+  } catch(...) {
+    return ByteBuffer();
+  }
+
+  for(std::size_t i = 0; i < buffer.size(); i++) {
+    const uint8_t hi = fromHexChar(text[i*2]);
+    const uint8_t lo = fromHexChar(text[i*2 + 1]);
+    if( hi == 0xFF  ||  lo == 0xFF ) {
+      return ByteBuffer();
+    }
+    buffer[i] = (hi << 4) | lo;
+  }
+
+  return buffer;
 }
-
-inline char toHexChar(const uint8_t in, const bool hi_nibble = false)
-{
-  const uint8_t nibble = hi_nibble
-      ? in >>    4
-      : in  & 0x0F;
-  return nibble >= 10
-      ? nibble - 10 + 'A'
-      : nibble + '0';
-}
-
-ByteBuffer extractHexBytes(std::string text, const char *prefix = nullptr);
-
-#endif // HEXCHAR_H

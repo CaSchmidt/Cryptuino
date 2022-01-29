@@ -18,6 +18,7 @@ list(APPEND CryptuinoUtil_SOURCES
   src/CmdOption.cpp
   src/CmdOptions.cpp
   src/CmdStringOption.cpp
+  src/HexChar.cpp
   src/Randomizer.cpp
   src/ScopeGuard.cpp
   )

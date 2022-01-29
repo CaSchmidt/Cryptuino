@@ -38,6 +38,7 @@
 #define HAVE_STD_FORMAT
 #include <csUtil/csDualLogger.h>
 #include <csUtil/csLogger.h>
+#include <csUtil/csNumeric.h>
 #include <csUtil/csSerial.h>
 
 #include "CmdOptions.h"
@@ -45,21 +46,6 @@
 #include "Randomizer.h"
 #include "Serial.h"
 #include "TekVISA.h"
-
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>,int> countDigits(T value)
-{
-  constexpr T  TEN = 10;
-  constexpr T ZERO =  0;
-
-  int cnt = 0;
-  do {
-    cnt++;
-    value /= TEN;
-  } while( value != ZERO );
-
-  return cnt;
-}
 
 CmdOptionsPtr options()
 {
@@ -159,7 +145,7 @@ int main(int argc, char **argv)
   // (4) Sequence ////////////////////////////////////////////////////////////
 
   const int maxIter       = count - 1;
-  const int numIterDigits = countDigits(maxIter);
+  const int numIterDigits = int(cs::countDigits(maxIter));
   for(int i = 0; i <= maxIter; i++) {
     logger->logTextf(u8"{:0{}}/{}", i, numIterDigits, maxIter);
 

@@ -33,10 +33,6 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include <array>
-#include <algorithm>
-#include <vector>
-
 #define HAVE_AES
 #ifdef HAVE_AES
 # include <aes.hpp>
@@ -50,73 +46,12 @@
 #include "Campaign.h"
 #include "HexChar.h"
 
-template<typename T>
-concept IsCharacter = cs::is_char_v<T>;
-
-template<typename T> requires IsCharacter<T>
-constexpr auto lambda_is_space()
-{
-  return [](const T &c) -> bool {
-    return cs::isSpace<T>(c);
-  };
-}
-
-template<typename  T, typename PredFunc>
-inline T *removeAll(T *first, T *last, PredFunc func)
-{
-  T *end = std::remove_if(first, last, func);
-  while( end != last ) {
-    *end++ = cs::glyph<T>::null;
-  }
-  return first;
-}
-
-template<typename T, typename PredFunc>
-inline std::basic_string<T> removeAll(std::basic_string<T> s, PredFunc func)
-{
-  using Iter = typename std::basic_string<T>::iterator;
-  Iter end = std::remove_if(s.begin(), s.end(), func);
-  s.erase(end, s.end());
-  return s;
-}
-
 using      String         = std::string;
 using      StringIter     = String::iterator;
 using ConstStringIter     = String::const_iterator;
 using      StringList     = std::list<String>;
 using      StringListIter = StringList::iterator;
 using ConstStringListIter = StringList::const_iterator;
-
-ByteBuffer extractHexBytes(std::string text, const char *prefix = nullptr)
-{
-  const std::size_t numPrefix = cs::length(prefix);
-  if( numPrefix > 0 ) {
-    text.erase(0, numPrefix);
-  }
-
-  text = removeAll(text, lambda_is_space<char>());
-  if( (text.size() & 1) != 0 ) {
-    return ByteBuffer();
-  }
-
-  ByteBuffer buffer;
-  try {
-    buffer.resize(text.size()/2);
-  } catch(...) {
-    return ByteBuffer();
-  }
-
-  for(std::size_t i = 0; i < buffer.size(); i++) {
-    const uint8_t hi = fromHexChar(text[i*2]);
-    const uint8_t lo = fromHexChar(text[i*2 + 1]);
-    if( hi == 0xFF  ||  lo == 0xFF ) {
-      return ByteBuffer();
-    }
-    buffer[i] = (hi << 4) | lo;
-  }
-
-  return buffer;
-}
 
 void printHex(const ByteBuffer& buffer, const bool eol = true)
 {
