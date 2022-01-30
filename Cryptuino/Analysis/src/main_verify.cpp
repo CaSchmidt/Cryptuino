@@ -33,28 +33,78 @@
 #include <cstdlib>
 #include <cstdint>
 
-#define HAVE_AES
-#ifdef HAVE_AES
-# include <aes.hpp>
-#endif
+#include <aes.hpp>
 
-#include <csUtil/csFileIO.h>
 #define HAVE_STD_FORMAT
 #include <csUtil/csLogger.h>
-#include <csUtil/csStringUtil.h>
 
 #include "Campaign.h"
 #include "CampaignReader.h"
-#include "HexChar.h"
 
-void printHex(const ByteBuffer& buffer, const bool eol = true)
+void printHex(const ByteBuffer& buffer, const bool eol = true, FILE *file = stdout)
 {
   for(const ByteBuffer::value_type b : buffer) {
-    printf(" %02X", b);
+    fprintf(file, " %02X", b);
   }
   if( eol ) {
-    printf("\n");
+    fprintf(file, "\n");
   }
+}
+
+inline void printHex(const ByteBuffer& buffer, FILE *file)
+{
+  printHex(buffer, true, file);
+}
+
+void print(const Campaign& campaign, const bool do_aes = true, FILE *file = stdout)
+{
+  const bool have_aes = do_aes  &&  campaign.key.size() == AES128_KEY_SIZE;
+
+  AES_ctx ctx;
+  if( have_aes ) {
+    AES_init_ctx(&ctx, campaign.key.data());
+  }
+
+  // (1) Output key (if present) /////////////////////////////////////////////
+
+  if( !campaign.key.empty() ) {
+    fprintf(file, "Setting key"); printHex(campaign.key, file);
+  }
+
+  // (2) Output entries... ///////////////////////////////////////////////////
+
+  const std::string maxIter = campaign.lastEntryName();
+  for(const CampaignEntry& entry : campaign.entries) {
+    ByteBuffer data;
+
+    // (2.1) Output iteration ////////////////////////////////////////////////
+
+    fprintf(file, "%s/%s\n", entry.name.data(), maxIter.data());
+
+    // (2.2) Output plain text ///////////////////////////////////////////////
+
+    if( have_aes  &&  entry.cipher.size() == AES_BLOCK_SIZE ) {
+      data = entry.cipher;
+      AES_ECB_decrypt(&ctx, data.data());
+      fprintf(file, "<"); printHex(data, file);
+    } else if( !entry.plain.empty() ) {
+      fprintf(file, "<"); printHex(entry.plain, file);
+    }
+
+    // (2.3) Output cipher text //////////////////////////////////////////////
+
+    if( have_aes  &&  entry.plain.size() == AES_BLOCK_SIZE ) {
+      data = entry.plain;
+      AES_ECB_encrypt(&ctx, data.data());
+      fprintf(file, ">"); printHex(data, file);
+    } else if( !entry.cipher.empty() ) {
+      fprintf(file, ">"); printHex(entry.cipher, file);
+    }
+
+    // (2.4) Output filename /////////////////////////////////////////////////
+
+    fprintf(file, "Wrote file \"%s.mat\".\n", entry.name.data());
+  } // For each entry...
 }
 
 int main(int /*argc*/, char **argv)
@@ -72,28 +122,7 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
-  const std::string maxIter = campaign.lastName();
-
-#ifdef HAVE_AES
-  AES_ctx ctx;
-  AES_init_ctx(&ctx, campaign.key.data());
-#endif
-
-  printf("Setting key"); printHex(campaign.key);
-  for(const CampaignEntry& entry : campaign.entries) {
-    printf("%s/%s\n", entry.name.data(), maxIter.data());
-    printf("<"); printHex(entry.plain);
-#ifdef HAVE_AES
-    {
-      ByteBuffer aesdata = entry.plain;
-      AES_ECB_encrypt(&ctx, aesdata.data());
-      printf(">"); printHex(aesdata);
-    }
-#else
-    printf(">"); printHex(entry.cipher);
-#endif
-    printf("Wrote file \"%s.mat\".\n", entry.name.data());
-  }
+  print(campaign);
 
   return EXIT_SUCCESS;
 }

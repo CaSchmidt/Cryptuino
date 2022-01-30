@@ -61,7 +61,7 @@ struct Campaign {
   bool isValid(const std::size_t keySize = AES128_KEY_SIZE,
                const std::size_t blockSize = AES_BLOCK_SIZE) const;
 
-  std::string lastName() const;
+  std::string lastEntryName() const;
 
   ByteBuffer          key{};
   CampaignEntries entries{};

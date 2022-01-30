@@ -93,7 +93,7 @@ bool Campaign::isValid(const std::size_t keySize, const std::size_t blockSize) c
   return true;
 }
 
-std::string Campaign::lastName() const
+std::string Campaign::lastEntryName() const
 {
   return !isEmpty()
       ? entries.back().name
