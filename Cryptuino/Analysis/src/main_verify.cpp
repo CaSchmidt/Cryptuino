@@ -44,14 +44,8 @@
 #include <csUtil/csStringUtil.h>
 
 #include "Campaign.h"
+#include "CampaignReader.h"
 #include "HexChar.h"
-
-using      String         = std::string;
-using      StringIter     = String::iterator;
-using ConstStringIter     = String::const_iterator;
-using      StringList     = std::list<String>;
-using      StringListIter = StringList::iterator;
-using ConstStringListIter = StringList::const_iterator;
 
 void printHex(const ByteBuffer& buffer, const bool eol = true)
 {
@@ -65,58 +59,11 @@ void printHex(const ByteBuffer& buffer, const bool eol = true)
 
 int main(int /*argc*/, char **argv)
 {
-  const char *STR_setkey = "Setting key ";
-
   const csLogger con_logger;
   const csILogger *logger = &con_logger;
 
-  if( cs::length(argv[1]) < 1 ) {
-    return EXIT_FAILURE;
-  }
-
-  const StringList lines = csReadLines(cs::UTF8(argv[1]), true);
-  ConstStringListIter iter = std::find_if(lines.cbegin(), lines.cend(),
-                                          [=](const String& s) -> bool {
-    return cs::startsWith(s.data(), STR_setkey);
-  });
-  if( iter == lines.end() ) {
-    logger->logError(u8"AES key not found!");
-    return EXIT_FAILURE;
-  }
-
   Campaign campaign;
-
-  campaign.key = extractHexBytes(*iter, STR_setkey);
-
-  CampaignEntry entry;
-  for(++iter; iter != lines.end(); ++iter) {
-    const std::string& line = *iter;
-
-    if( cs::isDigit(line[0]) ) {
-      if( !entry.isEmpty() ) {
-        campaign.entries.push_back(std::move(entry));
-      }
-      entry = CampaignEntry(); // Reset
-
-      entry.name.reserve(16);
-      for(ConstStringIter chit = line.cbegin(); cs::isDigit(*chit); ++chit) {
-        entry.name.push_back(*chit);
-      }
-
-    } else if( line.starts_with('<') ) {
-      entry.plain = extractHexBytes(line, "< ");
-
-    } else if( line.starts_with('>') ) {
-      entry.cipher = extractHexBytes(line, "> ");
-
-    }
-  } // for each line
-  if( !entry.isEmpty() ) {
-    campaign.entries.push_back(std::move(entry));
-  }
-
-  if( campaign.isEmpty() ) {
-    logger->logError(u8"No entries!");
+  if( !readCampaign(&campaign, cs::UTF8(argv[1]), logger) ) {
     return EXIT_FAILURE;
   }
 

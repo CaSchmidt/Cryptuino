@@ -53,6 +53,10 @@ using CampaignEntries = std::list<CampaignEntry>;
 struct Campaign {
   Campaign() noexcept;
 
+  void add(CampaignEntry& entry);
+
+  void clear();
+
   bool isEmpty() const;
   bool isValid(const std::size_t keySize = AES128_KEY_SIZE,
                const std::size_t blockSize = AES_BLOCK_SIZE) const;

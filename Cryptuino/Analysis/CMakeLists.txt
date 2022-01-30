@@ -2,7 +2,9 @@
 
 add_executable(VerifySeq
   include/Campaign.h
+  include/CampaignReader.h
   src/Campaign.cpp
+  src/CampaignReader.cpp
   src/main_verify.cpp
   )
 

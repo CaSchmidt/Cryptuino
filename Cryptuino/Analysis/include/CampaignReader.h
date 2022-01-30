@@ -29,73 +29,14 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "Campaign.h"
+#ifndef CAMPAIGNREADER_H
+#define CAMPAIGNREADER_H
 
-////// Private ///////////////////////////////////////////////////////////////
+#include <string>
 
-namespace priv {
+struct Campaign;
+class csILogger;
 
-  bool isValidBuffer(const ByteBuffer& buffer, const std::size_t size)
-  {
-    return buffer.size() != 0
-        ? buffer.size() == size
-        : true;
-  }
+bool readCampaign(Campaign *campaign, const std::u8string& filename, const csILogger *logger);
 
-} // namespace priv
-
-////// Entry /////////////////////////////////////////////////////////////////
-
-CampaignEntry::CampaignEntry() noexcept = default;
-
-bool CampaignEntry::isEmpty() const
-{
-  return name.empty();
-}
-
-////// Campaign //////////////////////////////////////////////////////////////
-
-Campaign::Campaign() noexcept = default;
-
-void Campaign::add(CampaignEntry& entry)
-{
-  if( !entry.isEmpty() ) {
-    entries.push_back(std::move(entry));
-  }
-}
-
-void Campaign::clear()
-{
-  key.clear();
-  entries.clear();
-}
-
-bool Campaign::isEmpty() const
-{
-  return entries.empty();
-}
-
-bool Campaign::isValid(const std::size_t keySize, const std::size_t blockSize) const
-{
-  if( !priv::isValidBuffer(key, keySize) ) {
-    return false;
-  }
-
-  for(const CampaignEntry& entry : entries) {
-    if( !priv::isValidBuffer(entry.plain, blockSize) ) {
-      return false;
-    }
-    if( !priv::isValidBuffer(entry.cipher, blockSize) ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-std::string Campaign::lastName() const
-{
-  return !isEmpty()
-      ? entries.back().name
-      : std::string();
-}
+#endif // CAMPAIGNREADER_H
