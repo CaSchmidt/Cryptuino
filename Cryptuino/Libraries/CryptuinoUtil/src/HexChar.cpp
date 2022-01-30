@@ -43,7 +43,7 @@ ByteBuffer extractHexBytes(std::string text, const char *prefix)
     text.erase(0, numPrefix);
   }
 
-  cs::removeAll(text, cs::lambda_is_space<char>());
+  cs::removeAll(&text, cs::lambda_is_space<char>());
   if( cs::isOdd(text.size()) ) {
     return ByteBuffer();
   }
