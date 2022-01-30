@@ -1,10 +1,6 @@
 ### Verify ###################################################################
 
 add_executable(VerifySeq
-  include/Campaign.h
-  include/CampaignReader.h
-  src/Campaign.cpp
-  src/CampaignReader.cpp
   src/main_verify.cpp
   )
 
@@ -19,4 +15,4 @@ target_include_directories(VerifySeq
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
 
-target_link_libraries(VerifySeq CryptuinoUtil TinyAES)
+target_link_libraries(VerifySeq AnalysisUtil TinyAES)

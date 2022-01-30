@@ -36,5 +36,6 @@ add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/3rdparty/tinyaes10
 
 add_subdirectory(Libraries/CryptuinoUtil)
 add_subdirectory(Libraries/AcquisitionUtil)
+add_subdirectory(Libraries/AnalysisUtil)
 add_subdirectory(Acquisition/TekVISA)
 add_subdirectory(Analysis)
