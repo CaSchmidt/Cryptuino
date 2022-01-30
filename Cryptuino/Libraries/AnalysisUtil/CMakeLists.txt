@@ -3,11 +3,13 @@
 list(APPEND AnalysisUtil_HEADERS
   include/Campaign.h
   include/CampaignReader.h
+  include/MatInput.h
   )
 
 list(APPEND AnalysisUtil_SOURCES
   src/Campaign.cpp
   src/CampaignReader.cpp
+  src/MatInput.cpp
   )
 
 ### Target ###################################################################
@@ -29,5 +31,6 @@ set_target_properties(AnalysisUtil PROPERTIES
   )
 
 target_link_libraries(AnalysisUtil
-  PUBLIC CryptuinoUtil
+  PRIVATE matio
+  PUBLIC  CryptuinoUtil
   )
