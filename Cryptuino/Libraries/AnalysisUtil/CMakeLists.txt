@@ -4,6 +4,7 @@ list(APPEND AnalysisUtil_HEADERS
   include/Campaign.h
   include/CampaignReader.h
   include/MatInput.h
+  include/Matrix.h
   )
 
 list(APPEND AnalysisUtil_SOURCES
