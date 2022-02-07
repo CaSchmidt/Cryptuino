@@ -40,12 +40,40 @@
 
 #include "ScopeGuard.h"
 
+bool haveMatVariable(const std::string& filename, const std::string& varname,
+                     const csILogger *logger)
+{
+  mat_t   *file = NULL;
+  matvar_t *var = NULL;
+  ScopeGuard guard([&](void) -> void {
+    if( var != NULL ) {
+      Mat_VarFree(var);
+      var = NULL;
+    }
+    if( file != NULL ) {
+      Mat_Close(file);
+      file = NULL;
+    }
+  });
+
+  file = Mat_Open(filename.data(), MAT_ACC_RDONLY);
+  if( file == NULL ) {
+    logger->logErrorf(u8"Unable to open file \"{}\"!", filename);
+    return false;
+  }
+
+  var = Mat_VarReadInfo(file, varname.data());
+  const bool have_var = var != NULL;
+
+  return have_var;
+}
+
 SampleBuffer readMatVector(const std::string& filename, const std::string& varname,
                            const csILogger *logger)
 {
-  mat_t *file;
-  matvar_t *var;
-  ScopeGuard guard_file([&](void) -> void {
+  mat_t   *file = NULL;
+  matvar_t *var = NULL;
+  ScopeGuard guard([&](void) -> void {
     if( var != NULL ) {
       Mat_VarFree(var);
       var = NULL;

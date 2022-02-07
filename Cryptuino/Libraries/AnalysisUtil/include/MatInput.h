@@ -38,6 +38,9 @@
 
 class csILogger;
 
+bool haveMatVariable(const std::string& filename, const std::string& varname,
+                     const csILogger *logger);
+
 SampleBuffer readMatVector(const std::string& filename, const std::string& varname,
                            const csILogger *logger);
 
