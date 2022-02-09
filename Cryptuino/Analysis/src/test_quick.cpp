@@ -39,6 +39,25 @@
 #include "MatInput.h"
 #include "Matrix.h"
 
+////// (1) Test MAT I/O //////////////////////////////////////////////////////
+
+bool test_matio(const char *filename, const char *varname,
+                const csILogger *logger)
+{
+  const SampleBuffer buffer = readMatVector(filename, varname, logger);
+  if( buffer.empty() ) {
+    return false;
+  }
+
+  for(const double d : buffer) {
+    printf("%.3f\n", d);
+  }
+
+  return true;
+}
+
+////// (2) Test Matrix Order /////////////////////////////////////////////////
+
 const char *printBool(const bool b)
 {
   return b ? "true" : "false";
@@ -59,26 +78,30 @@ void printInfo(const Matrix<T,TraitsT>& M, const char *name = nullptr)
   printf("\n"); fflush(stdout);
 }
 
-int main(int /*argc*/, char **argv)
+void test_matrix()
 {
-#if 0
-  const csLogger con_logger;
-  const csILogger *logger = &con_logger;
-
-  const SampleBuffer buffer = readMatVector(argv[1], argv[2], logger);
-  if( buffer.empty() ) {
-    return EXIT_FAILURE;
-  }
-
-  for(const double d : buffer) {
-    printf("%.3f\n", d);
-  }
-#else
   ColMajMatrix<double> M1(4, 4);
   RowMajMatrix<double> M2(4, 4);
 
   printInfo(M1, "M1");
   printInfo(M2, "M2");
+}
+
+////// (X) Main //////////////////////////////////////////////////////////////
+
+int main(int /*argc*/, char **argv)
+{
+  const csLogger con_logger;
+  const csILogger *logger = &con_logger;
+
+#if 0
+  if( !test_matio(argv[1], argv[2], logger) ) {
+    return EXIT_FAILURE;
+  }
+#endif
+
+#if 0
+  test_matrix();
 #endif
 
   return EXIT_SUCCESS;
