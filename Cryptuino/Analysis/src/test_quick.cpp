@@ -38,54 +38,100 @@
 
 #include "MatInput.h"
 #include "Matrix.h"
+#include "Trigger.h"
 
 ////// (1) Test MAT I/O //////////////////////////////////////////////////////
 
-bool test_matio(const char *filename, const char *varname,
-                const csILogger *logger)
-{
-  const SampleBuffer buffer = readMatVector(filename, varname, logger);
-  if( buffer.empty() ) {
-    return false;
+namespace test_matio {
+
+  bool run(const char *filename, const char *varname,
+           const csILogger *logger)
+  {
+    const SampleBuffer buffer = readMatVector(filename, varname, logger);
+    if( buffer.empty() ) {
+      return false;
+    }
+
+    for(const double d : buffer) {
+      printf("%.3f\n", d);
+    }
+
+    return true;
   }
 
-  for(const double d : buffer) {
-    printf("%.3f\n", d);
-  }
-
-  return true;
-}
+} // namespace test_matio
 
 ////// (2) Test Matrix Order /////////////////////////////////////////////////
 
-const char *printBool(const bool b)
-{
-  return b ? "true" : "false";
-}
+namespace test_matrix {
 
-template<typename T, typename TraitsT>
-void printInfo(const Matrix<T,TraitsT>& M, const char *name = nullptr)
-{
-  printf("   name = %s\n", name);
-  printf("columns = %d\n", int(M.columns()));
-  printf("   rows = %d\n", int(M.rows()));
-  printf("col maj = %s\n", printBool(M.isColumnMajor()));
-  printf("row maj = %s\n", printBool(M.isRowMajor()));
-  printf(" @col#0 = 0x%p\n", M.columnData(0));
-  printf(" @col#1 = 0x%p\n", M.columnData(1));
-  printf(" @row#0 = 0x%p\n", M.rowData(0));
-  printf(" @row#1 = 0x%p\n", M.rowData(1));
-  printf("\n"); fflush(stdout);
-}
+  const char *printBool(const bool b)
+  {
+    return b ? "true" : "false";
+  }
 
-void test_matrix()
-{
-  ColMajMatrix<double> M1(4, 4);
-  RowMajMatrix<double> M2(4, 4);
+  template<typename T, typename TraitsT>
+  void printInfo(const Matrix<T,TraitsT>& M, const char *name = nullptr)
+  {
+    printf("   name = %s\n", name);
+    printf("columns = %d\n", int(M.columns()));
+    printf("   rows = %d\n", int(M.rows()));
+    printf("col maj = %s\n", printBool(M.isColumnMajor()));
+    printf("row maj = %s\n", printBool(M.isRowMajor()));
+    printf(" @col#0 = 0x%p\n", M.columnData(0));
+    printf(" @col#1 = 0x%p\n", M.columnData(1));
+    printf(" @row#0 = 0x%p\n", M.rowData(0));
+    printf(" @row#1 = 0x%p\n", M.rowData(1));
+    printf("\n"); fflush(stdout);
+  }
 
-  printInfo(M1, "M1");
-  printInfo(M2, "M2");
-}
+  void run()
+  {
+    ColMajMatrix<double> M1(4, 4);
+    RowMajMatrix<double> M2(4, 4);
+
+    printInfo(M1, "M1");
+    printInfo(M2, "M2");
+  }
+
+} // namespace test_matrix
+
+////// (3) Test Trigger //////////////////////////////////////////////////////
+
+namespace test_trigger {
+
+  void print(const SampleBuffer& buffer, const char *name = nullptr)
+  {
+    FILE *file = stdout;
+
+    if( name != nullptr ) {
+      fprintf(file, "%s =", name);
+    }
+    for(const SampleBuffer::value_type val : buffer) {
+      fprintf(file, " %4.1f", val);
+    }
+    fprintf(file, "\n"); fflush(file);
+  }
+
+  void run()
+  {
+    constexpr auto event = [](const double d) -> bool {
+      return d != 0;
+    };
+
+    const SampleBuffer  signal{0, 1, 2,  3, 4,  5, 6, 7, 8, 9};
+    const SampleBuffer trigger{0, 1, 1, -1, 1, -1, 1, 1, 1, 0};
+
+    print(signal,  " signal");
+    print(trigger, "trigger");
+
+    print(selectTrigger(signal, SampleBuffer{}, event), "  empty");
+    print(selectTrigger(signal, trigger, event), "  event");
+    print(selectTrigger(signal, trigger, event, 25), "event25");
+    print(selectTrigger(signal, trigger, event, 38), "event38");
+  }
+
+} // namespace test_trigger
 
 ////// (X) Main //////////////////////////////////////////////////////////////
 
@@ -95,13 +141,17 @@ int main(int /*argc*/, char **argv)
   const csILogger *logger = &con_logger;
 
 #if 0
-  if( !test_matio(argv[1], argv[2], logger) ) {
+  if( !test_matio::run(argv[1], argv[2], logger) ) {
     return EXIT_FAILURE;
   }
 #endif
 
 #if 0
-  test_matrix();
+  test_matrix::run();
+#endif
+
+#if 0
+  test_trigger::run();
 #endif
 
   return EXIT_SUCCESS;
