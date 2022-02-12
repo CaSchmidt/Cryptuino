@@ -62,6 +62,7 @@ struct Campaign {
                const std::size_t blockSize = AES_BLOCK_SIZE) const;
 
   std::string lastEntryName() const;
+  std::size_t numEntries(const std::size_t numWant) const;
 
   ByteBuffer          key{};
   CampaignEntries entries{};

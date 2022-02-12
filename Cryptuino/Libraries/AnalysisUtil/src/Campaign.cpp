@@ -29,6 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <algorithm>
+
 #include "Campaign.h"
 
 ////// Private ///////////////////////////////////////////////////////////////
@@ -98,4 +100,11 @@ std::string Campaign::lastEntryName() const
   return !isEmpty()
       ? entries.back().name
       : std::string();
+}
+
+std::size_t Campaign::numEntries(const std::size_t numWant) const
+{
+  return numWant > 0
+      ? std::min<std::size_t>(numWant, entries.size())
+      : 0;
 }
