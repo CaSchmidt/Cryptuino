@@ -32,13 +32,13 @@
 #ifndef MATOUTPUT_H
 #define MATOUTPUT_H
 
-#include <string>
+#include <filesystem>
 
 #include "IInstrument.h"
 
 class csILogger;
 
 bool writeMatOutput(const csILogger *logger, const InstrumentPtr& instr,
-                    const std::string& filename, const std::string& channels);
+                    const std::filesystem::path& path, const std::string& channels);
 
 #endif // MATOUTPUT_H

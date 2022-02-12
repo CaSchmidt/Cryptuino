@@ -32,16 +32,16 @@
 #ifndef MATINPUT_H
 #define MATINPUT_H
 
-#include <string>
+#include <filesystem>
 
 #include "Buffer.h"
 
 class csILogger;
 
-bool haveMatVariable(const std::string& filename, const std::string& varname,
+bool haveMatVariable(const std::filesystem::path& path, const std::string& varname,
                      const csILogger *logger);
 
-SampleBuffer readMatVector(const std::string& filename, const std::string& varname,
+SampleBuffer readMatVector(const std::filesystem::path& path, const std::string& varname,
                            const csILogger *logger);
 
 #endif // MATINPUT_H

@@ -111,12 +111,12 @@ namespace priv {
 ////// Public ////////////////////////////////////////////////////////////////
 
 bool writeMatOutput(const csILogger *logger, const InstrumentPtr& instr,
-                    const std::string& filename, const std::string& channels)
+                    const std::filesystem::path& path, const std::string& channels)
 {
   const int ch_trace   = channels[0] - '0';
   const int ch_trigger = channels[1] - '0';
 
-  mat_t *matfile = Mat_CreateVer(filename.data(), NULL, MAT_FT_DEFAULT);
+  mat_t *matfile = Mat_CreateVer(cs::CSTR(path.generic_u8string().data()), NULL, MAT_FT_DEFAULT);
   if( matfile == NULL ) {
     return false;
   }
@@ -143,7 +143,7 @@ bool writeMatOutput(const csILogger *logger, const InstrumentPtr& instr,
     return false;
   }
 
-  logger->logTextf(u8"Wrote file \"{}\".", filename);
+  logger->logTextf(u8"Wrote file \"{}\".", cs::CSTR(path.generic_u8string().data()));
 
   return true;
 }

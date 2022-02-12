@@ -48,15 +48,15 @@ using ConstStringListIter = cs::ConstStringListIter<char>;
 
 ////// Public ////////////////////////////////////////////////////////////////
 
-bool readCampaign(Campaign *campaign, const std::u8string& filename, const csILogger *logger)
+bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const csILogger *logger)
 {
   *campaign = Campaign();
 
-  logger->logTextf(u8"Opening file \"{}\".", cs::CSTR(filename.data()));
+  logger->logTextf(u8"Opening file \"{}\".", cs::CSTR(path.generic_u8string().data()));
 
   // (1) Open file ///////////////////////////////////////////////////////////
 
-  const StringList lines = csReadLines(filename);
+  const StringList lines = csReadLines(path);
   if( lines.empty() ) {
     logger->logError(u8"No input!");
     return false;
@@ -98,7 +98,7 @@ bool readCampaign(Campaign *campaign, const std::u8string& filename, const csILo
 
   // Done! ///////////////////////////////////////////////////////////////////
 
-  logger->logTextf(u8"File \"{}\" opened.", cs::CSTR(filename.data()));
+  logger->logTextf(u8"File \"{}\" opened.", cs::CSTR(path.generic_u8string().data()));
 
   return true;
 }

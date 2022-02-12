@@ -32,11 +32,11 @@
 #ifndef CAMPAIGNREADER_H
 #define CAMPAIGNREADER_H
 
-#include <string>
+#include <filesystem>
 
 struct Campaign;
 class csILogger;
 
-bool readCampaign(Campaign *campaign, const std::u8string& filename, const csILogger *logger);
+bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const csILogger *logger);
 
 #endif // CAMPAIGNREADER_H
