@@ -1,3 +1,23 @@
+### CPA ######################################################################
+
+add_executable(CPA
+  src/main_cpa.cpp
+  )
+
+format_output_name(CPA "CPA")
+
+set_target_properties(CPA PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
+  )
+
+target_include_directories(CPA
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
+
+target_link_libraries(CPA AnalysisUtil TinyAES)
+
+
 ### Verify ###################################################################
 
 add_executable(VerifySeq
