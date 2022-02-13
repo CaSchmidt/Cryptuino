@@ -74,15 +74,14 @@ double powerModel(const uint8_t plain, const uint8_t key)
   return static_cast<double>(std::popcount<uint8_t>(SBOX[plain ^ key]));
 }
 
-AttackMatrix buildAttackMatrix(const std::filesystem::path& path, const Campaign& campaign,
-                               const std::size_t numWant, const std::size_t run)
+AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
+                               const std::size_t run)
 {
   constexpr std::size_t KEY_VALUES = 256;
 
   // (1) Sanity Check ////////////////////////////////////////////////////////
 
-  const std::size_t numHave = campaign.numEntries(numWant);
-  if( !std::filesystem::is_regular_file(path)  ||  numHave < 1 ) {
+  if( numD < 1 ) {
     return AttackMatrix();
   }
 
@@ -93,14 +92,14 @@ AttackMatrix buildAttackMatrix(const std::filesystem::path& path, const Campaign
   // (2) Create Attack Matrix ////////////////////////////////////////////////
 
   AttackMatrix A;
-  if( !A.resize(numHave, KEY_VALUES) ) {
+  if( !A.resize(numD, KEY_VALUES) ) {
     return AttackMatrix();
   }
 
   // (3) Fill Attack Matrix //////////////////////////////////////////////////
 
   CampaignEntries::const_iterator iter = campaign.entries.cbegin();
-  for(std::size_t i = 0; i < numHave; i++, ++iter) {
+  for(std::size_t i = 0; i < numD; i++, ++iter) {
     const uint8_t plain = iter->plain[run];
     for(std::size_t j = 0; j < KEY_VALUES; j++) {
       A(i, j) = powerModel(plain, uint8_t(j));
@@ -135,6 +134,23 @@ int main(int argc, char **argv)
   if( !campaign.isValid() ) {
     logger->logErrorf(u8"Invalid campaign \"{}\"!",
                       cs::CSTR(campaignPath.generic_u8string().data()));
+    return EXIT_FAILURE;
+  }
+
+  // (2) Sanitize Number of Traces ///////////////////////////////////////////
+
+  const std::size_t numD = campaign.numEntries(campaignPath, numTraces);
+  if( numD < 1 ) {
+    logger->logErrorf(u8"No traces for campaign \"{}\"!",
+                      cs::CSTR(campaignPath.generic_u8string().data()));
+    return EXIT_FAILURE;
+  }
+
+  // (3) Create Attack Matrix ////////////////////////////////////////////////
+
+  const AttackMatrix A = buildAttackMatrix(campaign, numD, 0);
+  if( A.isEmpty() ) {
+    logger->logError(u8"Unable to build attack matrix!");
     return EXIT_FAILURE;
   }
 

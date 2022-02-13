@@ -55,6 +55,24 @@ bool CampaignEntry::isEmpty() const
   return name.empty();
 }
 
+bool CampaignEntry::exists(const std::filesystem::path& base) const
+{
+  std::error_code ec;
+  return std::filesystem::exists(path(base), ec);
+}
+
+std::filesystem::path CampaignEntry::path(const std::filesystem::path& base) const
+{
+  std::error_code ec;
+  std::filesystem::path p = std::filesystem::is_directory(base, ec)
+      ? base
+      : base.parent_path();
+
+  p.append(name + ".mat");
+
+  return p;
+}
+
 ////// Campaign //////////////////////////////////////////////////////////////
 
 Campaign::Campaign() noexcept = default;
@@ -102,9 +120,20 @@ std::string Campaign::lastEntryName() const
       : std::string();
 }
 
-std::size_t Campaign::numEntries(const std::size_t numWant) const
+std::size_t Campaign::numEntries(const std::filesystem::path& base, const std::size_t numWant) const
 {
-  return numWant > 0
-      ? std::min<std::size_t>(numWant, entries.size())
-      : 0;
+  if( isEmpty()  || numWant < 1 ) {
+    return 0;
+  }
+
+  const std::size_t numHave = std::min<std::size_t>(numWant, entries.size());
+
+  CampaignEntries::const_iterator iter = entries.cbegin();
+  for(std::size_t i = 0; i < numHave; i++, ++iter) {
+    if( !iter->exists(base) ) {
+      return i;
+    }
+  }
+
+  return numHave;
 }

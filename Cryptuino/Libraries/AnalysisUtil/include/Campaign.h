@@ -32,8 +32,8 @@
 #ifndef CAMPAIGN_H
 #define CAMPAIGN_H
 
+#include <filesystem>
 #include <list>
-#include <string>
 
 #include "Buffer.h"
 #include "Cryptuino.h"
@@ -42,6 +42,9 @@ struct CampaignEntry {
   CampaignEntry() noexcept;
 
   bool isEmpty() const;
+
+  bool exists(const std::filesystem::path& base) const;
+  std::filesystem::path path(const std::filesystem::path& base) const;
 
   std::string  name{};
   ByteBuffer  plain{};
@@ -62,7 +65,7 @@ struct Campaign {
                const std::size_t blockSize = AES_BLOCK_SIZE) const;
 
   std::string lastEntryName() const;
-  std::size_t numEntries(const std::size_t numWant) const;
+  std::size_t numEntries(const std::filesystem::path& base, const std::size_t numWant) const;
 
   ByteBuffer          key{};
   CampaignEntries entries{};
