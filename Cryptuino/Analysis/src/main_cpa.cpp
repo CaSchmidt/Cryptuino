@@ -35,23 +35,29 @@
 
 #include <array>
 #include <bit>
+#include <limits>
 
 #define HAVE_STD_FORMAT
 #include <csUtil/csLogger.h>
+#include <csUtil/csNumeric.h>
 #include <csUtil/csTypeTraits.h>
 
 #include "Campaign.h"
 #include "CampaignReader.h"
+#include "MatInput.h"
 #include "Matrix.h"
+#include "Trigger.h"
 
 ////// Types /////////////////////////////////////////////////////////////////
 
 using AttackMatrix = ColMajMatrix<double>;
+using  TraceMatrix = ColMajMatrix<double>;
 
 ////// Implementation ////////////////////////////////////////////////////////
 
 double powerModel(const uint8_t plain, const uint8_t key)
 {
+  // cf. https://en.wikipedia.org/wiki/Rijndael_S-box
   const std::array<uint8_t,256> SBOX{
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -81,10 +87,6 @@ AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
 
   // (1) Sanity Check ////////////////////////////////////////////////////////
 
-  if( numD < 1 ) {
-    return AttackMatrix();
-  }
-
   if( run < 0  ||  run >= AES128_KEY_SIZE ) {
     return AttackMatrix();
   }
@@ -111,15 +113,120 @@ AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
   return A;
 }
 
+void progress(const csILogger *logger, const std::size_t pos, const std::size_t max,
+              const std::size_t step = 10)
+{
+  constexpr std::size_t HUNDRED = 100;
+  constexpr std::size_t    ZERO = 0;
+
+  if( max < 1  ||  pos < 1  ||  pos > max  ||  step < 1 ) {
+    return;
+  }
+
+  if( pos%step == ZERO  ||  pos == max ) {
+    const std::size_t pct = (pos*HUNDRED)/max;
+    const std::size_t wid = cs::countDigits(max);
+
+    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, wid, max);
+  }
+}
+
+SampleBuffer readTrace(const std::filesystem::path& path,
+                       const TriggerEvent& event, const std::size_t range,
+                       const csILogger *logger)
+{
+  // (1) Read Signal AKA Full Trace //////////////////////////////////////////
+
+  const SampleBuffer signal = readMatVector(path, "trace", logger);
+  if( signal.empty() ) {
+    return SampleBuffer();
+  }
+
+  // (2) Read (Optional) Trigger /////////////////////////////////////////////
+
+  const bool    have_trigger = haveMatVariable(path, "trigger", logger);
+  const SampleBuffer trigger = have_trigger
+      ? readMatVector(path, "trigger", logger)
+      : SampleBuffer();
+  if( have_trigger  &&  trigger.empty() ) {
+    return SampleBuffer();
+  }
+
+  // (3) Apply Trigger Condition and/or Range ////////////////////////////////
+
+  const SampleBuffer trace = !trigger.empty()
+      ? selectTrigger(signal, trigger, event, range)
+      : copyRange(signal, range);
+  if( trace.empty() ) {
+    logger->logErrorf(u8"Empty trace for file \"{}\"!",
+                      cs::CSTR(path.generic_u8string().data()));
+    return SampleBuffer();
+  }
+
+  return trace;
+}
+
+TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& campaign,
+                             const std::size_t numD,
+                             const TriggerEvent& event, const std::size_t range,
+                             const csILogger *logger)
+{
+  using Traces = std::list<SampleBuffer>;
+
+  // (1) Read all Traces /////////////////////////////////////////////////////
+
+  Traces    traces;
+  std::size_t numT = std::numeric_limits<std::size_t>::max();
+
+  CampaignEntries::const_iterator entry = campaign.entries.cbegin();
+  for(std::size_t i = 0; i < numD; i++, ++entry) {
+    SampleBuffer trace = readTrace(entry->path(base), event, range, logger);
+    if( trace.empty() ) {
+      return TraceMatrix();
+    }
+
+    traces.push_back(std::move(trace));
+
+    if( traces.back().size() < numT ) {
+      numT = traces.back().size();
+    }
+
+    progress(logger, i + 1, numD);
+  }
+
+  // (2) Create Trace Matrix /////////////////////////////////////////////////
+
+  TraceMatrix T;
+  if( !T.resize(numD, numT) ) {
+    return TraceMatrix();
+  }
+
+  // (3) Fill Trace Matrix ///////////////////////////////////////////////////
+
+  Traces::const_iterator trace = traces.cbegin();
+  for(std::size_t i = 0; i < numD; i++, ++trace) {
+    for(std::size_t j = 0; j < numT; j++) {
+      T(i, j) = trace->operator[](j);
+    }
+  }
+
+  return T;
+}
+
 ////// Main //////////////////////////////////////////////////////////////////
 
-int main(int argc, char **argv)
+int main(int /*argc*/, char **argv)
 {
   // (0) Configuration ///////////////////////////////////////////////////////
 
   const std::filesystem::path campaignPath(argv[1]);
 
   const std::size_t numTraces = 200;
+
+  const TriggerEvent event = [](const double d) -> bool {
+    return d > 2.5;
+  };
+  const std::size_t range = 15;
 
   const csLogger con_logger(stderr);
   const csILogger *logger = &con_logger;
@@ -146,8 +253,18 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  // (3) Create Attack Matrix ////////////////////////////////////////////////
+  // (3) Create Trace Matrix /////////////////////////////////////////////////
 
+  logger->logText(u8"Step 1: Build trace matrix.");
+  const TraceMatrix T = buildTraceMatrix(campaignPath, campaign, numD, event, range, logger);
+  if( T.isEmpty() ) {
+    logger->logError(u8"Unable to build trace matrix!");
+    return EXIT_FAILURE;
+  }
+
+  // (4) Create Attack Matrix ////////////////////////////////////////////////
+
+  logger->logText(u8"Step 2: Build attack matrix.");
   const AttackMatrix A = buildAttackMatrix(campaign, numD, 0);
   if( A.isEmpty() ) {
     logger->logError(u8"Unable to build attack matrix!");
