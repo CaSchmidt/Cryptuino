@@ -40,6 +40,8 @@
 
 using TriggerEvent = std::function<bool(const SampleBuffer::value_type)>;
 
+SampleBuffer copyRange(const SampleBuffer& signal, const std::size_t _range = 100);
+
 SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigger,
                            const TriggerEvent& event, const std::size_t _range = 100);
 

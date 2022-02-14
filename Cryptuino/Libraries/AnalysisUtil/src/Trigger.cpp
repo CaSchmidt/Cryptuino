@@ -34,12 +34,55 @@
 
 #include "Trigger.h"
 
+////// Private ///////////////////////////////////////////////////////////////
+
+namespace priv {
+
+  std::size_t relativeCount(const std::size_t have, const std::size_t _range)
+  {
+    constexpr std::size_t HUNDRED = 100;
+
+    const std::size_t range = std::clamp<std::size_t>(_range, 1, 100);
+    const std::size_t  want = range == HUNDRED
+        ? have
+        : (have*range)/HUNDRED;
+
+    return have < 1
+        ? 0
+        : want;
+  }
+
+} // namespace priv
+
+////// Public ////////////////////////////////////////////////////////////////
+
+SampleBuffer copyRange(const SampleBuffer& signal, const std::size_t _range)
+{
+  // (1) Sanity Check ////////////////////////////////////////////////////////
+
+  if( signal.empty() ) {
+    return SampleBuffer();
+  }
+
+  // (2) Copy Range //////////////////////////////////////////////////////////
+
+  const std::size_t want = priv::relativeCount(signal.size(), _range);
+
+  SampleBuffer result;
+  try {
+    result.resize(want);
+    std::copy_n(signal.cbegin(), want, result.begin());
+  } catch(...) {
+    return SampleBuffer();
+  }
+
+  return result;
+}
+
 SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigger,
                            const TriggerEvent& event, const std::size_t _range)
 {
   using ConstIter = SampleBuffer::const_iterator;
-
-  constexpr std::size_t HUNDRED = 100;
 
   // (1) Sanity Check ////////////////////////////////////////////////////////
 
@@ -61,10 +104,7 @@ SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigg
 
   // (3) Copy Range //////////////////////////////////////////////////////////
 
-  const std::size_t range = std::clamp<std::size_t>(_range, 1, 100);
-  const std::size_t  want = range == HUNDRED
-      ?  have
-       : (have*range)/HUNDRED;
+  const std::size_t want = priv::relativeCount(have, _range);
 
   SampleBuffer result;
   try {
