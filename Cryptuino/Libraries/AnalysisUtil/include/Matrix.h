@@ -43,9 +43,10 @@
  * Element (i,j) refers to the i-th row and the j-th column.
  */
 
-template<typename T>
+template<typename T, typename TagT = T>
 struct ColumnMajorTraits {
   using  size_type = std::size_t;
+  using   tag_type = TagT;
   using value_type = T;
 
   inline static size_type index(const size_type Mrows, const size_type /*Ncols*/,
@@ -55,9 +56,10 @@ struct ColumnMajorTraits {
   }
 };
 
-template<typename T>
+template<typename T, typename TagT = T>
 struct RowMajorTraits {
   using  size_type = std::size_t;
+  using   tag_type = TagT;
   using value_type = T;
 
   inline static size_type index(const size_type /*Mrows*/, const size_type Ncols,
@@ -210,10 +212,10 @@ private:
   size_type               _Ncols{};
 };
 
-template<typename T>
-using ColMajMatrix = Matrix<T,ColumnMajorTraits<T>>;
+template<typename T, typename TagT = T>
+using ColMajMatrix = Matrix<T,ColumnMajorTraits<T,TagT>>;
 
-template<typename T>
-using RowMajMatrix = Matrix<T,RowMajorTraits<T>>;
+template<typename T, typename TagT = T>
+using RowMajMatrix = Matrix<T,RowMajorTraits<T,TagT>>;
 
 #endif // MATRIX_H

@@ -50,8 +50,15 @@
 
 ////// Types /////////////////////////////////////////////////////////////////
 
-using AttackMatrix = ColMajMatrix<double>;
-using  TraceMatrix = ColMajMatrix<double>;
+namespace impl {
+
+  struct attack_tag {};
+  struct  trace_tag {};
+
+} // namespace impl
+
+using AttackMatrix = ColMajMatrix<double,impl::attack_tag>;
+using  TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
 
 ////// Implementation ////////////////////////////////////////////////////////
 
