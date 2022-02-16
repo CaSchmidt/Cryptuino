@@ -52,13 +52,15 @@
 
 namespace impl {
 
-  struct attack_tag {};
-  struct  trace_tag {};
+  struct      attack_tag {};
+  struct correlation_tag {};
+  struct       trace_tag {};
 
 } // namespace impl
 
-using AttackMatrix = ColMajMatrix<double,impl::attack_tag>;
-using  TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
+using      AttackMatrix = ColMajMatrix<double,impl::attack_tag>;
+using CorrelationMatrix = ColMajMatrix<double,impl::correlation_tag>;
+using       TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
 
 ////// Implementation ////////////////////////////////////////////////////////
 
@@ -131,10 +133,10 @@ void progress(const csILogger *logger, const std::size_t pos, const std::size_t 
   }
 
   if( pos%step == ZERO  ||  pos == max ) {
-    const std::size_t pct = (pos*HUNDRED)/max;
-    const std::size_t wid = cs::countDigits(max);
+    const std::size_t   pct = (pos*HUNDRED)/max;
+    const std::size_t width = cs::countDigits(max);
 
-    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, wid, max);
+    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, width, max);
   }
 }
 
@@ -213,7 +215,7 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
   Traces::const_iterator trace = traces.cbegin();
   for(std::size_t i = 0; i < numD; i++, ++trace) {
     for(std::size_t j = 0; j < numT; j++) {
-      T(i, j) = trace->operator[](j);
+      T(i, j) = (*trace)[j];
     }
   }
 
