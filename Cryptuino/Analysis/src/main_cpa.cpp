@@ -40,7 +40,7 @@
 #define HAVE_STD_FORMAT
 #include <csUtil/csLogger.h>
 #include <csUtil/csNumeric.h>
-#include <csUtil/csTypeTraits.h>
+#include <csUtil/csStatistics.h>
 
 #include "Campaign.h"
 #include "CampaignReader.h"
@@ -222,6 +222,33 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
   return T;
 }
 
+CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
+                                     const csILogger *)
+{
+  // (1) Setup ///////////////////////////////////////////////////////////////
+
+  const std::size_t numD = A.rows();    // ... or T.rows()
+  const std::size_t numK = A.columns();
+  const std::size_t numT = T.columns();
+
+  // (2) Create Correlation Matrix ///////////////////////////////////////////
+
+  CorrelationMatrix R;
+  if( !R.resize(numK, numT) ) {
+    return CorrelationMatrix();
+  }
+
+  // (3) Compute Correlation /////////////////////////////////////////////////
+
+  for(std::size_t i = 0; i < numK; i++) {
+    for(std::size_t j = 0; j < numT; j++) {
+      R(i, j) = cs::corr(A.columnData(i), T.columnData(j), numD);
+    }
+  }
+
+  return R;
+}
+
 ////// Main //////////////////////////////////////////////////////////////////
 
 int main(int /*argc*/, char **argv)
@@ -230,7 +257,7 @@ int main(int /*argc*/, char **argv)
 
   const std::filesystem::path campaignPath(argv[1]);
 
-  const std::size_t numTraces = 200;
+  const std::size_t numTraces = 500;
 
   const TriggerEvent event = [](const double d) -> bool {
     return d > 2.5;
@@ -274,11 +301,39 @@ int main(int /*argc*/, char **argv)
   // (4) Create Attack Matrix ////////////////////////////////////////////////
 
   logger->logText(u8"Step 2: Build attack matrix.");
-  const AttackMatrix A = buildAttackMatrix(campaign, numD, 0);
+  const AttackMatrix A = buildAttackMatrix(campaign, numD, 1);
   if( A.isEmpty() ) {
     logger->logError(u8"Unable to build attack matrix!");
     return EXIT_FAILURE;
   }
+
+  // (5) Compute Correlation Matrix //////////////////////////////////////////
+
+  logger->logText(u8"Step 3: Compute correlation matrix.");
+  const CorrelationMatrix R = computeCorrelation(A, T, logger);
+  if( R.isEmpty() ) {
+    logger->logError(u8"Unable to compute correlation matrix!");
+    return EXIT_FAILURE;
+  }
+
+  // TODO...
+
+  printf("Done!\n");
+
+  std::size_t keyi = std::numeric_limits<std::size_t>::max();
+  double      keyv = 0;
+
+  for(std::size_t i = 0; i < R.rows(); i++) {
+    for(std::size_t j = 0; j < R.columns(); j++) {
+      const double v = cs::abs(R(i, j));
+      if( v > keyv ) {
+        keyi = i;
+        keyv = v;
+      }
+    }
+  }
+
+  printf("0x%02llX, %.3f\n", keyi, keyv);
 
   return EXIT_SUCCESS;
 }
