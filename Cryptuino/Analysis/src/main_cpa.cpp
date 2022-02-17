@@ -222,8 +222,7 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
   return T;
 }
 
-CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
-                                     const csILogger *)
+CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T)
 {
   // (1) Setup ///////////////////////////////////////////////////////////////
 
@@ -298,42 +297,56 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
-  // (4) Create Attack Matrix ////////////////////////////////////////////////
+  std::array<std::size_t,AES128_KEY_SIZE> keyi;
+  std::array<double,AES128_KEY_SIZE> keyv;
 
-  logger->logText(u8"Step 2: Build attack matrix.");
-  const AttackMatrix A = buildAttackMatrix(campaign, numD, 1);
-  if( A.isEmpty() ) {
-    logger->logError(u8"Unable to build attack matrix!");
-    return EXIT_FAILURE;
-  }
+  for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
+    const std::string pstr =
+        std::format("{:{}}/{}",
+                    k + 1, cs::countDigits(AES128_KEY_SIZE), AES128_KEY_SIZE);
 
-  // (5) Compute Correlation Matrix //////////////////////////////////////////
+    // (4) Create Attack Matrix //////////////////////////////////////////////
 
-  logger->logText(u8"Step 3: Compute correlation matrix.");
-  const CorrelationMatrix R = computeCorrelation(A, T, logger);
-  if( R.isEmpty() ) {
-    logger->logError(u8"Unable to compute correlation matrix!");
-    return EXIT_FAILURE;
-  }
+    logger->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
+    const AttackMatrix A = buildAttackMatrix(campaign, numD, k);
+    if( A.isEmpty() ) {
+      logger->logError(u8"Unable to build attack matrix!");
+      return EXIT_FAILURE;
+    }
 
-  // TODO...
+    // (5) Compute Correlation Matrix //////////////////////////////////////////
 
-  printf("Done!\n");
+    logger->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
+    const CorrelationMatrix R = computeCorrelation(A, T);
+    if( R.isEmpty() ) {
+      logger->logError(u8"Unable to compute correlation matrix!");
+      return EXIT_FAILURE;
+    }
 
-  std::size_t keyi = std::numeric_limits<std::size_t>::max();
-  double      keyv = 0;
-
-  for(std::size_t i = 0; i < R.rows(); i++) {
-    for(std::size_t j = 0; j < R.columns(); j++) {
-      const double v = cs::abs(R(i, j));
-      if( v > keyv ) {
-        keyi = i;
-        keyv = v;
+    keyi[k] = std::numeric_limits<std::size_t>::max();
+    keyv[k] = 0;
+    for(std::size_t i = 0; i < R.rows(); i++) {
+      for(std::size_t j = 0; j < R.columns(); j++) {
+        const double v = cs::abs(R(i, j));
+        if( v > keyv[k] ) {
+          keyi[k] = i;
+          keyv[k] = v;
+        }
       }
     }
-  }
+  } // For Each Byte of Key
 
-  printf("0x%02llX, %.3f\n", keyi, keyv);
+  std::string keystr;
+  for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
+    keystr += std::format(" {:2X}", keyi[k]);
+  }
+  logger->logTextf(u8"key ={}", keystr);
+
+  std::string corstr;
+  for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
+    corstr += std::format(" {:.3}", keyv[k]);
+  }
+  logger->logTextf(u8"cor ={}", corstr);
 
   return EXIT_SUCCESS;
 }
