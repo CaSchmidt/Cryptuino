@@ -106,7 +106,9 @@ void CmdOption::printUsage(std::ostream& output) const
     output << "<" << impl_defaultValue() << ">";
   }
 
-  output << "    " << _help;
+  if( !_help.empty() ) {
+    output << std::endl << "        " << _help;
+  }
 
   output << std::endl;
 }
