@@ -107,7 +107,10 @@ void CmdOption::printUsage(std::ostream& output) const
   }
 
   if( !_help.empty() ) {
-    output << std::endl << "        " << _help;
+    const cs::StringList<char> lines = cs::split(_help, "\n");
+    for(const cs::String<char>& line : lines) {
+      output << std::endl << "        " << line;
+    }
   }
 
   output << std::endl;
