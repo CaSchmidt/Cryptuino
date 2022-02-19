@@ -32,12 +32,15 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#include <string>
+
 class csILogger;
 class csSerial;
 
 class Randomizer;
 
 void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer);
+void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer,
+              const std::string& data = std::string());
 
 #endif // SERIAL_H

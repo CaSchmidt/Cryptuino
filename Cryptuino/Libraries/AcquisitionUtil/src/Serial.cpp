@@ -77,13 +77,23 @@ void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned in
   }
 }
 
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer)
+void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer,
+              const std::string& data)
 {
   priv::AesBuffer  aesdata;
   priv::CharBuffer buffer;
   buffer.fill(0);
 
   randomizer.generate(aesdata.data(), aesdata.size());
-  priv::buildAesCmd(prefix, buffer.data(), aesdata.data());
+  if( data.size() == 32 ) {
+    char *cmd = buffer.data();
+    *cmd++ = prefix;
+    for(std::size_t i = 0; i < data.size(); i++) {
+      *cmd++ = data[i];
+    }
+    *cmd = '\n';
+  } else {
+    priv::buildAesCmd(prefix, buffer.data(), aesdata.data());
+  }
   serial.write(buffer.data(), cs::length(buffer.data()));
 }

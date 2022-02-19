@@ -88,6 +88,18 @@ CmdOptionsPtr options()
   ptr->setRequired(false);
   opts->add(ptr);
 
+  ptr = make_option<CmdStringOption>("key",
+                                     [](const std::string& s) -> bool {
+    if( s.empty() ) {
+      return true;
+    }
+    return std::count_if(s.cbegin(), s.cend(), [](const char& c) -> bool {
+      return cs::isHexDigit(c);
+    }) == 32;
+  });
+  ptr->setRequired(false);
+  opts->add(ptr);
+
   opts->setLongFormat(true);
 
   return opts;
@@ -104,6 +116,7 @@ int main(int argc, char **argv)
 
   const std::string         channels =  opts->value<std::string>("channels");
   const int                    count =  opts->value<int>("count");
+  const std::string              key =  opts->value<std::string>("key");
   const std::string       ser_device =  opts->value<std::string>("ser-device");
   const int               ser_rate   =  opts->value<int>("ser-rate");
   const unsigned int tout_instrument =  opts->value<unsigned int>("tout-instrument");
@@ -140,7 +153,7 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  txAesCmd('@', serial, randomizer);
+  txAesCmd('@', serial, randomizer, key);
   rxAesCmd(logger, serial, tout_serial);
 
   // (4) Sequence ////////////////////////////////////////////////////////////
