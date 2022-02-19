@@ -61,6 +61,7 @@ CmdOptionsPtr options()
                                      [](const std::string& s) -> bool {
     return s.size() == 2  &&  cs::isDigit(s[0])  &&  cs::isDigit(s[1]);
   }, "12");
+  ptr->setHelp("1st: trace, 2nd: trigger");
   ptr->setRequired(false);
   opts->add(ptr);
 
