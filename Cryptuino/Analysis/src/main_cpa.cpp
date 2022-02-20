@@ -42,6 +42,8 @@
 #include <csUtil/csNumeric.h>
 #include <csUtil/csStatistics.h>
 
+#include <csUtil/csTime.h>
+
 #include "Campaign.h"
 #include "CampaignReader.h"
 #include "MatInput.h"
@@ -61,6 +63,28 @@ namespace impl {
 using      AttackMatrix = ColMajMatrix<double,impl::attack_tag>;
 using CorrelationMatrix = ColMajMatrix<double,impl::correlation_tag>;
 using       TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
+
+using NumVec = std::vector<double>;
+
+////// Helper ////////////////////////////////////////////////////////////////
+
+void progress(const csILogger *logger, const std::size_t pos, const std::size_t max,
+              const std::size_t step = 10)
+{
+  constexpr std::size_t HUNDRED = 100;
+  constexpr std::size_t    ZERO = 0;
+
+  if( max < 1  ||  pos < 0  ||  pos > max  ||  step < 1 ) {
+    return;
+  }
+
+  if( pos%step == ZERO  ||  pos == max ) {
+    const std::size_t   pct = (pos*HUNDRED)/max;
+    const std::size_t width = cs::countDigits(max);
+
+    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, width, max);
+  }
+}
 
 ////// Implementation ////////////////////////////////////////////////////////
 
@@ -120,24 +144,6 @@ AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
   // Done! ///////////////////////////////////////////////////////////////////
 
   return A;
-}
-
-void progress(const csILogger *logger, const std::size_t pos, const std::size_t max,
-              const std::size_t step = 10)
-{
-  constexpr std::size_t HUNDRED = 100;
-  constexpr std::size_t    ZERO = 0;
-
-  if( max < 1  ||  pos < 1  ||  pos > max  ||  step < 1 ) {
-    return;
-  }
-
-  if( pos%step == ZERO  ||  pos == max ) {
-    const std::size_t   pct = (pos*HUNDRED)/max;
-    const std::size_t width = cs::countDigits(max);
-
-    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, width, max);
-  }
 }
 
 SampleBuffer readTrace(const std::filesystem::path& path,
@@ -222,6 +228,44 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
   return T;
 }
 
+template<typename TraitsT>
+NumVec columnMean(const Matrix<double,TraitsT>& M)
+{
+  NumVec mean;
+  try {
+    mean.resize(M.columns());
+  } catch(...) {
+    return NumVec();
+  }
+
+  for(std::size_t j = 0; j < M.columns(); j++) {
+    mean[j] = cs::mean(M.columnData(j), M.rows());
+  }
+
+  return mean;
+}
+
+template<typename TraitsT>
+NumVec columnStdDev(const Matrix<double,TraitsT>& M, const NumVec& mean)
+{
+  if( M.columns() != mean.size() ) {
+    return NumVec();
+  }
+
+  NumVec stddev;
+  try {
+    stddev.resize(M.columns());
+  } catch(...) {
+    return NumVec();
+  }
+
+  for(std::size_t j = 0; j < M.columns(); j++) {
+    stddev[j] = cs::stddev(M.columnData(j), M.rows(), mean[j]);
+  }
+
+  return stddev;
+}
+
 CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T)
 {
   // (1) Setup ///////////////////////////////////////////////////////////////
@@ -239,11 +283,29 @@ CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T
 
   // (3) Compute Correlation /////////////////////////////////////////////////
 
+  const uint64_t beg = csTickCountMs();
+
+  const NumVec meanA = columnMean(A);
+  const NumVec meanT = columnMean(T);
+  if( meanA.empty()  ||  meanT.empty() ) {
+    return CorrelationMatrix();
+  }
+
+  const NumVec stddevA = columnStdDev(A, meanA);
+  const NumVec stddevT = columnStdDev(T, meanT);
+  if( stddevA.empty()  ||  stddevT.empty() ) {
+    return CorrelationMatrix();
+  }
+
   for(std::size_t i = 0; i < numK; i++) {
     for(std::size_t j = 0; j < numT; j++) {
-      R(i, j) = cs::corr(A.columnData(i), T.columnData(j), numD);
+      R(i, j)  = cs::cov(A.columnData(i), T.columnData(j), numD, meanA[i], meanT[j]);
+      R(i, j) /= stddevA[i]*stddevT[j];
     }
   }
+
+  const uint64_t end = csTickCountMs();
+  printf("duration = %llums\n", end - beg);
 
   return R;
 }
