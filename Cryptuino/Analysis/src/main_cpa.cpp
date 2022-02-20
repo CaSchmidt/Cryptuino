@@ -266,7 +266,8 @@ NumVec columnStdDev(const Matrix<double,TraitsT>& M, const NumVec& mean)
   return stddev;
 }
 
-CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T)
+CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
+                                     const NumVec& meanT, const NumVec& stddevT)
 {
   // (1) Setup ///////////////////////////////////////////////////////////////
 
@@ -286,14 +287,12 @@ CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T
   const uint64_t beg = csTickCountMs();
 
   const NumVec meanA = columnMean(A);
-  const NumVec meanT = columnMean(T);
-  if( meanA.empty()  ||  meanT.empty() ) {
+  if( meanA.empty() ) {
     return CorrelationMatrix();
   }
 
   const NumVec stddevA = columnStdDev(A, meanA);
-  const NumVec stddevT = columnStdDev(T, meanT);
-  if( stddevA.empty()  ||  stddevT.empty() ) {
+  if( stddevA.empty() ) {
     return CorrelationMatrix();
   }
 
@@ -359,6 +358,13 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
+  const NumVec   meanT = columnMean(T);
+  const NumVec stddevT = columnStdDev(T, meanT);
+  if( meanT.empty()  ||  stddevT.empty() ) {
+    logger->logError(u8"Unable to compute trace auxiliaries!");
+    return EXIT_FAILURE;
+  }
+
   // (4) Attack with Correlation /////////////////////////////////////////////
 
   std::array<std::size_t,AES128_KEY_SIZE> keyi;
@@ -381,7 +387,7 @@ int main(int /*argc*/, char **argv)
     // (4.2) Compute Correlation Matrix //////////////////////////////////////
 
     logger->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
-    const CorrelationMatrix R = computeCorrelation(A, T);
+    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT);
     if( R.isEmpty() ) {
       logger->logError(u8"Unable to compute correlation matrix!");
       return EXIT_FAILURE;
