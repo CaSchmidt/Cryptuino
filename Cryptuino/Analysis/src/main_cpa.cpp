@@ -359,6 +359,8 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
+  // (4) Attack with Correlation /////////////////////////////////////////////
+
   std::array<std::size_t,AES128_KEY_SIZE> keyi;
   std::array<double,AES128_KEY_SIZE> keyv;
 
@@ -367,7 +369,7 @@ int main(int /*argc*/, char **argv)
         std::format("{:{}}/{}",
                     k + 1, cs::countDigits(AES128_KEY_SIZE), AES128_KEY_SIZE);
 
-    // (4) Create Attack Matrix //////////////////////////////////////////////
+    // (4.1) Create Attack Matrix ////////////////////////////////////////////
 
     logger->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
     const AttackMatrix A = buildAttackMatrix(campaign, numD, k);
@@ -376,7 +378,7 @@ int main(int /*argc*/, char **argv)
       return EXIT_FAILURE;
     }
 
-    // (5) Compute Correlation Matrix //////////////////////////////////////////
+    // (4.2) Compute Correlation Matrix //////////////////////////////////////
 
     logger->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
     const CorrelationMatrix R = computeCorrelation(A, T);
@@ -384,6 +386,8 @@ int main(int /*argc*/, char **argv)
       logger->logError(u8"Unable to compute correlation matrix!");
       return EXIT_FAILURE;
     }
+
+    // (4.3) Guess Key ///////////////////////////////////////////////////////
 
     keyi[k] = std::numeric_limits<std::size_t>::max();
     keyv[k] = 0;
@@ -397,6 +401,8 @@ int main(int /*argc*/, char **argv)
       }
     }
   } // For Each Byte of Key
+
+  // (5) Output Result ///////////////////////////////////////////////////////
 
   std::string keystr;
   for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
