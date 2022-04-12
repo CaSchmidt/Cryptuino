@@ -88,7 +88,7 @@ void progress(const csILogger *logger, const std::size_t pos, const std::size_t 
 
 ////// Implementation ////////////////////////////////////////////////////////
 
-double powerModel(const uint8_t plain, const uint8_t key)
+double powerModel(const uint8_t data, const uint8_t key)
 {
   // cf. https://en.wikipedia.org/wiki/Rijndael_S-box
   const std::array<uint8_t,256> SBOX{
@@ -111,7 +111,7 @@ double powerModel(const uint8_t plain, const uint8_t key)
   };
 
   // cf. https://en.wikipedia.org/wiki/Hamming_weight
-  return static_cast<double>(std::popcount<uint8_t>(SBOX[plain ^ key]));
+  return static_cast<double>(std::popcount<uint8_t>(SBOX[data ^ key]));
 }
 
 AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
