@@ -31,8 +31,10 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 
 #include <iostream>
+#include <limits>
 
 #include <csUtil/csLogger.h>
 
@@ -133,6 +135,28 @@ namespace test_trigger {
 
 } // namespace test_trigger
 
+////// (4) Test Floating Point Count /////////////////////////////////////////
+
+namespace test_count {
+
+  template<typename T, typename Y = std::size_t>
+  constexpr Y max_count()
+  {
+    constexpr Y ONE = 1;
+    return sizeof(T) > sizeof(Y)
+        ? std::numeric_limits<Y>::max()
+        : (ONE << std::numeric_limits<T>::digits) - 1;
+  }
+
+  void run()
+  {
+    using Y = std::size_t;
+    std::cout << "float : " << "0x" << std::hex << max_count<float,Y>() << std::endl;
+    std::cout << "double: " << "0x" << std::hex << max_count<double,Y>() << std::endl;
+  }
+
+} // namespace test_count
+
 ////// (X) Main //////////////////////////////////////////////////////////////
 
 int main(int /*argc*/, char **argv)
@@ -152,6 +176,10 @@ int main(int /*argc*/, char **argv)
 
 #if 0
   test_trigger::run();
+#endif
+
+#if 1
+  test_count::run();
 #endif
 
   return EXIT_SUCCESS;
