@@ -40,6 +40,7 @@
 #define HAVE_STD_FORMAT
 #include <csUtil/csLogger.h>
 #include <csUtil/csNumeric.h>
+#define HAVE_SIMD128_PREFETCH
 #include <csUtil/csStatistics.h>
 
 #include <csUtil/csTime.h>
