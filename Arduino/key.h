@@ -32,6 +32,8 @@
 #ifndef KEY_H
 #define KEY_H
 
+#include <stdint.h>
+
 constexpr uint8_t AES_KEY_BYTES = 16;
 
 extern uint8_t key[];

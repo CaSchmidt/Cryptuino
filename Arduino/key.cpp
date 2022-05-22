@@ -29,9 +29,10 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <Arduino.h>
-
 #include "key.h"
+
+#include "I_random.h"
+#include "I_ser.h"
 
 #include "ardutil.h"
 
@@ -39,10 +40,9 @@ uint8_t key[AES_KEY_BYTES];
 
 void key_generate()
 {
-  Serial.println("Generating random key...");
-  randomSeed(analogRead(A0));
+  I_ser_puts("Generating random key...\n");
   for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
-    const uint8_t r = random(0, 256);
+    const uint8_t r = I_random_byte();
     key[i] = r;
   }
 }
@@ -56,15 +56,15 @@ void key_init()
 
 void key_show()
 {
-  Serial.print("Current key");
+  I_ser_puts("Current key");
   outputAesData(key);
-  Serial.println("");
+  I_ser_puts("\n");
 }
 
 void key_set(const uint8_t *ascii)
 {
   readAesData(key, ascii);
-  Serial.print("Setting key");
+  I_ser_puts("Setting key");
   outputAesData(key);
-  Serial.println("");
+  I_ser_puts("\n");
 }
