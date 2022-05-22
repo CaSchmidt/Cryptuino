@@ -32,6 +32,9 @@
 #ifndef ARDUTIL_H
 #define ARDUTIL_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 bool compareI(const char *s1, const char *s2, const size_t len = 0);
 
 uint8_t fromHexChar(const char c);

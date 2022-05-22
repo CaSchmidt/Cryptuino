@@ -41,6 +41,8 @@ extern "C" {
 
 void I_ser_init(uint32_t baud);
 
+void I_ser_putc(const char c);
+
 void I_ser_puts(const char *s);
 
 size_t I_ser_available(void);

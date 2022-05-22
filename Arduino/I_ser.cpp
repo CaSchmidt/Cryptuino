@@ -41,6 +41,11 @@ extern "C" void I_ser_init(uint32_t baud)
   }
 }
 
+extern "C" void I_ser_putc(const char c)
+{
+  Serial.write(c);
+}
+
 extern "C" void I_ser_puts(const char *s)
 {
   Serial.print(s);

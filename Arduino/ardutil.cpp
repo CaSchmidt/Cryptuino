@@ -29,9 +29,9 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <Arduino.h>
-
 #include "ardutil.h"
+
+#include "I_ser.h"
 
 #include "key.h"
 
@@ -72,9 +72,9 @@ uint8_t fromHexChar(const char c)
 void outputAesData(const uint8_t *data)
 {
   for(uint8_t i = 0; i < AES_KEY_BYTES; i++) {
-    Serial.write(' ');
-    Serial.write(toHexChar(data[i], true));
-    Serial.write(toHexChar(data[i]));
+    I_ser_putc(' ');
+    I_ser_putc(toHexChar(data[i], true));
+    I_ser_putc(toHexChar(data[i]));
   }
 }
 
