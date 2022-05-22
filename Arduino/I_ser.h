@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,12 +29,26 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "cryptuino.h"
+#ifndef I_SER_H
+#define I_SER_H
 
-void setup() {
-  cryptuino_init();
-}
+#include <stddef.h>
+#include <stdint.h>
 
-void loop() {
-  cryptuino_shell();
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void I_ser_init(uint32_t baud);
+
+void I_ser_puts(const char *s);
+
+size_t I_ser_available(void);
+
+uint8_t I_ser_getc(void);
+
+#ifdef __cplusplus
+};
+#endif
+
+#endif /* I_SER_H */

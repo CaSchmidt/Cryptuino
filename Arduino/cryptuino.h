@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,12 +29,19 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "cryptuino.h"
+#ifndef CRYPTUINO_H
+#define CRYPTUINO_H
 
-void setup() {
-  cryptuino_init();
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void loop() {
-  cryptuino_shell();
-}
+void cryptuino_init(void);
+
+void cryptuino_shell(void);
+
+#ifdef __cplusplus
+};
+#endif
+
+#endif /* CRYPTUINO_H */

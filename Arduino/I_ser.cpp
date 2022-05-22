@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,12 +29,29 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "cryptuino.h"
+#include <Arduino.h>
 
-void setup() {
-  cryptuino_init();
+#include "I_ser.h"
+
+extern "C" void I_ser_init(uint32_t baud)
+{
+  Serial.begin(baud, SERIAL_8N1);
+  while( !Serial ) {
+    ;
+  }
 }
 
-void loop() {
-  cryptuino_shell();
+extern "C" void I_ser_puts(const char *s)
+{
+  Serial.print(s);
+}
+
+extern "C" size_t I_ser_available(void)
+{
+  return size_t{Serial.available()};
+}
+
+extern "C" uint8_t I_ser_getc(void)
+{
+  return uint8_t{Serial.read()};
 }
