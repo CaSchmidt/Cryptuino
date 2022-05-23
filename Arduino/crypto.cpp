@@ -29,38 +29,32 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <Arduino.h>
-
 #include "crypto.h"
+
+#include "I_pin.h"
+#include "I_ser.h"
 
 #include "aes.hpp"
 #include "ardutil.h"
 #include "key.h"
-
-#define CRYPTO_PIN  7
 
 void crypto_encrypt(const uint8_t *ascii)
 {
   uint8_t data[AES_KEY_BYTES];
   readAesData(data, ascii);
 
-  Serial.print("<");
+  I_ser_puts("<");
   outputAesData(data);
-  Serial.println("");
+  I_ser_puts("\n");
 
   AES_ctx ctx;
   AES_init_ctx(&ctx, key);
 
-  digitalWrite(CRYPTO_PIN, HIGH);
+  I_pin_on();
   AES_ECB_encrypt(&ctx, data);
-  digitalWrite(CRYPTO_PIN, LOW);
+  I_pin_off();
 
-  Serial.print(">");
+  I_ser_puts(">");
   outputAesData(data);
-  Serial.println("");
-}
-
-void crypto_init()
-{
-  pinMode(CRYPTO_PIN, OUTPUT);
+  I_ser_puts("\n");
 }

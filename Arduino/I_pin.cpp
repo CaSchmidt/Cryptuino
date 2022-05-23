@@ -1,5 +1,5 @@
 /****************************************************************************
-** Copyright (c) 2021, Carsten Schmidt. All rights reserved.
+** Copyright (c) 2022, Carsten Schmidt. All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions
@@ -29,11 +29,23 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef CRYPTO_H
-#define CRYPTO_H
+#include <Arduino.h>
 
-#include <stdint.h>
+#include "I_pin.h"
 
-void crypto_encrypt(const uint8_t *ascii);
+#define CRYPTO_PIN  7
 
-#endif // CRYPTO_H
+extern "C" void I_pin_init(void)
+{
+  pinMode(CRYPTO_PIN, OUTPUT);
+}
+
+extern "C" void I_pin_on(void)
+{
+  digitalWrite(CRYPTO_PIN, HIGH);
+}
+
+extern "C" void I_pin_off(void)
+{
+  digitalWrite(CRYPTO_PIN, LOW);
+}

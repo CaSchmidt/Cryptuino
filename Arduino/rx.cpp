@@ -29,9 +29,9 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <Arduino.h>
-
 #include "rx.h"
+
+#include "I_ser.h"
 
 #include "ardutil.h"
 #include "key.h"
@@ -57,7 +57,7 @@ bool rx_have_aes_data()
     }
   }
   if( !result ) {
-    Serial.println("ERROR: Invalid AES data!");
+    I_ser_puts("ERROR: Invalid AES data!\n");
   }
   return result;
 }

@@ -31,6 +31,7 @@
 
 #include "cryptuino.h"
 
+#include "I_pin.h"
 #include "I_random.h"
 #include "I_ser.h"
 
@@ -40,13 +41,13 @@
 
 extern "C" void cryptuino_init(void)
 {
+  I_pin_init();
   I_random_init();
   I_ser_init(9600);
 
   I_ser_puts("Welcome to Cryptuino!\n");
   I_ser_puts("---------------------\n");
 
-  crypto_init();
   key_init();
 
   rx_len = 0;

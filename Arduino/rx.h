@@ -32,6 +32,8 @@
 #ifndef RX_H
 #define RX_H
 
+#include <stdint.h>
+
 constexpr uint8_t RXBUF_SIZE = 128;
 
 extern uint8_t rx_buffer[];
