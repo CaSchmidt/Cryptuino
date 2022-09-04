@@ -31,12 +31,10 @@
 
 #include <array>
 
-#include <csUtil/csCharUtil.h>
-#include <csUtil/csILogger.h>
+#include <cs/Core/CharUtil.h>
+#include <cs/Logging/ILogger.h>
 
 #include "Instrument.h"
-
-#include "util.h"
 
 ////// Private ///////////////////////////////////////////////////////////////
 
@@ -55,7 +53,7 @@ namespace priv {
 
   using WaveformInfo = WaveformInfo_T<float>;
 
-  bool initializeData(const csILogger *logger, ViSession vi,
+  bool initializeData(const cs::ILogger *logger, ViSession vi,
                       const char channel, const ViUInt32 numSamples)
   {
     ViStatus status;
@@ -101,7 +99,7 @@ namespace priv {
    * NOTE: Instrument's read buffer MUST already point to the binary data of the samples!
    */
   template<typename T>
-  bool readSamples(const csILogger *logger, ViSession vi,
+  bool readSamples(const cs::ILogger *logger, ViSession vi,
                    SampleBuffer *samples, const ViUInt32 numSamples, const WaveformInfo& info)
   {
     constexpr std::size_t RAWVALUE_SIZE = sizeof(T);
@@ -143,7 +141,7 @@ namespace priv {
     return true;
   }
 
-  bool readWaveformInfo(const csILogger *logger, ViSession vi,
+  bool readWaveformInfo(const cs::ILogger *logger, ViSession vi,
                         WaveformInfo *info)
   {
     static_assert( sizeof(WaveformInfo::value_type) == 4 );
@@ -178,7 +176,7 @@ namespace priv {
     return true;
   }
 
-  bool seekSamples(const csILogger *logger, ViSession vi)
+  bool seekSamples(const cs::ILogger *logger, ViSession vi)
   {
     ViStatus status;
 
@@ -214,7 +212,7 @@ namespace priv {
 
 ////// Public ////////////////////////////////////////////////////////////////
 
-bool flush(const csILogger *logger, ViSession vi,
+bool flush(const cs::ILogger *logger, ViSession vi,
            const bool rd_discard, const bool wr_discard)
 {
   ViStatus status;
@@ -235,7 +233,7 @@ bool flush(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool handleError(const csILogger *logger, const ViObject obj,
+bool handleError(const cs::ILogger *logger, const ViObject obj,
                  const ViStatus status, const char *reason)
 {
   const bool is_error = status < VI_SUCCESS;
@@ -256,7 +254,7 @@ bool handleError(const csILogger *logger, const ViObject obj,
   return is_error;
 }
 
-RsrcList queryInstruments(const csILogger *logger, ViSession rm)
+RsrcList queryInstruments(const cs::ILogger *logger, ViSession rm)
 {
   std::array<ViChar,1024> buffer;
   ViUInt32          numResources;
@@ -293,7 +291,7 @@ RsrcList queryInstruments(const csILogger *logger, ViSession rm)
   return result;
 }
 
-bool queryRecordLength(const csILogger *logger, ViSession vi,
+bool queryRecordLength(const cs::ILogger *logger, ViSession vi,
                        ViUInt32 *length)
 {
   ViStatus status;
@@ -310,7 +308,7 @@ bool queryRecordLength(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool querySampleRate(const csILogger *logger, ViSession vi,
+bool querySampleRate(const cs::ILogger *logger, ViSession vi,
                      float *rate)
 {
   ViStatus status;
@@ -327,7 +325,7 @@ bool querySampleRate(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool readWaveform(const csILogger *logger, ViSession vi,
+bool readWaveform(const cs::ILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleBuffer *samples)
 {
   ViStatus status;
@@ -388,7 +386,7 @@ bool readWaveform(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool setBufferAttributes(const csILogger *logger, ViSession vi,
+bool setBufferAttributes(const cs::ILogger *logger, ViSession vi,
                          const bool rd_flush, const bool wr_flush)
 {
   ViStatus status;
@@ -412,7 +410,7 @@ bool setBufferAttributes(const csILogger *logger, ViSession vi,
   return true;
 }
 
-bool setSingleShotAcquisition(const csILogger *logger, ViSession vi)
+bool setSingleShotAcquisition(const cs::ILogger *logger, ViSession vi)
 {
   ViStatus status;
 

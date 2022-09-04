@@ -29,10 +29,10 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <csUtil/csFileIO.h>
+#include <cs/Core/StringUtil.h>
+#include <cs/IO/FileIO.h>
 #define HAVE_STD_FORMAT
-#include <csUtil/csILogger.h>
-#include <csUtil/csStringUtil.h>
+#include <cs/Logging/ILogger.h>
 
 #include "CampaignReader.h"
 
@@ -48,7 +48,7 @@ using ConstStringListIter = cs::ConstStringListIter<char>;
 
 ////// Public ////////////////////////////////////////////////////////////////
 
-bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const csILogger *logger)
+bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const cs::ILogger *logger)
 {
   *campaign = Campaign();
 
@@ -56,7 +56,7 @@ bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const c
 
   // (1) Open file ///////////////////////////////////////////////////////////
 
-  const StringList lines = csReadLines(path);
+  const StringList lines = cs::readLines(path);
   if( lines.empty() ) {
     logger->logError(u8"No input!");
     return false;

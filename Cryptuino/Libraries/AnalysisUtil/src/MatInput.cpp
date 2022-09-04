@@ -34,14 +34,14 @@
 #include <matio.h>
 
 #define HAVE_STD_FORMAT
-#include <csUtil/csILogger.h>
+#include <cs/Logging/ILogger.h>
 
 #include "MatInput.h"
 
 #include "ScopeGuard.h"
 
 bool haveMatVariable(const std::filesystem::path& path, const std::string& varname,
-                     const csILogger *logger)
+                     const cs::ILogger *logger)
 {
   mat_t   *file = NULL;
   matvar_t *var = NULL;
@@ -69,7 +69,7 @@ bool haveMatVariable(const std::filesystem::path& path, const std::string& varna
 }
 
 SampleBuffer readMatVector(const std::filesystem::path& path, const std::string& varname,
-                           const csILogger *logger)
+                           const cs::ILogger *logger)
 {
   mat_t   *file = NULL;
   matvar_t *var = NULL;

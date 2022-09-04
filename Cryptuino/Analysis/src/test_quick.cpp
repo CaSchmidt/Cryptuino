@@ -36,7 +36,7 @@
 #include <iostream>
 #include <limits>
 
-#include <csUtil/csLogger.h>
+#include <cs/Logging/Logger.h>
 
 #include "MatInput.h"
 #include "Matrix.h"
@@ -47,7 +47,7 @@
 namespace test_matio {
 
   bool run(const char *filename, const char *varname,
-           const csILogger *logger)
+           const cs::ILogger *logger)
   {
     const SampleBuffer buffer = readMatVector(filename, varname, logger);
     if( buffer.empty() ) {
@@ -161,8 +161,8 @@ namespace test_count {
 
 int main(int /*argc*/, char **argv)
 {
-  const csLogger con_logger;
-  const csILogger *logger = &con_logger;
+  const cs::Logger con_logger;
+  const cs::ILogger *logger = &con_logger;
 
 #if 0
   if( !test_matio::run(argv[1], argv[2], logger) ) {

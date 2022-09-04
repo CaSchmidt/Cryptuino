@@ -34,7 +34,7 @@
 #include <matio.h>
 
 #define HAVE_STD_FORMAT
-#include <csUtil/csILogger.h>
+#include <cs/Logging/ILogger.h>
 
 #include "MatOutput.h"
 
@@ -44,7 +44,7 @@
 
 namespace priv {
 
-  bool writeMatVector(const csILogger *logger, mat_t *file,
+  bool writeMatVector(const cs::ILogger *logger, mat_t *file,
                       const std::string& varname, const std::size_t numSamples, const double *data)
   {
     std::array<std::size_t,2> dims;
@@ -65,7 +65,7 @@ namespace priv {
     return err == 0;
   }
 
-  bool writeMatSamples(const csILogger *logger, mat_t *matfile,
+  bool writeMatSamples(const cs::ILogger *logger, mat_t *matfile,
                        const std::string& varname, const SampleBuffer& samples)
   {
     // (1) Sanity check //////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ namespace priv {
 
 ////// Public ////////////////////////////////////////////////////////////////
 
-bool writeMatOutput(const csILogger *logger, const InstrumentPtr& instr,
+bool writeMatOutput(const cs::ILogger *logger, const InstrumentPtr& instr,
                     const std::filesystem::path& path, const std::string& channels)
 {
   const int ch_trace   = channels[0] - '0';

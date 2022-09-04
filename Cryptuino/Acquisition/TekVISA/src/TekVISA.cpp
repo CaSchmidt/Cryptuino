@@ -30,8 +30,8 @@
 *****************************************************************************/
 
 #define HAVE_STD_FORMAT
-#include <csUtil/csILogger.h>
-#include <csUtil/csTime.h>
+#include <cs/Logging/ILogger.h>
+#include <cs/System/Time.h>
 
 #include "TekVISA.h"
 
@@ -49,7 +49,7 @@ TekVISA::~TekVISA() noexcept
   disconnect();
 }
 
-bool TekVISA::connect(const csILogger *logger)
+bool TekVISA::connect(const cs::ILogger *logger)
 {
   ViStatus status;
 
@@ -104,7 +104,7 @@ bool TekVISA::isConnected() const
   return _rm != VI_NULL  &&  _vi != VI_NULL;
 }
 
-bool TekVISA::readSamples(const csILogger *logger, const int channel,
+bool TekVISA::readSamples(const cs::ILogger *logger, const int channel,
                           SampleBuffer *samples, const std::size_t numSamplesWant) const
 {
   if( channel < 1  ||  channel > 4 ) {
@@ -114,11 +114,11 @@ bool TekVISA::readSamples(const csILogger *logger, const int channel,
   return readWaveform(logger, _vi, char(channel + '0'), numSamplesWant, samples);
 }
 
-bool TekVISA::setupTrigger(const csILogger *logger, const unsigned int tout) const
+bool TekVISA::setupTrigger(const cs::ILogger *logger, const unsigned int tout) const
 {
   if( !setSingleShotAcquisition(logger, _vi) ) {
     return false;
   }
-  csSleep(tout);
+  cs::sleep(tout);
   return true;
 }

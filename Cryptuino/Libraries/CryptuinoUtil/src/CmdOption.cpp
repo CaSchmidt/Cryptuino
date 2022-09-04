@@ -33,7 +33,7 @@
 
 #include "CmdOption.h"
 
-#include <csUtil/csStringUtil.h>
+#include <cs/Core/StringUtil.h>
 
 ////// public ////////////////////////////////////////////////////////////////
 

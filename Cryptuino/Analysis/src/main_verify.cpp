@@ -36,7 +36,7 @@
 #include <aes.hpp>
 
 #define HAVE_STD_FORMAT
-#include <csUtil/csLogger.h>
+#include <cs/Logging/Logger.h>
 
 #include "Campaign.h"
 #include "CampaignReader.h"
@@ -109,8 +109,8 @@ void print(const Campaign& campaign, const bool do_aes = true, FILE *file = stdo
 
 int main(int /*argc*/, char **argv)
 {
-  const csLogger con_logger;
-  const csILogger *logger = &con_logger;
+  const cs::Logger con_logger;
+  const cs::ILogger *logger = &con_logger;
 
   Campaign campaign;
   if( !readCampaign(&campaign, cs::UTF8(argv[1]), logger) ) {

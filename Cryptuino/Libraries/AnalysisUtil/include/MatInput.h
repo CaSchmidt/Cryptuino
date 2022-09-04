@@ -36,12 +36,14 @@
 
 #include "Buffer.h"
 
-class csILogger;
+namespace cs {
+  class ILogger;
+} // namespace cs
 
 bool haveMatVariable(const std::filesystem::path& path, const std::string& varname,
-                     const csILogger *logger);
+                     const cs::ILogger *logger);
 
 SampleBuffer readMatVector(const std::filesystem::path& path, const std::string& varname,
-                           const csILogger *logger);
+                           const cs::ILogger *logger);
 
 #endif // MATINPUT_H

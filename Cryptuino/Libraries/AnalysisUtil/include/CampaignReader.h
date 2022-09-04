@@ -35,8 +35,11 @@
 #include <filesystem>
 
 struct Campaign;
-class csILogger;
 
-bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const csILogger *logger);
+namespace cs {
+  class ILogger;
+} // namespace cs
+
+bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const cs::ILogger *logger);
 
 #endif // CAMPAIGNREADER_H

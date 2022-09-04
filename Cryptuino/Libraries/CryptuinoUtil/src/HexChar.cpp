@@ -29,8 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <csUtil/csStringUtil.h>
-#include <csUtil/csNumeric.h>
+#include <cs/Core/StringUtil.h>
+#include <cs/Math/Numeric.h>
 
 #include "HexChar.h"
 

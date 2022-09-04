@@ -34,13 +34,15 @@
 
 #include <string>
 
-class csILogger;
-class csSerial;
+namespace cs {
+  class ILogger;
+  class Serial;
+} // namespace cs
 
 class Randomizer;
 
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout);
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer,
+void rxAesCmd(const cs::ILogger *logger, const cs::Serial& serial, const unsigned int tout);
+void txAesCmd(const char prefix, const cs::Serial& serial, const Randomizer& randomizer,
               const std::string& data = std::string());
 
 #endif // SERIAL_H

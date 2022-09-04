@@ -38,12 +38,12 @@
 #include <limits>
 
 #define HAVE_STD_FORMAT
-#include <csUtil/csLogger.h>
-#include <csUtil/csNumeric.h>
+#include <cs/Logging/Logger.h>
+#include <cs/Math/Numeric.h>
 #define HAVE_SIMD128_PREFETCH
-#include <csUtil/csStatistics.h>
+#include <cs/Math/Statistics.h>
 
-#include <csUtil/csTime.h>
+#include <cs/System/Time.h>
 
 #include "Campaign.h"
 #include "CampaignReader.h"
@@ -67,9 +67,11 @@ using       TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
 
 using NumVec = std::vector<double>;
 
+using math = cs::math<double>;
+
 ////// Helper ////////////////////////////////////////////////////////////////
 
-void progress(const csILogger *logger, const std::size_t pos, const std::size_t max,
+void progress(const cs::ILogger *logger, const std::size_t pos, const std::size_t max,
               const std::size_t step = 10)
 {
   constexpr std::size_t HUNDRED = 100;
@@ -150,7 +152,7 @@ AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
 
 SampleBuffer readTrace(const std::filesystem::path& path,
                        const TriggerEvent& event, const std::size_t range,
-                       const csILogger *logger)
+                       const cs::ILogger *logger)
 {
   // (1) Read Signal AKA Full Trace //////////////////////////////////////////
 
@@ -186,7 +188,7 @@ SampleBuffer readTrace(const std::filesystem::path& path,
 TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& campaign,
                              const std::size_t numD,
                              const TriggerEvent& event, const std::size_t range,
-                             const csILogger *logger)
+                             const cs::ILogger *logger)
 {
   using Traces = std::list<SampleBuffer>;
 
@@ -286,7 +288,7 @@ CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T
 
   // (3) Compute Correlation /////////////////////////////////////////////////
 
-  const uint64_t beg = csTickCountMs();
+  const uint64_t beg = cs::tickCountMs();
 
   const NumVec meanA = columnMean(A);
   if( meanA.empty() ) {
@@ -305,7 +307,7 @@ CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T
     }
   }
 
-  const uint64_t end = csTickCountMs();
+  const uint64_t end = cs::tickCountMs();
   printf("duration = %llums\n", end - beg);
 
   return R;
@@ -326,8 +328,8 @@ int main(int /*argc*/, char **argv)
   };
   const std::size_t range = 15;
 
-  const csLogger con_logger(stderr);
-  const csILogger *logger = &con_logger;
+  const cs::Logger con_logger(stderr);
+  const cs::ILogger *logger = &con_logger;
 
   // (1) Load Campaign ///////////////////////////////////////////////////////
 
@@ -401,7 +403,7 @@ int main(int /*argc*/, char **argv)
     keyv[k] = 0;
     for(std::size_t i = 0; i < R.rows(); i++) {
       for(std::size_t j = 0; j < R.columns(); j++) {
-        const double v = cs::abs(R(i, j));
+        const double v = math::abs(R(i, j));
         if( v > keyv[k] ) {
           keyi[k] = i;
           keyv[k] = v;

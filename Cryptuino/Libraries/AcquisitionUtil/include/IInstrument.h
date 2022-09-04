@@ -40,20 +40,22 @@
 
 using InstrumentPtr = std::unique_ptr<class IInstrument>;
 
-class csILogger;
+namespace cs {
+  class ILogger;
+} // namespace cs
 
 class IInstrument {
 public:
   virtual ~IInstrument() noexcept;
 
-  virtual bool connect(const csILogger *logger) = 0;
+  virtual bool connect(const cs::ILogger *logger) = 0;
   virtual void disconnect() = 0;
   virtual bool isConnected() const = 0;
 
-  virtual bool readSamples(const csILogger *logger, const int channel,
+  virtual bool readSamples(const cs::ILogger *logger, const int channel,
                            SampleBuffer *samples, const std::size_t numSamplesWant = 0) const = 0;
 
-  virtual bool setupTrigger(const csILogger *logger, const unsigned int tout) const = 0;
+  virtual bool setupTrigger(const cs::ILogger *logger, const unsigned int tout) const = 0;
 
 protected:
   IInstrument() noexcept;

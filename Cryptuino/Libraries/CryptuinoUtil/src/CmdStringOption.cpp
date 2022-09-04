@@ -29,7 +29,7 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <csUtil/csStringUtil.h>
+#include <cs/Core/StringUtil.h>
 
 #include "CmdStringOption.h"
 

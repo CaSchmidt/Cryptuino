@@ -48,14 +48,14 @@ public:
   TekVISA(const ctor_tag&) noexcept;
   ~TekVISA() noexcept;
 
-  bool connect(const csILogger *logger) final;
+  bool connect(const cs::ILogger *logger) final;
   void disconnect() final;
   bool isConnected() const final;
 
-  bool readSamples(const csILogger *logger, const int channel,
+  bool readSamples(const cs::ILogger *logger, const int channel,
                    SampleBuffer *samples, const std::size_t numSamplesWant = 0) const final;
 
-  bool setupTrigger(const csILogger *logger, const unsigned int tout) const final;
+  bool setupTrigger(const cs::ILogger *logger, const unsigned int tout) const final;
 
 private:
   TekVISA() noexcept = delete;

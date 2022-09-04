@@ -31,10 +31,10 @@
 
 #include <array>
 
-#include <csUtil/csILogger.h>
-#include <csUtil/csSerial.h>
-#include <csUtil/csStringUtil.h>
-#include <csUtil/csTime.h>
+#include <cs/Core/StringUtil.h>
+#include <cs/IO/Serial.h>
+#include <cs/Logging/ILogger.h>
+#include <cs/System/Time.h>
 
 #include "Serial.h"
 
@@ -64,12 +64,12 @@ namespace priv {
 
 ////// Public ////////////////////////////////////////////////////////////////
 
-void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned int tout)
+void rxAesCmd(const cs::ILogger *logger, const cs::Serial& serial, const unsigned int tout)
 {
   priv::CharBuffer buffer;
   buffer.fill(0);
 
-  csSleep(tout);
+  cs::sleep(tout);
   serial.read(buffer.data(), buffer.size());
   const std::list<std::string> answer = cs::split<char>(buffer.data(), '\n', true, true);
   for(const std::string& s : answer) {
@@ -77,7 +77,7 @@ void rxAesCmd(const csILogger *logger, const csSerial& serial, const unsigned in
   }
 }
 
-void txAesCmd(const char prefix, const csSerial& serial, const Randomizer& randomizer,
+void txAesCmd(const char prefix, const cs::Serial& serial, const Randomizer& randomizer,
               const std::string& data)
 {
   priv::AesBuffer  aesdata;

@@ -36,9 +36,11 @@
 
 #include "IInstrument.h"
 
-class csILogger;
+namespace cs {
+  class ILogger;
+} // namespace cs
 
-bool writeMatOutput(const csILogger *logger, const InstrumentPtr& instr,
+bool writeMatOutput(const cs::ILogger *logger, const InstrumentPtr& instr,
                     const std::filesystem::path& path, const std::string& channels);
 
 #endif // MATOUTPUT_H

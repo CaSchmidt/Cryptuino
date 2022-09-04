@@ -42,28 +42,30 @@
 using RsrcString = std::basic_string<ViChar>;
 using   RsrcList = std::list<RsrcString>;
 
-class csILogger;
+namespace cs {
+  class ILogger;
+} // namespace cs
 
-bool flush(const csILogger *logger, ViSession vi,
+bool flush(const cs::ILogger *logger, ViSession vi,
            const bool rd_discard = true, const bool wr_discard = false);
 
-bool handleError(const csILogger *logger, const ViObject obj,
+bool handleError(const cs::ILogger *logger, const ViObject obj,
                  const ViStatus status, const char *reason);
 
-RsrcList queryInstruments(const csILogger *logger, ViSession rm);
+RsrcList queryInstruments(const cs::ILogger *logger, ViSession rm);
 
-bool queryRecordLength(const csILogger *logger, ViSession vi,
+bool queryRecordLength(const cs::ILogger *logger, ViSession vi,
                        ViUInt32 *length);
 
-bool querySampleRate(const csILogger *logger, ViSession vi,
+bool querySampleRate(const cs::ILogger *logger, ViSession vi,
                      float *rate);
 
-bool readWaveform(const csILogger *logger, ViSession vi,
+bool readWaveform(const cs::ILogger *logger, ViSession vi,
                   const char ch, const ViUInt32 numSamplesWant, SampleBuffer *samples);
 
-bool setBufferAttributes(const csILogger *logger, ViSession vi,
+bool setBufferAttributes(const cs::ILogger *logger, ViSession vi,
                          const bool rd_flush = false, const bool wr_flush = false);
 
-bool setSingleShotAcquisition(const csILogger *logger, ViSession vi);
+bool setSingleShotAcquisition(const cs::ILogger *logger, ViSession vi);
 
 #endif // INSTRUMENT_H

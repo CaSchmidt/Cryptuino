@@ -35,11 +35,11 @@
 #include <iostream>
 #include <type_traits>
 
+#include <cs/IO/Serial.h>
 #define HAVE_STD_FORMAT
-#include <csUtil/csDualLogger.h>
-#include <csUtil/csLogger.h>
-#include <csUtil/csNumeric.h>
-#include <csUtil/csSerial.h>
+#include <cs/Logging/DualLogger.h>
+#include <cs/Logging/Logger.h>
+#include <cs/Math/Numeric.h>
 
 #include "CmdOptions.h"
 #include "MatOutput.h"
@@ -132,11 +132,11 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  const csLogger     log_con;
-  const csLogger     log_file(file);
-  const csDualLogger log_dual(&log_file, &log_con);
+  const cs::Logger     log_con;
+  const cs::Logger     log_file(file);
+  const cs::DualLogger log_dual(&log_file, &log_con);
 
-  const csILogger *logger = &log_dual;
+  const cs::ILogger *logger = &log_dual;
 
   // (3) Setup ///////////////////////////////////////////////////////////////
 
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
   Randomizer randomizer;
 
-  csSerial serial;
+  cs::Serial serial;
   if( !serial.open(cs::UTF8(ser_device.data()), ser_rate) ) {
     logger->logErrorf(u8"Unable to open serial device \"{}\"!", ser_device);
     return EXIT_FAILURE;
