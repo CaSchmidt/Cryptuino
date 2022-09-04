@@ -38,6 +38,8 @@
 extern "C" void I_pin_init(void)
 {
   pinMode(CRYPTO_PIN, OUTPUT);
+
+  I_pin_off();
 }
 
 extern "C" void I_pin_on(void)
