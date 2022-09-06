@@ -32,7 +32,13 @@ target_include_directories(gui
   )
 
 target_link_libraries(gui
+  PRIVATE csUtil
   PRIVATE Qt5::Widgets
+  )
+
+set_target_properties(gui PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
   )
 
 set_target_properties(gui PROPERTIES
