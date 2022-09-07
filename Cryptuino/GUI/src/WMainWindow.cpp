@@ -42,6 +42,11 @@ WMainWindow::WMainWindow(QWidget *parent, Qt::WindowFlags flags)
 
   // Signals & Slots /////////////////////////////////////////////////////////
 
+  connect(ui->openAction, &QAction::triggered,
+          this, &WMainWindow::openCampaign);
+  connect(ui->openButton, &QPushButton::clicked,
+          this, &WMainWindow::openCampaign);
+
   connect(ui->quitAction, &QAction::triggered,
           this, &WMainWindow::close);
 }
@@ -49,4 +54,10 @@ WMainWindow::WMainWindow(QWidget *parent, Qt::WindowFlags flags)
 WMainWindow::~WMainWindow()
 {
   delete ui;
+}
+
+////// private slots /////////////////////////////////////////////////////////
+
+void WMainWindow::openCampaign()
+{
 }

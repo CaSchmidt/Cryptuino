@@ -43,6 +43,9 @@ public:
   WMainWindow(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
   ~WMainWindow();
 
+private slots:
+  void openCampaign();
+
 private:
   Ui::WMainWindow *ui{nullptr};
 };
