@@ -33,7 +33,7 @@
 #define CAMPAIGN_H
 
 #include <filesystem>
-#include <list>
+#include <vector>
 
 #include "Buffer.h"
 #include "Cryptuino.h"
@@ -51,7 +51,7 @@ struct CampaignEntry {
   ByteBuffer cipher{};
 };
 
-using CampaignEntries = std::list<CampaignEntry>;
+using CampaignEntries = std::vector<CampaignEntry>;
 
 struct Campaign {
   Campaign() noexcept;
