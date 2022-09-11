@@ -60,4 +60,6 @@ inline char toHexChar(const uint8_t in, const bool hi_nibble = false)
 
 ByteBuffer extractHexBytes(std::string text, const char *prefix = nullptr);
 
+std::string toHexString(const ByteBuffer& buffer, const char fill = '\0');
+
 #endif // HEXCHAR_H

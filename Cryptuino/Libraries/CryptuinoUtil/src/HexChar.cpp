@@ -66,3 +66,32 @@ ByteBuffer extractHexBytes(std::string text, const char *prefix)
 
   return buffer;
 }
+
+std::string toHexString(const ByteBuffer& buffer, const char fill)
+{
+  if( buffer.empty() ) {
+    return std::string();
+  }
+
+  const std::size_t sizHexString = fill != '\0'
+      ? buffer.size()*3 - 1 // buffer.size()*2 + (buffer.size() - 1)
+      : buffer.size()*2;
+
+  std::string result;
+  try {
+    result.resize(sizHexString, fill);
+  } catch(...) {
+    return std::string();
+  }
+
+  for(std::size_t i = 0; i < buffer.size(); i++) {
+    const std::size_t pos = fill != '\0'
+        ? i*3
+        : i*2;
+
+    result[pos + 0] = toHexChar(buffer[i], true);
+    result[pos + 1] = toHexChar(buffer[i]);
+  }
+
+  return result;
+}
