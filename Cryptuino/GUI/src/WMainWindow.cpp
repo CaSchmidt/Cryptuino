@@ -29,8 +29,13 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <QtWidgets/QFileDialog>
+
 #include "WMainWindow.h"
 #include "ui_WMainWindow.h"
+
+#include "CampaignModel.h"
+#include "CampaignReader.h"
 
 ////// public ////////////////////////////////////////////////////////////////
 
@@ -39,6 +44,11 @@ WMainWindow::WMainWindow(QWidget *parent, Qt::WindowFlags flags)
   , ui(new Ui::WMainWindow)
 {
   ui->setupUi(this);
+
+  // Item Model //////////////////////////////////////////////////////////////
+
+  CampaignModel *model = new CampaignModel(ui->tracesView);
+  ui->tracesView->setModel(model);
 
   // Signals & Slots /////////////////////////////////////////////////////////
 
@@ -60,4 +70,26 @@ WMainWindow::~WMainWindow()
 
 void WMainWindow::openCampaign()
 {
+  const QString filename =
+      QFileDialog::getOpenFileName(this, tr("Open Campaign"), QString(), tr("Campaigns (*.txt)"));
+  if( filename.isEmpty() ) {
+    return;
+  }
+
+  CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
+
+  model->clear();
+  ui->filenameEdit->clear();
+  ui->keyEdit->clear();
+
+  Campaign campaign;
+
+  const std::filesystem::path path = TO_PATH(filename);
+  if( !readCampaign(&campaign, path, ui->logBrowser) ) {
+    return;
+  }
+
+  model->set(campaign);
+  ui->filenameEdit->setText(filename);
+  ui->keyEdit->setText(model->key());
 }

@@ -35,7 +35,7 @@
 
 ////// Constants /////////////////////////////////////////////////////////////
 
-constexpr char HEX_FILL = '\0';
+constexpr char HEX_FILL = ' ';
 
 ////// public ////////////////////////////////////////////////////////////////
 
@@ -61,6 +61,13 @@ void CampaignModel::set(const Campaign& c)
   beginResetModel();
   _campaign = c;
   endResetModel();
+}
+
+QString CampaignModel::key() const
+{
+  return !_campaign.key.empty()
+      ? QString::fromStdString(toHexString(_campaign.key, HEX_FILL))
+      : QString();
 }
 
 int CampaignModel::columnCount(const QModelIndex& /*parent*/) const
@@ -95,13 +102,17 @@ Qt::ItemFlags CampaignModel::flags(const QModelIndex& index) const
 
 QVariant CampaignModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if( orientation == Qt::Horizontal  &&  role == Qt::DisplayRole ) {
-    if(        section == Col_Name ) {
-      return tr("Name");
-    } else if( section == Col_Plain ) {
-      return tr("Plain");
-    } else if( section == Col_Cipher ) {
-      return tr("Cipher");
+  if( role == Qt::DisplayRole ) {
+    if(        orientation == Qt::Horizontal ) {
+      if(        section == Col_Name ) {
+        return tr("Name");
+      } else if( section == Col_Plain ) {
+        return tr("Plain");
+      } else if( section == Col_Cipher ) {
+        return tr("Cipher");
+      }
+    } else if( orientation == Qt::Vertical ) {
+      return QString(QStringLiteral("%1")).arg(section + 1);
     }
   }
   return QVariant();

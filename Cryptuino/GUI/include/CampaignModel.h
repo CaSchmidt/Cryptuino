@@ -51,6 +51,8 @@ public:
   void clear();
   void set(const Campaign& c);
 
+  QString key() const;
+
   int columnCount(const QModelIndex& parent = QModelIndex()) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -64,4 +66,21 @@ private:
 inline CampaignModel *CAMPAIGN_MODEL(QAbstractItemModel *model)
 {
   return dynamic_cast<CampaignModel*>(model);
+}
+
+// TODO: Find suitable place!
+
+inline std::filesystem::path TO_PATH(const QString& s,
+                                     const std::filesystem::path::format fmt = std::filesystem::path::auto_format)
+{
+  return !s.isEmpty()
+      ? std::filesystem::path(s.toStdU16String(), fmt)
+      : std::filesystem::path();
+}
+
+inline QString TO_QSTRING(const std::filesystem::path& path)
+{
+  return !path.empty()
+      ? QString::fromStdU16String(path.generic_u16string())
+      : QString();
 }
