@@ -3,10 +3,12 @@ list(APPEND gui_FORMS
   )
 
 list(APPEND gui_HEADERS
+  include/CampaignModel.h
   include/WMainWindow.h
   )
 
 list(APPEND gui_SOURCES
+  src/CampaignModel.cpp
   src/main.cpp
   src/WMainWindow.cpp
   )
