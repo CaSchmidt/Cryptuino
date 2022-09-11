@@ -27,11 +27,17 @@ if(WIN32)
     )
 endif()
 
+target_compile_definitions(gui
+  PRIVATE QT_NO_CAST_FROM_ASCII
+  PRIVATE QT_NO_CAST_TO_ASCII
+  )
+
 target_include_directories(gui
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
 
 target_link_libraries(gui
+  PRIVATE AnalysisUtil
   PRIVATE csUtil
   PRIVATE Qt5::Widgets
   )
