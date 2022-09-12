@@ -89,7 +89,7 @@ void WMainWindow::openCampaign()
     return;
   }
 
-  model->set(campaign);
-  ui->filenameEdit->setText(filename);
+  model->set(path, campaign);
+  ui->filenameEdit->setText(model->filename());
   ui->keyEdit->setText(model->key());
 }

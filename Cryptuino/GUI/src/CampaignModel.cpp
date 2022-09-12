@@ -41,7 +41,6 @@ constexpr char HEX_FILL = ' ';
 
 CampaignModel::CampaignModel(QObject *parent)
   : QAbstractTableModel(parent)
-  , _campaign{}
 {
 }
 
@@ -52,15 +51,24 @@ CampaignModel::~CampaignModel()
 void CampaignModel::clear()
 {
   beginResetModel();
+  _path.clear();
   _campaign.clear();
   endResetModel();
 }
 
-void CampaignModel::set(const Campaign& c)
+void CampaignModel::set(const std::filesystem::path& p, const Campaign& c)
 {
   beginResetModel();
+  _path     = p;
   _campaign = c;
   endResetModel();
+}
+
+QString CampaignModel::filename() const
+{
+  return !_path.empty()
+      ? TO_QSTRING(_path)
+      : QString();
 }
 
 QString CampaignModel::key() const

@@ -49,8 +49,9 @@ public:
   ~CampaignModel();
 
   void clear();
-  void set(const Campaign& c);
+  void set(const std::filesystem::path& p, const Campaign& c);
 
+  QString filename() const;
   QString key() const;
 
   int columnCount(const QModelIndex& parent = QModelIndex()) const;
@@ -60,7 +61,8 @@ public:
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
 private:
-  Campaign _campaign;
+  std::filesystem::path _path{};
+  Campaign _campaign{};
 };
 
 inline CampaignModel *CAMPAIGN_MODEL(QAbstractItemModel *model)
