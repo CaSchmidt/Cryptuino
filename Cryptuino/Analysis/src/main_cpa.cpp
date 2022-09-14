@@ -39,6 +39,8 @@
 
 #define HAVE_STD_FORMAT
 #include <cs/Logging/Logger.h>
+#include <cs/Logging/OutputContext.h>
+#include <cs/Logging/Progress.h>
 #include <cs/Math/Numeric.h>
 #define HAVE_SIMD128_PREFETCH
 #include <cs/Math/Statistics.h>
@@ -68,26 +70,6 @@ using       TraceMatrix = ColMajMatrix<double,impl::trace_tag>;
 using NumVec = std::vector<double>;
 
 using math = cs::math<double>;
-
-////// Helper ////////////////////////////////////////////////////////////////
-
-void progress(const cs::ILogger *logger, const std::size_t pos, const std::size_t max,
-              const std::size_t step = 10)
-{
-  constexpr std::size_t HUNDRED = 100;
-  constexpr std::size_t    ZERO = 0;
-
-  if( max < 1  ||  pos < 0  ||  pos > max  ||  step < 1 ) {
-    return;
-  }
-
-  if( pos%step == ZERO  ||  pos == max ) {
-    const std::size_t   pct = (pos*HUNDRED)/max;
-    const std::size_t width = cs::countDigits(max);
-
-    logger->logTextf(u8"Progress: {:3}% ({:{}}/{})", pct, pos, width, max);
-  }
-}
 
 ////// Implementation ////////////////////////////////////////////////////////
 
@@ -188,9 +170,13 @@ SampleBuffer readTrace(const std::filesystem::path& path,
 TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& campaign,
                              const std::size_t numD,
                              const TriggerEvent& event, const std::size_t range,
-                             const cs::ILogger *logger)
+                             const cs::OutputContext *ctx)
 {
   using Traces = std::list<SampleBuffer>;
+
+  // (0) Setup Progress //////////////////////////////////////////////////////
+
+  ctx->setProgressRange(0, int(numD));
 
   // (1) Read all Traces /////////////////////////////////////////////////////
 
@@ -199,7 +185,7 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
 
   CampaignEntries::const_iterator entry = campaign.entries.cbegin();
   for(std::size_t i = 0; i < numD; i++, ++entry) {
-    SampleBuffer trace = readTrace(entry->path(base), event, range, logger);
+    SampleBuffer trace = readTrace(entry->path(base), event, range, ctx->logger());
     if( trace.empty() ) {
       return TraceMatrix();
     }
@@ -210,7 +196,7 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
       numT = traces.back().size();
     }
 
-    progress(logger, i + 1, numD);
+    ctx->setProgressValue(int(i + 1));
   }
 
   // (2) Create Trace Matrix /////////////////////////////////////////////////
@@ -271,7 +257,8 @@ NumVec columnStdDev(const Matrix<double,TraitsT>& M, const NumVec& mean)
 }
 
 CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
-                                     const NumVec& meanT, const NumVec& stddevT)
+                                     const NumVec& meanT, const NumVec& stddevT,
+                                     const cs::ILogger *logger)
 {
   // (1) Setup ///////////////////////////////////////////////////////////////
 
@@ -308,7 +295,7 @@ CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T
   }
 
   const uint64_t end = cs::tickCountMs();
-  printf("duration = %llums\n", end - beg);
+  logger->logTextf(u8"duration = {}ms", end - beg);
 
   return R;
 }
@@ -328,19 +315,20 @@ int main(int /*argc*/, char **argv)
   };
   const std::size_t range = 15;
 
-  const cs::Logger con_logger(stderr);
-  const cs::ILogger *logger = &con_logger;
+  const cs::Logger     logger(stderr);
+  const cs::Progress progress(stderr);
+  const cs::OutputContext ctx(&logger, true, &progress, true);
 
   // (1) Load Campaign ///////////////////////////////////////////////////////
 
   Campaign campaign;
-  if( !readCampaign(&campaign, campaignPath, logger) ) {
+  if( !readCampaign(&campaign, campaignPath, ctx.logger()) ) {
     return EXIT_FAILURE;
   }
 
   if( !campaign.isValid() ) {
-    logger->logErrorf(u8"Invalid campaign \"{}\"!",
-                      cs::CSTR(campaignPath.generic_u8string().data()));
+    ctx.logger()->logErrorf(u8"Invalid campaign \"{}\"!",
+                            cs::CSTR(campaignPath.generic_u8string().data()));
     return EXIT_FAILURE;
   }
 
@@ -348,24 +336,24 @@ int main(int /*argc*/, char **argv)
 
   const std::size_t numD = campaign.numEntries(campaignPath, numTraces);
   if( numD < 1 ) {
-    logger->logErrorf(u8"No traces for campaign \"{}\"!",
-                      cs::CSTR(campaignPath.generic_u8string().data()));
+    ctx.logger()->logErrorf(u8"No traces for campaign \"{}\"!",
+                            cs::CSTR(campaignPath.generic_u8string().data()));
     return EXIT_FAILURE;
   }
 
   // (3) Create Trace Matrix /////////////////////////////////////////////////
 
-  logger->logText(u8"Step 1: Build trace matrix.");
-  const TraceMatrix T = buildTraceMatrix(campaignPath, campaign, numD, event, range, logger);
+  ctx.logger()->logText(u8"Step 1: Build trace matrix.");
+  const TraceMatrix T = buildTraceMatrix(campaignPath, campaign, numD, event, range, &ctx);
   if( T.isEmpty() ) {
-    logger->logError(u8"Unable to build trace matrix!");
+    ctx.logger()->logError(u8"Unable to build trace matrix!");
     return EXIT_FAILURE;
   }
 
   const NumVec   meanT = columnMean(T);
   const NumVec stddevT = columnStdDev(T, meanT);
   if( meanT.empty()  ||  stddevT.empty() ) {
-    logger->logError(u8"Unable to compute trace auxiliaries!");
+    ctx.logger()->logError(u8"Unable to compute trace auxiliaries!");
     return EXIT_FAILURE;
   }
 
@@ -381,19 +369,19 @@ int main(int /*argc*/, char **argv)
 
     // (4.1) Create Attack Matrix ////////////////////////////////////////////
 
-    logger->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
+    ctx.logger()->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
     const AttackMatrix A = buildAttackMatrix(campaign, numD, k);
     if( A.isEmpty() ) {
-      logger->logError(u8"Unable to build attack matrix!");
+      ctx.logger()->logError(u8"Unable to build attack matrix!");
       return EXIT_FAILURE;
     }
 
     // (4.2) Compute Correlation Matrix //////////////////////////////////////
 
-    logger->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
-    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT);
+    ctx.logger()->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
+    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT, ctx.logger());
     if( R.isEmpty() ) {
-      logger->logError(u8"Unable to compute correlation matrix!");
+      ctx.logger()->logError(u8"Unable to compute correlation matrix!");
       return EXIT_FAILURE;
     }
 
@@ -418,13 +406,13 @@ int main(int /*argc*/, char **argv)
   for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
     keystr += std::format(" {:2X}", keyi[k]);
   }
-  logger->logTextf(u8"key ={}", keystr);
+  ctx.logger()->logTextf(u8"key ={}", keystr);
 
   std::string corstr;
   for(std::size_t k = 0; k < AES128_KEY_SIZE; k++) {
     corstr += std::format(" {:.3}", keyv[k]);
   }
-  logger->logTextf(u8"cor ={}", corstr);
+  ctx.logger()->logTextf(u8"cor ={}", corstr);
 
   return EXIT_SUCCESS;
 }
