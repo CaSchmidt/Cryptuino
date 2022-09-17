@@ -29,26 +29,25 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#pragma once
+#include "TriggerGT.h"
 
-#include "ITrigger.h"
+////// public ////////////////////////////////////////////////////////////////
 
-class TriggerGreater : public ITrigger {
-private:
-  struct ctor_tag {
-    ctor_tag() noexcept
-    {
-    }
-  };
+TriggerGT::TriggerGT(const double level, const ctor_tag&) noexcept
+  : _level{level}
+{
+}
 
-public:
-  TriggerGreater(const double level, const ctor_tag& = ctor_tag{}) noexcept;
-  ~TriggerGreater() noexcept;
+TriggerGT::~TriggerGT() noexcept
+{
+}
 
-  bool eval(const double x) const;
+bool TriggerGT::eval(const double x) const
+{
+  return x > _level;
+}
 
-  static TriggerPtr make(const double level);
-
-private:
-  double _level{0};
-};
+TriggerPtr TriggerGT::make(const double level)
+{
+  return std::make_unique<TriggerGT>(level);
+}

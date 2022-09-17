@@ -6,7 +6,7 @@ list(APPEND AnalysisUtil_HEADERS
   include/ITrigger.h
   include/MatInput.h
   include/Matrix.h
-  include/TriggerGreater.h
+  include/TriggerGT.h
   include/TriggerSelect.h
   )
 
@@ -15,7 +15,7 @@ list(APPEND AnalysisUtil_SOURCES
   src/CampaignReader.cpp
   src/ITrigger.cpp
   src/MatInput.cpp
-  src/TriggerGreater.cpp
+  src/TriggerGT.cpp
   src/TriggerSelect.cpp
   )
 
