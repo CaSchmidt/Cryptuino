@@ -3,9 +3,11 @@
 list(APPEND AnalysisUtil_HEADERS
   include/Campaign.h
   include/CampaignReader.h
+  include/IPowerModel.h
   include/ITrigger.h
   include/MatInput.h
   include/Matrix.h
+  include/PowerAES.h
   include/TriggerGT.h
   include/TriggerSelect.h
   )
@@ -13,8 +15,10 @@ list(APPEND AnalysisUtil_HEADERS
 list(APPEND AnalysisUtil_SOURCES
   src/Campaign.cpp
   src/CampaignReader.cpp
+  src/IPowerModel.cpp
   src/ITrigger.cpp
   src/MatInput.cpp
+  src/PowerAES.cpp
   src/TriggerGT.cpp
   src/TriggerSelect.cpp
   )
