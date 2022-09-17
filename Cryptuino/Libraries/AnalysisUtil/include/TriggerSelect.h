@@ -33,13 +33,10 @@
 
 #include <cstddef>
 
-#include <functional>
-
 #include "Buffer.h"
-
-using TriggerEvent = std::function<bool(const SampleBuffer::value_type)>;
+#include "ITrigger.h"
 
 SampleBuffer copyRange(const SampleBuffer& signal, const std::size_t _range = 100);
 
 SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigger,
-                           const TriggerEvent& event, const std::size_t _range = 100);
+                           const TriggerPtr& event, const std::size_t _range = 100);

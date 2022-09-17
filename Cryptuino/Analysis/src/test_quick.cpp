@@ -102,6 +102,26 @@ namespace test_matrix {
 
 namespace test_trigger {
 
+  class TriggerNEQ : public ITrigger {
+  public:
+    TriggerNEQ(const double level) noexcept
+      : _level{level}
+    {
+    }
+
+    ~TriggerNEQ() noexcept
+    {
+    }
+
+    bool eval(const double x) const
+    {
+      return x != _level;
+    }
+
+  private:
+    double _level{0};
+  };
+
   void print(const SampleBuffer& buffer, const char *name = nullptr)
   {
     FILE *file = stdout;
@@ -117,9 +137,7 @@ namespace test_trigger {
 
   void run()
   {
-    constexpr auto event = [](const double d) -> bool {
-      return d != 0;
-    };
+    TriggerPtr event= std::make_unique<TriggerNEQ>(0);
 
     const SampleBuffer  signal{0, 1, 2,  3, 4,  5, 6, 7, 8, 9};
     const SampleBuffer trigger{0, 1, 1, -1, 1, -1, 1, 1, 1, 0};
@@ -178,7 +196,7 @@ int main(int /*argc*/, char **argv)
   test_trigger::run();
 #endif
 
-#if 1
+#if 0
   test_count::run();
 #endif
 

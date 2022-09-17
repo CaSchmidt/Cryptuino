@@ -52,6 +52,7 @@
 #include "MatInput.h"
 #include "Matrix.h"
 #include "TriggerSelect.h"
+#include "TriggerGT.h"
 
 ////// Types /////////////////////////////////////////////////////////////////
 
@@ -133,7 +134,7 @@ AttackMatrix buildAttackMatrix(const Campaign& campaign, const std::size_t numD,
 }
 
 SampleBuffer readTrace(const std::filesystem::path& path,
-                       const TriggerEvent& event, const std::size_t range,
+                       const TriggerPtr& event, const std::size_t range,
                        const cs::ILogger *logger)
 {
   // (1) Read Signal AKA Full Trace //////////////////////////////////////////
@@ -169,7 +170,7 @@ SampleBuffer readTrace(const std::filesystem::path& path,
 
 TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& campaign,
                              const std::size_t numD,
-                             const TriggerEvent& event, const std::size_t range,
+                             const TriggerPtr& event, const std::size_t range,
                              const cs::OutputContext *ctx)
 {
   using Traces = std::list<SampleBuffer>;
@@ -310,9 +311,7 @@ int main(int /*argc*/, char **argv)
 
   const std::size_t numTraces = 500;
 
-  const TriggerEvent event = [](const double d) -> bool {
-    return d > 2.5;
-  };
+  const TriggerPtr  event = TriggerGT::make(2.5);
   const std::size_t range = 15;
 
   const cs::Logger     logger(stderr);

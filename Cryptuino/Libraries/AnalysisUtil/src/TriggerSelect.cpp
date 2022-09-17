@@ -80,9 +80,13 @@ SampleBuffer copyRange(const SampleBuffer& signal, const std::size_t _range)
 }
 
 SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigger,
-                           const TriggerEvent& event, const std::size_t _range)
+                           const TriggerPtr& event, const std::size_t _range)
 {
   using ConstIter = SampleBuffer::const_iterator;
+
+  const auto trigger_cond = [&](const double x) -> bool {
+    return event->eval(x);
+  };
 
   // (1) Sanity Check ////////////////////////////////////////////////////////
 
@@ -92,12 +96,12 @@ SampleBuffer selectTrigger(const SampleBuffer& signal, const SampleBuffer& trigg
 
   // (2) Find Range //////////////////////////////////////////////////////////
 
-  ConstIter beg = std::find_if(trigger.cbegin(), trigger.cend(), event);
+  ConstIter beg = std::find_if(trigger.cbegin(), trigger.cend(), trigger_cond);
   if( beg == trigger.cend() ) {
     return SampleBuffer();
   }
 
-  ConstIter end = std::find_if_not(beg + 1, trigger.cend(), event);
+  ConstIter end = std::find_if_not(beg + 1, trigger.cend(), trigger_cond);
 
   const std::ptrdiff_t pos = std::distance(trigger.cbegin(), beg);
   const std::size_t   have = std::distance(beg, end);
