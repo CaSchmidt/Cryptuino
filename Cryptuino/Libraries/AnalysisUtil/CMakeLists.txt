@@ -3,15 +3,19 @@
 list(APPEND AnalysisUtil_HEADERS
   include/Campaign.h
   include/CampaignReader.h
+  include/ITrigger.h
   include/MatInput.h
   include/Matrix.h
+  include/TriggerGreater.h
   include/TriggerSelect.h
   )
 
 list(APPEND AnalysisUtil_SOURCES
   src/Campaign.cpp
   src/CampaignReader.cpp
+  src/ITrigger.cpp
   src/MatInput.cpp
+  src/TriggerGreater.cpp
   src/TriggerSelect.cpp
   )
 
