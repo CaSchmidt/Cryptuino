@@ -5,14 +5,14 @@ list(APPEND AnalysisUtil_HEADERS
   include/CampaignReader.h
   include/MatInput.h
   include/Matrix.h
-  include/Trigger.h
+  include/TriggerSelect.h
   )
 
 list(APPEND AnalysisUtil_SOURCES
   src/Campaign.cpp
   src/CampaignReader.cpp
   src/MatInput.cpp
-  src/Trigger.cpp
+  src/TriggerSelect.cpp
   )
 
 ### Target ###################################################################

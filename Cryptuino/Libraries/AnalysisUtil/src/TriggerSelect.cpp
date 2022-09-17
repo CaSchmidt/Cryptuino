@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "Trigger.h"
+#include "TriggerSelect.h"
 
 ////// Private ///////////////////////////////////////////////////////////////
 

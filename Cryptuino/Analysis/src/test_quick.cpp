@@ -40,7 +40,7 @@
 
 #include "MatInput.h"
 #include "Matrix.h"
-#include "Trigger.h"
+#include "TriggerSelect.h"
 
 ////// (1) Test MAT I/O //////////////////////////////////////////////////////
 

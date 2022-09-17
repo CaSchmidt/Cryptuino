@@ -51,7 +51,7 @@
 #include "CampaignReader.h"
 #include "MatInput.h"
 #include "Matrix.h"
-#include "Trigger.h"
+#include "TriggerSelect.h"
 
 ////// Types /////////////////////////////////////////////////////////////////
 
