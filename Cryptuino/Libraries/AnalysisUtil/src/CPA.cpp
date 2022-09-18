@@ -33,6 +33,9 @@
 #include <cs/Logging/ILogger.h>
 #include <cs/Logging/Progress.h>
 #include <cs/Math/Math.h>
+#define HAVE_SIMD128_PREFETCH
+#include <cs/Math/Statistics.h>
+#include <cs/System/Time.h>
 
 #include "CPA.h"
 
@@ -53,6 +56,46 @@ namespace impl_cpa {
   using NumVec = std::vector<double>;
 
   using math = cs::math<double>;
+
+  ////// Helpers /////////////////////////////////////////////////////////////
+
+  template<typename TraitsT>
+  NumVec columnMean(const Matrix<TraitsT>& M)
+  {
+    NumVec mean;
+    try {
+      mean.resize(M.columns());
+    } catch(...) {
+      return NumVec();
+    }
+
+    for(std::size_t j = 0; j < M.columns(); j++) {
+      mean[j] = cs::mean(M.columnData(j), M.rows());
+    }
+
+    return mean;
+  }
+
+  template<typename TraitsT>
+  NumVec columnStdDev(const Matrix<TraitsT>& M, const NumVec& mean)
+  {
+    if( M.columns() != mean.size() ) {
+      return NumVec();
+    }
+
+    NumVec stddev;
+    try {
+      stddev.resize(M.columns());
+    } catch(...) {
+      return NumVec();
+    }
+
+    for(std::size_t j = 0; j < M.columns(); j++) {
+      stddev[j] = cs::stddev(M.columnData(j), M.rows(), mean[j]);
+    }
+
+    return stddev;
+  }
 
   ////// Attack Matrix ///////////////////////////////////////////////////////
 
@@ -87,6 +130,52 @@ namespace impl_cpa {
     // Done! /////////////////////////////////////////////////////////////////
 
     return A;
+  }
+
+  ////// Correlation Matrix //////////////////////////////////////////////////
+
+  CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
+                                       const NumVec& meanT, const NumVec& stddevT,
+                                       const cs::ILogger *logger)
+  {
+    // (1) Setup /////////////////////////////////////////////////////////////
+
+    const std::size_t numD = A.rows();    // ... or T.rows()
+    const std::size_t numK = A.columns();
+    const std::size_t numT = T.columns();
+
+    // (2) Create Correlation Matrix /////////////////////////////////////////
+
+    CorrelationMatrix R;
+    if( !R.resize(numK, numT) ) {
+      return CorrelationMatrix();
+    }
+
+    // (3) Compute Correlation ///////////////////////////////////////////////
+
+    const uint64_t beg = cs::tickCountMs();
+
+    const NumVec meanA = columnMean(A);
+    if( meanA.empty() ) {
+      return CorrelationMatrix();
+    }
+
+    const NumVec stddevA = columnStdDev(A, meanA);
+    if( stddevA.empty() ) {
+      return CorrelationMatrix();
+    }
+
+    for(std::size_t i = 0; i < numK; i++) {
+      for(std::size_t j = 0; j < numT; j++) {
+        R(i, j)  = cs::cov(A.columnData(i), T.columnData(j), numD, meanA[i], meanT[j]);
+        R(i, j) /= stddevA[i]*stddevT[j];
+      }
+    }
+
+    const uint64_t end = cs::tickCountMs();
+    logger->logTextf(u8"duration = {}ms", end - beg);
+
+    return R;
   }
 
   ////// Trace Matrix ////////////////////////////////////////////////////////
