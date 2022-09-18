@@ -30,3 +30,18 @@
 *****************************************************************************/
 
 #pragma once
+
+#include <cs/Logging/OutputContext.h>
+
+#include "Campaign.h"
+#include "IPowerModel.h"
+#include "ITrigger.h"
+
+struct CPAcontext {
+  Campaign     campaign{};
+  TriggerPtr      event{};
+  PowerModelPtr   model{};
+  std::size_t numTraces{0};
+  std::size_t  sizBlock{0};
+  std::size_t    sizKey{0};
+};

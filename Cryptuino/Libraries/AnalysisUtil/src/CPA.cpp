@@ -29,4 +29,59 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <cs/Math/Math.h>
+
 #include "CPA.h"
+
+#include "Matrix.h"
+
+namespace impl_cpa {
+
+  struct      attack_tag {};
+  struct correlation_tag {};
+  struct       trace_tag {};
+
+  using      AttackMatrix = ColMajMatrix<double,attack_tag>;
+  using CorrelationMatrix = ColMajMatrix<double,correlation_tag>;
+  using       TraceMatrix = ColMajMatrix<double,trace_tag>;
+
+  using NumVec = std::vector<double>;
+
+  using math = cs::math<double>;
+
+  ////// Attack Matrix ///////////////////////////////////////////////////////
+
+  AttackMatrix buildAttackMatrix(const CPAcontext& ctx,
+                                 const std::size_t numD, const std::size_t run)
+  {
+    constexpr std::size_t KEY_VALUES = 256;
+
+    // (1) Sanity Check //////////////////////////////////////////////////////
+
+    if( run < 0  ||  run >= ctx.sizKey ) {
+      return AttackMatrix();
+    }
+
+    // (2) Create Attack Matrix //////////////////////////////////////////////
+
+    AttackMatrix A;
+    if( !A.resize(numD, KEY_VALUES) ) {
+      return AttackMatrix();
+    }
+
+    // (3) Fill Attack Matrix ////////////////////////////////////////////////
+
+    CampaignEntries::const_iterator iter = ctx.campaign.entries.cbegin();
+    for(std::size_t i = 0; i < numD; i++, ++iter) {
+      const uint8_t plain = iter->plain[run];
+      for(std::size_t j = 0; j < KEY_VALUES; j++) {
+        A(i, j) = ctx.model->eval(plain, uint8_t(j));
+      }
+    }
+
+    // Done! /////////////////////////////////////////////////////////////////
+
+    return A;
+  }
+
+} // namespace impl_cpa
