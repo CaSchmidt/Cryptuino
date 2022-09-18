@@ -195,7 +195,7 @@ TraceMatrix buildTraceMatrix(const std::filesystem::path& base, const Campaign& 
 }
 
 template<typename TraitsT>
-NumVec columnMean(const Matrix<double,TraitsT>& M)
+NumVec columnMean(const Matrix<TraitsT>& M)
 {
   NumVec mean;
   try {
@@ -212,7 +212,7 @@ NumVec columnMean(const Matrix<double,TraitsT>& M)
 }
 
 template<typename TraitsT>
-NumVec columnStdDev(const Matrix<double,TraitsT>& M, const NumVec& mean)
+NumVec columnStdDev(const Matrix<TraitsT>& M, const NumVec& mean)
 {
   if( M.columns() != mean.size() ) {
     return NumVec();

@@ -72,8 +72,8 @@ namespace test_matrix {
     return b ? "true" : "false";
   }
 
-  template<typename T, typename TraitsT>
-  void printInfo(const Matrix<T,TraitsT>& M, const char *name = nullptr)
+  template<typename TraitsT>
+  void printInfo(const Matrix<TraitsT>& M, const char *name = nullptr)
   {
     printf("   name = %s\n", name);
     printf("columns = %d\n", int(M.columns()));
