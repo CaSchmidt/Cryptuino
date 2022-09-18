@@ -49,6 +49,7 @@
 
 #include "Campaign.h"
 #include "CampaignReader.h"
+#include "Cryptuino.h"
 #include "MatInput.h"
 #include "Matrix.h"
 #include "PowerAES.h"
@@ -302,7 +303,7 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
-  if( !campaign.isValid() ) {
+  if( !campaign.isValid(AES128_KEY_SIZE, AES_BLOCK_SIZE) ) {
     ctx.logger()->logErrorf(u8"Invalid campaign \"{}\"!",
                             cs::CSTR(campaignPath.generic_u8string().data()));
     return EXIT_FAILURE;
@@ -310,7 +311,7 @@ int main(int /*argc*/, char **argv)
 
   // (2) Sanitize Number of Traces ///////////////////////////////////////////
 
-  const std::size_t numD = campaign.numEntries(campaignPath, numTraces);
+  const std::size_t numD = campaign.numEntries(numTraces);
   if( numD < 1 ) {
     ctx.logger()->logErrorf(u8"No traces for campaign \"{}\"!",
                             cs::CSTR(campaignPath.generic_u8string().data()));

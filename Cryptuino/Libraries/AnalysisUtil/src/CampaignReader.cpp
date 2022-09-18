@@ -52,7 +52,8 @@ bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const c
 {
   *campaign = Campaign();
 
-  logger->logTextf(u8"Opening file \"{}\".", cs::CSTR(path.generic_u8string().data()));
+  logger->logTextf(u8"Opening file \"{}\".",
+                   cs::CSTR(path.generic_u8string().data()));
 
   // (1) Open file ///////////////////////////////////////////////////////////
 
@@ -96,9 +97,14 @@ bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const c
   } // For each line...
   campaign->add(entry);
 
+  // (4) Set Path ////////////////////////////////////////////////////////////
+
+  campaign->path = path;
+
   // Done! ///////////////////////////////////////////////////////////////////
 
-  logger->logTextf(u8"File \"{}\" opened.", cs::CSTR(path.generic_u8string().data()));
+  logger->logTextf(u8"File \"{}\" opened.",
+                   cs::CSTR(campaign->path.generic_u8string().data()));
 
   return true;
 }

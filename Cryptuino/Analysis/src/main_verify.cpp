@@ -40,6 +40,7 @@
 
 #include "Campaign.h"
 #include "CampaignReader.h"
+#include "Cryptuino.h"
 
 void printHex(const ByteBuffer& buffer, const bool eol = true, FILE *file = stdout)
 {
@@ -117,7 +118,7 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
-  if( !campaign.isValid() ) {
+  if( !campaign.isValid(AES128_KEY_SIZE, AES_BLOCK_SIZE) ) {
     logger->logError(u8"Invalid AES key/data size!");
     return EXIT_FAILURE;
   }

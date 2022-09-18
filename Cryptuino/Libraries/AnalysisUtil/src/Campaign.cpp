@@ -40,8 +40,8 @@ namespace priv {
   bool isValidBuffer(const ByteBuffer& buffer, const std::size_t size)
   {
     return buffer.size() != 0
-        ? buffer.size() == size
-        : true;
+        ? buffer.size() == size // Non-Empty buffer: mandatory
+        : true;                 // Empty buffer: optional
   }
 
 } // namespace priv
@@ -95,17 +95,21 @@ bool Campaign::isEmpty() const
   return entries.empty();
 }
 
-bool Campaign::isValid(const std::size_t keySize, const std::size_t blockSize) const
+bool Campaign::isValid(const std::size_t sizKey, const std::size_t sizBlock) const
 {
-  if( !priv::isValidBuffer(key, keySize) ) {
+  if( path.empty() ) {
+    return false;
+  }
+
+  if( !priv::isValidBuffer(key, sizKey) ) {
     return false;
   }
 
   for(const CampaignEntry& entry : entries) {
-    if( !priv::isValidBuffer(entry.plain, blockSize) ) {
+    if( !priv::isValidBuffer(entry.plain, sizBlock) ) {
       return false;
     }
-    if( !priv::isValidBuffer(entry.cipher, blockSize) ) {
+    if( !priv::isValidBuffer(entry.cipher, sizBlock) ) {
       return false;
     }
   }
@@ -120,7 +124,7 @@ std::string Campaign::lastEntryName() const
       : std::string();
 }
 
-std::size_t Campaign::numEntries(const std::filesystem::path& base, const std::size_t numWant) const
+std::size_t Campaign::numEntries(const std::size_t numWant) const
 {
   if( isEmpty()  || numWant < 1 ) {
     return 0;
@@ -130,7 +134,7 @@ std::size_t Campaign::numEntries(const std::filesystem::path& base, const std::s
 
   CampaignEntries::const_iterator iter = entries.cbegin();
   for(std::size_t i = 0; i < numHave; i++, ++iter) {
-    if( !iter->exists(base) ) {
+    if( !iter->exists(path) ) {
       return i;
     }
   }

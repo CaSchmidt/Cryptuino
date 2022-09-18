@@ -36,7 +36,6 @@
 #include <vector>
 
 #include "Buffer.h"
-#include "Cryptuino.h"
 
 struct CampaignEntry {
   CampaignEntry() noexcept;
@@ -61,14 +60,14 @@ struct Campaign {
   void clear();
 
   bool isEmpty() const;
-  bool isValid(const std::size_t keySize = AES128_KEY_SIZE,
-               const std::size_t blockSize = AES_BLOCK_SIZE) const;
+  bool isValid(const std::size_t sizKey, const std::size_t sizBlock) const;
 
   std::string lastEntryName() const;
-  std::size_t numEntries(const std::filesystem::path& base, const std::size_t numWant) const;
+  std::size_t numEntries(const std::size_t numWant) const;
 
-  ByteBuffer          key{};
-  CampaignEntries entries{};
+  ByteBuffer             key{};
+  CampaignEntries    entries{};
+  std::filesystem::path path{};
 };
 
 #endif // CAMPAIGN_H
