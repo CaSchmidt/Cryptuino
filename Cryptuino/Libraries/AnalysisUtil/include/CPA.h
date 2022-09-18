@@ -42,6 +42,7 @@ struct CPAcontext {
   TriggerPtr      event{};
   PowerModelPtr   model{};
   std::size_t numTraces{0};
+  std::size_t  pctRange{0};
   std::size_t  sizBlock{0};
   std::size_t    sizKey{0};
 };

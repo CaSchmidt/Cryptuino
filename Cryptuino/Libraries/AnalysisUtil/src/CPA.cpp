@@ -29,11 +29,16 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#define HAVE_STD_FORMAT
+#include <cs/Logging/ILogger.h>
+#include <cs/Logging/Progress.h>
 #include <cs/Math/Math.h>
 
 #include "CPA.h"
 
+#include "MatInput.h"
 #include "Matrix.h"
+#include "TriggerSelect.h"
 
 namespace impl_cpa {
 
@@ -82,6 +87,92 @@ namespace impl_cpa {
     // Done! /////////////////////////////////////////////////////////////////
 
     return A;
+  }
+
+  ////// Trace Matrix ////////////////////////////////////////////////////////
+
+  SampleBuffer readTrace(const CPAcontext& ctx, const cs::ILogger *logger,
+                         const std::filesystem::path& filename)
+  {
+    // (1) Read Signal AKA Full Trace ////////////////////////////////////////
+
+    const SampleBuffer signal = readMatVector(filename, "trace", logger);
+    if( signal.empty() ) {
+      return SampleBuffer();
+    }
+
+    // (2) Read (Optional) Trigger ///////////////////////////////////////////
+
+    const bool    have_trigger = ctx.event  &&  haveMatVariable(filename, "trigger", logger);
+    const SampleBuffer trigger = have_trigger
+        ? readMatVector(filename, "trigger", logger)
+        : SampleBuffer();
+    if( have_trigger  &&  trigger.empty() ) {
+      return SampleBuffer();
+    }
+
+    // (3) Apply Trigger Condition and/or Range //////////////////////////////
+
+    const SampleBuffer trace = !trigger.empty()
+        ? selectTrigger(signal, trigger, ctx.event, ctx.pctRange)
+        : copyRange(signal, ctx.pctRange);
+    if( trace.empty() ) {
+      logger->logErrorf(u8"Empty trace for file \"{}\"!",
+                        cs::CSTR(filename.generic_u8string().data()));
+      return SampleBuffer();
+    }
+
+    return trace;
+  }
+
+  TraceMatrix buildTraceMatrix(const CPAcontext& ctx, const cs::OutputContext *output,
+                               const std::size_t numD)
+  {
+    using Traces = std::list<SampleBuffer>;
+
+    // (0) Setup Progress ////////////////////////////////////////////////////
+
+    output->setProgressRange(0, int(numD));
+
+    // (1) Read all Traces ///////////////////////////////////////////////////
+
+    Traces    traces;
+    std::size_t numT = std::numeric_limits<std::size_t>::max();
+
+    CampaignEntries::const_iterator entry = ctx.campaign.entries.cbegin();
+    for(std::size_t i = 0; i < numD; i++, ++entry) {
+      const std::filesystem::path filename = entry->path(ctx.campaign.path);
+      SampleBuffer trace = readTrace(ctx, output->logger(), filename);
+      if( trace.empty() ) {
+        return TraceMatrix();
+      }
+
+      traces.push_back(std::move(trace));
+
+      if( traces.back().size() < numT ) {
+        numT = traces.back().size();
+      }
+
+      output->setProgressValue(int(i + 1));
+    }
+
+    // (2) Create Trace Matrix ///////////////////////////////////////////////
+
+    TraceMatrix T;
+    if( !T.resize(numD, numT) ) {
+      return TraceMatrix();
+    }
+
+    // (3) Fill Trace Matrix /////////////////////////////////////////////////
+
+    Traces::const_iterator trace = traces.cbegin();
+    for(std::size_t i = 0; i < numD; i++, ++trace) {
+      for(std::size_t j = 0; j < numT; j++) {
+        T(i, j) = (*trace)[j];
+      }
+    }
+
+    return T;
   }
 
 } // namespace impl_cpa
