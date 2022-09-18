@@ -3,6 +3,7 @@
 list(APPEND AnalysisUtil_HEADERS
   include/Campaign.h
   include/CampaignReader.h
+  include/CPA.h
   include/IPowerModel.h
   include/ITrigger.h
   include/MatInput.h
@@ -15,6 +16,7 @@ list(APPEND AnalysisUtil_HEADERS
 list(APPEND AnalysisUtil_SOURCES
   src/Campaign.cpp
   src/CampaignReader.cpp
+  src/CPA.cpp
   src/IPowerModel.cpp
   src/ITrigger.cpp
   src/MatInput.cpp
