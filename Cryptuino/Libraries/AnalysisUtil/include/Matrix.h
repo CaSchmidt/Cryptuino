@@ -71,10 +71,8 @@ struct RowMajorTraits {
 
 ////// Implementation ////////////////////////////////////////////////////////
 
-template<typename T, typename TraitsT>
+template<typename TraitsT>
 class Matrix {
-  static_assert( std::is_same_v<T,typename TraitsT::value_type> );
-
 public:
   using traits_type = TraitsT;
   using   size_type = typename traits_type::size_type;
@@ -213,9 +211,9 @@ private:
 };
 
 template<typename T, typename TagT = T>
-using ColMajMatrix = Matrix<T,ColumnMajorTraits<T,TagT>>;
+using ColMajMatrix = Matrix<ColumnMajorTraits<T,TagT>>;
 
 template<typename T, typename TagT = T>
-using RowMajMatrix = Matrix<T,RowMajorTraits<T,TagT>>;
+using RowMajMatrix = Matrix<RowMajorTraits<T,TagT>>;
 
 #endif // MATRIX_H
