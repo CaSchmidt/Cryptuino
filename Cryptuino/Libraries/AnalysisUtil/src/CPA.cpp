@@ -33,6 +33,7 @@
 #include <cs/Logging/ILogger.h>
 #include <cs/Logging/Progress.h>
 #include <cs/Math/Math.h>
+#include <cs/Math/Numeric.h>
 #define HAVE_SIMD128_PREFETCH
 #include <cs/Math/Statistics.h>
 #include <cs/System/Time.h>
@@ -265,3 +266,144 @@ namespace impl_cpa {
   }
 
 } // namespace impl_cpa
+
+////// CPAcontext - public ///////////////////////////////////////////////////
+
+bool CPAcontext::isValid() const
+{
+  if( numTraces < 1 ) {
+    return false;
+  }
+
+  if( pctRange < 1  ||  pctRange > 100 ) {
+    return false;
+  }
+
+  if( sizBlock < 1 ) {
+    return false;
+  }
+
+  if( sizKey < 1 ) {
+    return false;
+  }
+
+  if( !campaign.isValid(sizKey, sizBlock) ) {
+    return false;
+  }
+
+  if( !model ) {
+    return false;
+  }
+
+  return true;
+}
+
+////// Public ////////////////////////////////////////////////////////////////
+
+void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
+{
+  using namespace impl_cpa;
+
+  // (1) Sanitize Input //////////////////////////////////////////////////////
+
+  if( !ctx.campaign.isValid(ctx.sizKey, ctx.sizBlock) ) {
+    output->logger()->logErrorf(u8"Invalid campaign \"{}\"!",
+                                cs::CSTR(ctx.campaign.path.generic_u8string().data()));
+    return;
+  }
+
+  if( !ctx.isValid() ) {
+    output->logError(u8"Invalid context!");
+    return;
+  }
+
+  // (2) Sanitize Number of Traces ///////////////////////////////////////////
+
+  const std::size_t numD = ctx.campaign.numEntries(ctx.numTraces);
+  if( numD < 1 ) {
+    output->logger()->logErrorf(u8"No traces for campaign \"{}\"!",
+                                cs::CSTR(ctx.campaign.path.generic_u8string().data()));
+    return;
+  }
+
+  // (3) Create Trace Matrix /////////////////////////////////////////////////
+
+  output->logText(u8"Step 1: Build trace matrix.");
+  const TraceMatrix T = buildTraceMatrix(ctx, output, numD);
+  if( T.isEmpty() ) {
+    output->logError(u8"Unable to build trace matrix!");
+    return;
+  }
+
+  const NumVec   meanT = columnMean(T);
+  const NumVec stddevT = columnStdDev(T, meanT);
+  if( meanT.empty()  ||  stddevT.empty() ) {
+    output->logError(u8"Unable to compute trace auxiliaries!");
+    return;
+  }
+
+  // (4) Attack with Correlation /////////////////////////////////////////////
+
+  std::vector<std::size_t> keyi;
+  std::vector<double>      keyv;
+
+  try {
+    keyi.resize(ctx.sizKey);
+    keyv.resize(ctx.sizKey);
+  } catch(...) {
+    output->logError(u8"Unable to allocate result buffer!");
+    return;
+  }
+
+  for(std::size_t k = 0; k < ctx.sizKey; k++) {
+    const std::string pstr =
+        std::format("{:{}}/{}",
+                    k + 1, cs::countDigits(ctx.sizKey), ctx.sizKey);
+
+    // (4.1) Create Attack Matrix ////////////////////////////////////////////
+
+    output->logger()->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
+    const AttackMatrix A = buildAttackMatrix(ctx, numD, k);
+    if( A.isEmpty() ) {
+      output->logError(u8"Unable to build attack matrix!");
+      return;
+    }
+
+    // (4.2) Compute Correlation Matrix //////////////////////////////////////
+
+    output->logger()->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
+    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT, output->logger());
+    if( R.isEmpty() ) {
+      output->logError(u8"Unable to compute correlation matrix!");
+      return;
+    }
+
+    // (4.3) Guess Key ///////////////////////////////////////////////////////
+
+    keyi[k] = std::numeric_limits<std::size_t>::max();
+    keyv[k] = 0;
+    for(std::size_t i = 0; i < R.rows(); i++) {
+      for(std::size_t j = 0; j < R.columns(); j++) {
+        const double v = math::abs(R(i, j));
+        if( v > keyv[k] ) {
+          keyi[k] = i;
+          keyv[k] = v;
+        }
+      }
+    }
+  } // For Each Byte of Key
+
+  // (5) Output Result ///////////////////////////////////////////////////////
+
+  std::string keystr;
+  for(std::size_t k = 0; k < ctx.sizKey; k++) {
+    keystr += std::format(" {:2X}", keyi[k]);
+  }
+  output->logger()->logTextf(u8"key ={}", keystr);
+
+  std::string corstr;
+  for(std::size_t k = 0; k < ctx.sizKey; k++) {
+    corstr += std::format(" {:.3}", keyv[k]);
+  }
+  output->logger()->logTextf(u8"cor ={}", corstr);
+}

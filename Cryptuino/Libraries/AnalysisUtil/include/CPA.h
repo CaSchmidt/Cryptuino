@@ -45,4 +45,8 @@ struct CPAcontext {
   std::size_t  pctRange{0};
   std::size_t  sizBlock{0};
   std::size_t    sizKey{0};
+
+  bool isValid() const;
 };
+
+void runCPA(const CPAcontext& ctx, const cs::OutputContext *output);
