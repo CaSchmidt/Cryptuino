@@ -97,6 +97,10 @@ bool Campaign::isEmpty() const
 
 bool Campaign::isValid(const std::size_t sizKey, const std::size_t sizBlock) const
 {
+  if( sizKey < 1  ||  sizBlock < 1 ) {
+    return false;
+  }
+
   if( path.empty() ) {
     return false;
   }
