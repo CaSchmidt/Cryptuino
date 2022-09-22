@@ -231,7 +231,7 @@ namespace impl_cpa {
 
     CampaignEntries::const_iterator entry = ctx.campaign.entries.cbegin();
     for(std::size_t i = 0; i < numD; i++, ++entry) {
-      const std::filesystem::path filename = entry->path(ctx.campaign.path);
+      const std::filesystem::path filename = entry->filename(ctx.campaign.filename);
       SampleBuffer trace = readTrace(ctx, output->logger(), filename);
       if( trace.empty() ) {
         return TraceMatrix();
@@ -308,7 +308,7 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
 
   if( !ctx.campaign.isValid(ctx.sizKey, ctx.sizBlock) ) {
     output->logger()->logErrorf(u8"Invalid campaign \"{}\"!",
-                                cs::CSTR(ctx.campaign.path.generic_u8string().data()));
+                                cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
     return;
   }
 
@@ -322,7 +322,7 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
   const std::size_t numD = ctx.campaign.numEntries(ctx.numTraces);
   if( numD < 1 ) {
     output->logger()->logErrorf(u8"No traces for campaign \"{}\"!",
-                                cs::CSTR(ctx.campaign.path.generic_u8string().data()));
+                                cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
     return;
   }
 

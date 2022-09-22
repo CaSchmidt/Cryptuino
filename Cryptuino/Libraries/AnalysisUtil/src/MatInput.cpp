@@ -40,7 +40,7 @@
 
 #include "ScopeGuard.h"
 
-bool haveMatVariable(const std::filesystem::path& path, const std::string& varname,
+bool haveMatVariable(const std::filesystem::path& filename, const std::string& varname,
                      const cs::ILogger *logger)
 {
   mat_t   *file = NULL;
@@ -56,9 +56,9 @@ bool haveMatVariable(const std::filesystem::path& path, const std::string& varna
     }
   });
 
-  file = Mat_Open(cs::CSTR(path.generic_u8string().data()), MAT_ACC_RDONLY);
+  file = Mat_Open(cs::CSTR(filename.generic_u8string().data()), MAT_ACC_RDONLY);
   if( file == NULL ) {
-    logger->logErrorf(u8"Unable to open file \"{}\"!", cs::CSTR(path.generic_u8string().data()));
+    logger->logErrorf(u8"Unable to open file \"{}\"!", cs::CSTR(filename.generic_u8string().data()));
     return false;
   }
 
@@ -68,7 +68,7 @@ bool haveMatVariable(const std::filesystem::path& path, const std::string& varna
   return have_var;
 }
 
-SampleBuffer readMatVector(const std::filesystem::path& path, const std::string& varname,
+SampleBuffer readMatVector(const std::filesystem::path& filename, const std::string& varname,
                            const cs::ILogger *logger)
 {
   mat_t   *file = NULL;
@@ -86,9 +86,9 @@ SampleBuffer readMatVector(const std::filesystem::path& path, const std::string&
 
   // (1) Open MAT file ///////////////////////////////////////////////////////
 
-  file = Mat_Open(cs::CSTR(path.generic_u8string().data()), MAT_ACC_RDONLY);
+  file = Mat_Open(cs::CSTR(filename.generic_u8string().data()), MAT_ACC_RDONLY);
   if( file == NULL ) {
-    logger->logErrorf(u8"Unable to open file \"{}\"!", cs::CSTR(path.generic_u8string().data()));
+    logger->logErrorf(u8"Unable to open file \"{}\"!", cs::CSTR(filename.generic_u8string().data()));
     return SampleBuffer();
   }
 

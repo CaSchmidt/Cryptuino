@@ -43,7 +43,7 @@ struct CampaignEntry {
   bool isEmpty() const;
 
   bool exists(const std::filesystem::path& base) const;
-  std::filesystem::path path(const std::filesystem::path& base) const;
+  std::filesystem::path filename(const std::filesystem::path& base) const;
 
   std::string  name{};
   ByteBuffer  plain{};
@@ -65,9 +65,9 @@ struct Campaign {
   std::string lastEntryName() const;
   std::size_t numEntries(const std::size_t numWant) const;
 
-  ByteBuffer             key{};
-  CampaignEntries    entries{};
-  std::filesystem::path path{};
+  ByteBuffer                 key{};
+  CampaignEntries        entries{};
+  std::filesystem::path filename{};
 };
 
 #endif // CAMPAIGN_H

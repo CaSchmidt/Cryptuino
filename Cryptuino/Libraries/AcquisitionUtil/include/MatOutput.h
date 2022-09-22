@@ -41,6 +41,6 @@ namespace cs {
 } // namespace cs
 
 bool writeMatOutput(const cs::ILogger *logger, const InstrumentPtr& instr,
-                    const std::filesystem::path& path, const std::string& channels);
+                    const std::filesystem::path& filename, const std::string& channels);
 
 #endif // MATOUTPUT_H

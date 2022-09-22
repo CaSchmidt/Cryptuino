@@ -58,10 +58,10 @@ bool CampaignEntry::isEmpty() const
 bool CampaignEntry::exists(const std::filesystem::path& base) const
 {
   std::error_code ec;
-  return std::filesystem::exists(path(base), ec);
+  return std::filesystem::exists(filename(base), ec);
 }
 
-std::filesystem::path CampaignEntry::path(const std::filesystem::path& base) const
+std::filesystem::path CampaignEntry::filename(const std::filesystem::path& base) const
 {
   std::error_code ec;
   std::filesystem::path p = std::filesystem::is_directory(base, ec)
@@ -101,7 +101,8 @@ bool Campaign::isValid(const std::size_t sizKey, const std::size_t sizBlock) con
     return false;
   }
 
-  if( path.empty() ) {
+  std::error_code ec;
+  if( filename.empty()  ||  !std::filesystem::exists(filename, ec) ) {
     return false;
   }
 
@@ -138,7 +139,7 @@ std::size_t Campaign::numEntries(const std::size_t numWant) const
 
   CampaignEntries::const_iterator iter = entries.cbegin();
   for(std::size_t i = 0; i < numHave; i++, ++iter) {
-    if( !iter->exists(path) ) {
+    if( !iter->exists(filename) ) {
       return i;
     }
   }

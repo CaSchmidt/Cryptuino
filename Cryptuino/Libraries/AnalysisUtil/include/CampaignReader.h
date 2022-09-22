@@ -40,6 +40,6 @@ namespace cs {
   class ILogger;
 } // namespace cs
 
-bool readCampaign(Campaign *campaign, const std::filesystem::path& path, const cs::ILogger *logger);
+bool readCampaign(Campaign *campaign, const std::filesystem::path& filename, const cs::ILogger *logger);
 
 #endif // CAMPAIGNREADER_H

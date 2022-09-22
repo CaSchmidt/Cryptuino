@@ -40,10 +40,10 @@ namespace cs {
   class ILogger;
 } // namespace cs
 
-bool haveMatVariable(const std::filesystem::path& path, const std::string& varname,
+bool haveMatVariable(const std::filesystem::path& filename, const std::string& varname,
                      const cs::ILogger *logger);
 
-SampleBuffer readMatVector(const std::filesystem::path& path, const std::string& varname,
+SampleBuffer readMatVector(const std::filesystem::path& filename, const std::string& varname,
                            const cs::ILogger *logger);
 
 #endif // MATINPUT_H
