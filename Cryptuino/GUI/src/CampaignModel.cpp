@@ -51,23 +51,21 @@ CampaignModel::~CampaignModel()
 void CampaignModel::clear()
 {
   beginResetModel();
-  _path.clear();
   _campaign.clear();
   endResetModel();
 }
 
-void CampaignModel::set(const std::filesystem::path& p, const Campaign& c)
+void CampaignModel::set(const Campaign& c)
 {
   beginResetModel();
-  _path     = p;
   _campaign = c;
   endResetModel();
 }
 
 QString CampaignModel::filename() const
 {
-  return !_path.empty()
-      ? TO_QSTRING(_path)
+  return !_campaign.filename.empty()
+      ? TO_QSTRING(_campaign.filename)
       : QString();
 }
 

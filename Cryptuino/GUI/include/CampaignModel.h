@@ -49,7 +49,7 @@ public:
   ~CampaignModel();
 
   void clear();
-  void set(const std::filesystem::path& p, const Campaign& c);
+  void set(const Campaign& c);
 
   QString filename() const;
   QString key() const;
@@ -61,7 +61,6 @@ public:
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
 private:
-  std::filesystem::path _path{};
   Campaign _campaign{};
 };
 
