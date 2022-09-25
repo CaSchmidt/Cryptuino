@@ -1,15 +1,18 @@
 list(APPEND gui_FORMS
+  forms/WAnalysisOptions.ui
   forms/WMainWindow.ui
   )
 
 list(APPEND gui_HEADERS
   include/CampaignModel.h
+  include/WAnalysisOptions.h
   include/WMainWindow.h
   )
 
 list(APPEND gui_SOURCES
   src/CampaignModel.cpp
   src/main.cpp
+  src/WAnalysisOptions.cpp
   src/WMainWindow.cpp
   )
 
