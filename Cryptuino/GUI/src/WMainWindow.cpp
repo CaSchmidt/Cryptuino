@@ -31,6 +31,8 @@
 
 #include <QtWidgets/QFileDialog>
 
+#include <cs/Core/QStringUtil.h>
+
 #include "WMainWindow.h"
 #include "ui_WMainWindow.h"
 
@@ -84,7 +86,7 @@ void WMainWindow::openCampaign()
 
   Campaign campaign;
 
-  const std::filesystem::path path = TO_PATH(filename);
+  const std::filesystem::path path = cs::toPath(filename);
   if( !readCampaign(&campaign, path, ui->logBrowser) ) {
     return;
   }

@@ -29,6 +29,8 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <cs/Core/QStringUtil.h>
+
 #include "CampaignModel.h"
 
 #include "HexChar.h"
@@ -62,11 +64,14 @@ void CampaignModel::set(const Campaign& c)
   endResetModel();
 }
 
+Campaign CampaignModel::campaign() const
+{
+  return _campaign;
+}
+
 QString CampaignModel::filename() const
 {
-  return !_campaign.filename.empty()
-      ? TO_QSTRING(_campaign.filename)
-      : QString();
+  return cs::toQString(_campaign.filename);
 }
 
 QString CampaignModel::key() const

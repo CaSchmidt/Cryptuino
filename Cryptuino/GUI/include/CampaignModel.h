@@ -51,6 +51,8 @@ public:
   void clear();
   void set(const Campaign& c);
 
+  Campaign campaign() const;
+
   QString filename() const;
   QString key() const;
 
@@ -67,21 +69,4 @@ private:
 inline CampaignModel *CAMPAIGN_MODEL(QAbstractItemModel *model)
 {
   return dynamic_cast<CampaignModel*>(model);
-}
-
-// TODO: Find suitable place!
-
-inline std::filesystem::path TO_PATH(const QString& s,
-                                     const std::filesystem::path::format fmt = std::filesystem::path::auto_format)
-{
-  return !s.isEmpty()
-      ? std::filesystem::path(s.toStdU16String(), fmt)
-      : std::filesystem::path();
-}
-
-inline QString TO_QSTRING(const std::filesystem::path& path)
-{
-  return !path.empty()
-      ? QString::fromStdU16String(path.generic_u16string())
-      : QString();
 }
