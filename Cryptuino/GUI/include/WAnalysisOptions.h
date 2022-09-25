@@ -31,22 +31,18 @@
 
 #pragma once
 
-#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QDialog>
 
 namespace Ui {
-  class WMainWindow;
+  class WAnalysisOptions;
 } // namespace Ui
 
-class WMainWindow : public QMainWindow {
+class WAnalysisOptions : public QDialog {
   Q_OBJECT
 public:
-  WMainWindow(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
-  ~WMainWindow();
-
-private slots:
-  void openCampaign();
-  void runAnalysis();
+  WAnalysisOptions(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  ~WAnalysisOptions();
 
 private:
-  Ui::WMainWindow *ui{nullptr};
+  Ui::WAnalysisOptions *ui{nullptr};
 };

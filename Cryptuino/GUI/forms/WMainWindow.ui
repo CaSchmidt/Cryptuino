@@ -161,7 +161,14 @@
     <addaction name="separator"/>
     <addaction name="quitAction"/>
    </widget>
+   <widget class="QMenu" name="menu_Analysis">
+    <property name="title">
+     <string>&amp;Analysis</string>
+    </property>
+    <addaction name="runAnalysisAction"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Analysis"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -214,6 +221,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="runAnalysisAction">
+   <property name="text">
+    <string>&amp;Run...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

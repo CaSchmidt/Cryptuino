@@ -29,79 +29,19 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <QtWidgets/QFileDialog>
-
-#include <cs/Core/QStringUtil.h>
-
-#include "WMainWindow.h"
-#include "ui_WMainWindow.h"
-
-#include "CampaignModel.h"
-#include "CampaignReader.h"
 #include "WAnalysisOptions.h"
+#include "ui_WAnalysisOptions.h"
 
 ////// public ////////////////////////////////////////////////////////////////
 
-WMainWindow::WMainWindow(QWidget *parent, Qt::WindowFlags flags)
-  : QMainWindow(parent, flags)
-  , ui(new Ui::WMainWindow)
+WAnalysisOptions::WAnalysisOptions(QWidget *parent, Qt::WindowFlags f)
+  : QDialog(parent, f)
+  , ui(new Ui::WAnalysisOptions)
 {
   ui->setupUi(this);
-
-  // Item Model //////////////////////////////////////////////////////////////
-
-  CampaignModel *model = new CampaignModel(ui->tracesView);
-  ui->tracesView->setModel(model);
-
-  // Signals & Slots /////////////////////////////////////////////////////////
-
-  connect(ui->openAction, &QAction::triggered,
-          this, &WMainWindow::openCampaign);
-  connect(ui->openButton, &QPushButton::clicked,
-          this, &WMainWindow::openCampaign);
-
-  connect(ui->runAnalysisAction, &QAction::triggered,
-          this, &WMainWindow::runAnalysis);
-
-  connect(ui->quitAction, &QAction::triggered,
-          this, &WMainWindow::close);
 }
 
-WMainWindow::~WMainWindow()
+WAnalysisOptions::~WAnalysisOptions()
 {
   delete ui;
-}
-
-////// private slots /////////////////////////////////////////////////////////
-
-void WMainWindow::openCampaign()
-{
-  const QString filename =
-      QFileDialog::getOpenFileName(this, tr("Open Campaign"), QString(), tr("Campaigns (*.txt)"));
-  if( filename.isEmpty() ) {
-    return;
-  }
-
-  CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
-
-  model->clear();
-  ui->filenameEdit->clear();
-  ui->keyEdit->clear();
-
-  Campaign campaign;
-
-  const std::filesystem::path path = cs::toPath(filename);
-  if( !readCampaign(&campaign, path, ui->logBrowser) ) {
-    return;
-  }
-
-  model->set(campaign);
-  ui->filenameEdit->setText(model->filename());
-  ui->keyEdit->setText(model->key());
-}
-
-void WMainWindow::runAnalysis()
-{
-  WAnalysisOptions d(this);
-  d.exec();
 }
