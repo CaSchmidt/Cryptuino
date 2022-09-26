@@ -77,9 +77,4 @@ namespace PowerAES {
     return std::make_unique<EncryptionRound1SubBytes>();
   }
 
-  std::u8string EncryptionRound1SubBytes::name()
-  {
-    return u8"AES::EncryptionRound1SubBytes";
-  }
-
 } // namespace PowerAES

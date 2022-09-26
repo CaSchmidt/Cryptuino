@@ -52,8 +52,6 @@ namespace PowerAES {
     double eval(const uint8_t data, const uint8_t key) const;
 
     static PowerModelPtr make();
-
-    static std::u8string name();
   };
 
 } // namespace PowerAES
