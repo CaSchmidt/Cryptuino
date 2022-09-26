@@ -31,21 +31,29 @@
 
 #pragma once
 
+#include <string>
+
 #include "IPowerModel.h"
 
-class PowerAES128EncRnd1 : public IPowerModel {
-private:
-  struct ctor_tag {
-    ctor_tag() noexcept
-    {
-    }
+namespace PowerAES {
+
+  class EncryptionRound1SubBytes : public IPowerModel {
+  private:
+    struct ctor_tag {
+      ctor_tag() noexcept
+      {
+      }
+    };
+
+  public:
+    EncryptionRound1SubBytes(const ctor_tag& = ctor_tag{}) noexcept;
+    ~EncryptionRound1SubBytes() noexcept;
+
+    double eval(const uint8_t data, const uint8_t key) const;
+
+    static PowerModelPtr make();
+
+    static std::u8string name();
   };
 
-public:
-  PowerAES128EncRnd1(const ctor_tag& = ctor_tag{}) noexcept;
-  ~PowerAES128EncRnd1() noexcept;
-
-  double eval(const uint8_t data, const uint8_t key) const;
-
-  static PowerModelPtr make();
-};
+} // namespace PowerAES
