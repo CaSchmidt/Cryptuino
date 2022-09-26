@@ -46,7 +46,7 @@
 #include "Cryptuino.h"
 #include "CPA.h"
 #include "PowerAES.h"
-#include "TriggerGT.h"
+#include "TriggerImpl.h"
 
 ////// Main //////////////////////////////////////////////////////////////////
 
@@ -64,8 +64,8 @@ int main(int /*argc*/, char **argv)
     return EXIT_FAILURE;
   }
 
-  ctx.event = TriggerGT::make(2.5);
-  ctx.model = PowerAES128EncRnd1::make();
+  ctx.event = TriggerGreater::make(2.5);
+  ctx.model = PowerAES::EncryptionRound1SubBytes::make();
 
   ctx.numTraces = 500;
   ctx.pctRange  = 15;

@@ -35,9 +35,11 @@
 
 class ITrigger {
 public:  
+  using value_type = double;
+
   virtual ~ITrigger() noexcept;
 
-  virtual bool eval(const double value) const = 0;
+  virtual bool eval(const value_type value) const = 0;
 };
 
 using TriggerPtr = std::unique_ptr<ITrigger>;

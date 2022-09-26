@@ -29,25 +29,51 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include "TriggerGreater.h"
+#pragma once
 
-////// public ////////////////////////////////////////////////////////////////
+#include <functional>
+#include <string>
 
-TriggerGreater::TriggerGreater(const double level, const ctor_tag&) noexcept
-  : _level{level}
-{
-}
+#include "ITrigger.h"
 
-TriggerGreater::~TriggerGreater() noexcept
-{
-}
+namespace impl {
 
-bool TriggerGreater::eval(const double x) const
-{
-  return x > _level;
-}
+  template<template<typename T> typename FUNC>
+  class Trigger : public ITrigger {
+  private:
+    struct ctor_tag {
+      ctor_tag() noexcept
+      {
+      }
+    };
 
-TriggerPtr TriggerGreater::make(const double level)
-{
-  return std::make_unique<TriggerGreater>(level);
-}
+  public:
+    using value_type = ITrigger::value_type;
+
+    Trigger(const value_type level, const ctor_tag& = ctor_tag{}) noexcept
+      : _level{level}
+    {
+    }
+
+    ~Trigger() noexcept
+    {
+    }
+
+    bool eval(const value_type x) const
+    {
+      return FUNC<value_type>{}(x, _level);
+    }
+
+    static TriggerPtr make(const value_type level)
+    {
+      return std::make_unique<Trigger>(level);
+    }
+
+  private:
+    value_type _level{0};
+  };
+
+} // namespace impl
+
+using TriggerGreater = impl::Trigger<std::greater>;
+using TriggerLess    = impl::Trigger<std::less>;
