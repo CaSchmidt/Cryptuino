@@ -9,7 +9,7 @@ list(APPEND AnalysisUtil_HEADERS
   include/MatInput.h
   include/Matrix.h
   include/PowerAES.h
-  include/TriggerGT.h
+  include/TriggerGreater.h
   include/TriggerSelect.h
   )
 
@@ -21,7 +21,7 @@ list(APPEND AnalysisUtil_SOURCES
   src/ITrigger.cpp
   src/MatInput.cpp
   src/PowerAES.cpp
-  src/TriggerGT.cpp
+  src/TriggerGreater.cpp
   src/TriggerSelect.cpp
   )
 
