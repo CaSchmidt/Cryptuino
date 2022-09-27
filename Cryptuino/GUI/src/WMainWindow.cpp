@@ -103,5 +103,6 @@ void WMainWindow::openCampaign()
 void WMainWindow::runAnalysis()
 {
   WAnalysisOptions d(this);
+  d.set(CAMPAIGN_MODEL(ui->tracesView->model())->campaign());
   d.exec();
 }

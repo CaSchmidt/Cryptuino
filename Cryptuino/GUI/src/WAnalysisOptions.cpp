@@ -32,6 +32,12 @@
 #include "WAnalysisOptions.h"
 #include "ui_WAnalysisOptions.h"
 
+#include <cs/Core/QStringUtil.h>
+
+#include "Campaign.h"
+#include "PowerAES.h"
+#include "TriggerImpl.h"
+
 ////// public ////////////////////////////////////////////////////////////////
 
 WAnalysisOptions::WAnalysisOptions(QWidget *parent, Qt::WindowFlags f)
@@ -39,9 +45,64 @@ WAnalysisOptions::WAnalysisOptions(QWidget *parent, Qt::WindowFlags f)
   , ui(new Ui::WAnalysisOptions)
 {
   ui->setupUi(this);
+
+  // Initialization //////////////////////////////////////////////////////////
+
+  initializeAlgorithm();
+  initializeEvent();
+  initializeModel();
+  initializeTrace(1);
 }
 
 WAnalysisOptions::~WAnalysisOptions()
 {
   delete ui;
+}
+
+void WAnalysisOptions::set(const Campaign& c)
+{
+  initializeTrace(int(c.entries.size()));
+}
+
+////// private ///////////////////////////////////////////////////////////////
+
+void WAnalysisOptions::initializeAlgorithm()
+{
+  ui->blockSpin->setRange(0, 128);
+  ui->blockSpin->setSuffix(QStringLiteral(" [byte]"));
+  ui->blockSpin->setValue(0);
+
+  ui->keySpin->setRange(0, 128);
+  ui->keySpin->setSuffix(QStringLiteral(" [byte]"));
+  ui->keySpin->setValue(0);
+}
+
+void WAnalysisOptions::initializeEvent()
+{
+  ui->eventCombo->clear();
+  ui->eventCombo->addItem(QStringLiteral("<none>"));
+  ui->eventCombo->addItem(cs::toQString(TriggerGreater::name()));
+  ui->eventCombo->addItem(cs::toQString(TriggerLess::name()));
+
+  ui->eventSpin->setDecimals(2);
+  ui->eventSpin->setMinimum(-10);
+  ui->eventSpin->setMaximum(10);
+  ui->eventSpin->setValue(0);
+
+}
+
+void WAnalysisOptions::initializeModel()
+{
+  ui->modelCombo->clear();
+  ui->modelCombo->addItem(cs::toQString(PowerAES::EncryptionRound1SubBytes::name()));
+}
+
+void WAnalysisOptions::initializeTrace(const int numTraces)
+{
+  ui->numTracesSpin->setRange(0, numTraces);
+  ui->numTracesSpin->setValue(0);
+
+  ui->pctRangeSpin->setRange(0, 100);
+  ui->pctRangeSpin->setSuffix(QStringLiteral("%"));
+  ui->pctRangeSpin->setValue(0);
 }

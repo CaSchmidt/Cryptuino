@@ -33,6 +33,8 @@
 
 #include <QtWidgets/QDialog>
 
+struct Campaign;
+
 namespace Ui {
   class WAnalysisOptions;
 } // namespace Ui
@@ -43,6 +45,13 @@ public:
   WAnalysisOptions(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~WAnalysisOptions();
 
+  void set(const Campaign& c);
+
 private:
+  void initializeAlgorithm();
+  void initializeEvent();
+  void initializeModel();
+  void initializeTrace(const int numTraces);
+
   Ui::WAnalysisOptions *ui{nullptr};
 };
