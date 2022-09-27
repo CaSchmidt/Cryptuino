@@ -21,6 +21,7 @@ list(APPEND AnalysisUtil_SOURCES
   src/ITrigger.cpp
   src/MatInput.cpp
   src/PowerAES.cpp
+  src/TriggerImpl.cpp
   src/TriggerSelect.cpp
   )
 

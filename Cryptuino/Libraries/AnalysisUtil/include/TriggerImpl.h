@@ -32,13 +32,12 @@
 #pragma once
 
 #include <functional>
-#include <string>
 
 #include "ITrigger.h"
 
 namespace impl {
 
-  template<template<typename T> typename FUNC>
+  template<template<typename T> typename FUNC, const char *NAME>
   class Trigger : public ITrigger {
   private:
     struct ctor_tag {
@@ -69,11 +68,19 @@ namespace impl {
       return std::make_unique<Trigger>(level);
     }
 
+    static const char8_t *name()
+    {
+      return reinterpret_cast<const char8_t*>(NAME);
+    }
+
   private:
     value_type _level{0};
   };
 
 } // namespace impl
 
-using TriggerGreater = impl::Trigger<std::greater>;
-using TriggerLess    = impl::Trigger<std::less>;
+extern const char TriggerGreater_name[];
+extern const char TriggerLess_name[];
+
+using TriggerGreater = impl::Trigger<std::greater,TriggerGreater_name>;
+using TriggerLess    = impl::Trigger<std::less,TriggerLess_name>;

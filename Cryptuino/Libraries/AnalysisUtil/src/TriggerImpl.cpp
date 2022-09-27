@@ -29,29 +29,10 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#pragma once
+#include "TriggerImpl.h"
 
-#include "IPowerModel.h"
+////// Public ////////////////////////////////////////////////////////////////
 
-namespace PowerAES {
+const char TriggerGreater_name[] = "Greater";
 
-  class EncryptionRound1SubBytes : public IPowerModel {
-  private:
-    struct ctor_tag {
-      ctor_tag() noexcept
-      {
-      }
-    };
-
-  public:
-    EncryptionRound1SubBytes(const ctor_tag& = ctor_tag{}) noexcept;
-    ~EncryptionRound1SubBytes() noexcept;
-
-    double eval(const uint8_t data, const uint8_t key) const;
-
-    static PowerModelPtr make();
-
-    static const char8_t *name();
-  };
-
-} // namespace PowerAES
+const char TriggerLess_name[] = "Less";
