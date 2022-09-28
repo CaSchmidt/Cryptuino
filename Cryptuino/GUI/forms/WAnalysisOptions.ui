@@ -125,7 +125,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="blockSpin"/>
+       <widget class="QSpinBox" name="sizBlockSpin"/>
       </item>
       <item>
        <widget class="QLabel" name="label_2">
@@ -138,7 +138,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="keySpin"/>
+       <widget class="QSpinBox" name="sizKeySpin"/>
       </item>
      </layout>
     </widget>
@@ -222,8 +222,8 @@
   <tabstop>modelCombo</tabstop>
   <tabstop>eventCombo</tabstop>
   <tabstop>eventSpin</tabstop>
-  <tabstop>blockSpin</tabstop>
-  <tabstop>keySpin</tabstop>
+  <tabstop>sizBlockSpin</tabstop>
+  <tabstop>sizKeySpin</tabstop>
   <tabstop>numTracesSpin</tabstop>
   <tabstop>pctRangeSpin</tabstop>
  </tabstops>

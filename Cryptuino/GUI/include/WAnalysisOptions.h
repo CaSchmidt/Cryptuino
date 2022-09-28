@@ -33,7 +33,7 @@
 
 #include <QtWidgets/QDialog>
 
-struct Campaign;
+#include "CPA.h"
 
 namespace Ui {
   class WAnalysisOptions;
@@ -46,6 +46,8 @@ public:
   ~WAnalysisOptions();
 
   void set(const Campaign& c);
+
+  CPAcontext context() const;
 
 private:
   void initializeAlgorithm();

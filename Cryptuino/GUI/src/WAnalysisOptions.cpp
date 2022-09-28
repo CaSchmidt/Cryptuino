@@ -38,6 +38,40 @@
 #include "PowerAES.h"
 #include "TriggerImpl.h"
 
+////// Private ///////////////////////////////////////////////////////////////
+
+namespace impl {
+
+  TriggerPtr makeEvent(const std::u8string& name, const double level)
+  {
+    if(        TriggerGreater::name() == name ) {
+      return TriggerGreater::make(level);
+    } else if( TriggerLess::name() == name ) {
+      return TriggerLess::make(level);
+    }
+    return TriggerPtr{};
+  }
+
+  inline TriggerPtr makeEvent(const QComboBox *combo, const QDoubleSpinBox *spin)
+  {
+    return makeEvent(cs::toUtf8String(combo->currentText()), spin->value());
+  }
+
+  PowerModelPtr makeModel(const std::u8string& name)
+  {
+    if( PowerAES::EncryptionRound1SubBytes::name() == name ) {
+      return PowerAES::EncryptionRound1SubBytes::make();
+    }
+    return PowerModelPtr{};
+  }
+
+  inline PowerModelPtr makeModel(const QComboBox *combo)
+  {
+    return makeModel(cs::toUtf8String(combo->currentText()));
+  }
+
+} // namespace impl
+
 ////// public ////////////////////////////////////////////////////////////////
 
 WAnalysisOptions::WAnalysisOptions(QWidget *parent, Qt::WindowFlags f)
@@ -64,17 +98,32 @@ void WAnalysisOptions::set(const Campaign& c)
   initializeTrace(int(c.entries.size()));
 }
 
+CPAcontext WAnalysisOptions::context() const
+{
+  CPAcontext ctx;
+
+  ctx.event = impl::makeEvent(ui->eventCombo, ui->eventSpin);
+  ctx.model = impl::makeModel(ui->modelCombo);
+
+  ctx.numTraces = std::size_t(ui->numTracesSpin->value());
+  ctx.pctRange  = std::size_t(ui->pctRangeSpin->value());
+  ctx.sizBlock  = std::size_t(ui->sizBlockSpin->value());
+  ctx.sizKey    = std::size_t(ui->sizKeySpin->value());
+
+  return ctx;
+}
+
 ////// private ///////////////////////////////////////////////////////////////
 
 void WAnalysisOptions::initializeAlgorithm()
 {
-  ui->blockSpin->setRange(0, 128);
-  ui->blockSpin->setSuffix(QStringLiteral(" [byte]"));
-  ui->blockSpin->setValue(0);
+  ui->sizBlockSpin->setRange(0, 128);
+  ui->sizBlockSpin->setSuffix(QStringLiteral(" [byte]"));
+  ui->sizBlockSpin->setValue(0);
 
-  ui->keySpin->setRange(0, 128);
-  ui->keySpin->setSuffix(QStringLiteral(" [byte]"));
-  ui->keySpin->setValue(0);
+  ui->sizKeySpin->setRange(0, 128);
+  ui->sizKeySpin->setSuffix(QStringLiteral(" [byte]"));
+  ui->sizKeySpin->setValue(0);
 }
 
 void WAnalysisOptions::initializeEvent()
