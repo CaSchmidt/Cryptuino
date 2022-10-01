@@ -31,6 +31,7 @@
 
 #pragma once
 
+#define HAVE_STD_FORMAT
 #include <cs/Logging/OutputContext.h>
 
 #include "Campaign.h"

@@ -29,8 +29,6 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#define HAVE_STD_FORMAT
-#include <cs/Logging/ILogger.h>
 #include <cs/Logging/Progress.h>
 #include <cs/Math/Math.h>
 #include <cs/Math/Numeric.h>
@@ -137,7 +135,7 @@ namespace impl_cpa {
 
   CorrelationMatrix computeCorrelation(const AttackMatrix& A, const TraceMatrix& T,
                                        const NumVec& meanT, const NumVec& stddevT,
-                                       const cs::ILogger *logger)
+                                       const cs::OutputContext *output)
   {
     // (1) Setup /////////////////////////////////////////////////////////////
 
@@ -174,28 +172,28 @@ namespace impl_cpa {
     }
 
     const uint64_t end = cs::tickCountMs();
-    logger->logTextf(u8"duration = {}ms", end - beg);
+    output->logTextf(u8"duration = {}ms", end - beg);
 
     return R;
   }
 
   ////// Trace Matrix ////////////////////////////////////////////////////////
 
-  SampleBuffer readTrace(const CPAcontext& ctx, const cs::ILogger *logger,
+  SampleBuffer readTrace(const CPAcontext& ctx, const cs::OutputContext *output,
                          const std::filesystem::path& filename)
   {
     // (1) Read Signal AKA Full Trace ////////////////////////////////////////
 
-    const SampleBuffer signal = readMatVector(filename, "trace", logger);
+    const SampleBuffer signal = readMatVector(filename, "trace", output->logger());
     if( signal.empty() ) {
       return SampleBuffer();
     }
 
     // (2) Read (Optional) Trigger ///////////////////////////////////////////
 
-    const bool    have_trigger = ctx.event  &&  haveMatVariable(filename, "trigger", logger);
+    const bool    have_trigger = ctx.event  &&  haveMatVariable(filename, "trigger", output->logger());
     const SampleBuffer trigger = have_trigger
-        ? readMatVector(filename, "trigger", logger)
+        ? readMatVector(filename, "trigger", output->logger())
         : SampleBuffer();
     if( have_trigger  &&  trigger.empty() ) {
       return SampleBuffer();
@@ -207,7 +205,7 @@ namespace impl_cpa {
         ? selectTrigger(signal, trigger, ctx.event, ctx.pctRange)
         : copyRange(signal, ctx.pctRange);
     if( trace.empty() ) {
-      logger->logErrorf(u8"Empty trace for file \"{}\"!",
+      output->logErrorf(u8"Empty trace for file \"{}\"!",
                         cs::CSTR(filename.generic_u8string().data()));
       return SampleBuffer();
     }
@@ -232,7 +230,7 @@ namespace impl_cpa {
     CampaignEntries::const_iterator entry = ctx.campaign.entries.cbegin();
     for(std::size_t i = 0; i < numD; i++, ++entry) {
       const std::filesystem::path filename = entry->filename(ctx.campaign.filename);
-      SampleBuffer trace = readTrace(ctx, output->logger(), filename);
+      SampleBuffer trace = readTrace(ctx, output, filename);
       if( trace.empty() ) {
         return TraceMatrix();
       }
@@ -307,8 +305,8 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
   // (1) Sanitize Input //////////////////////////////////////////////////////
 
   if( !ctx.campaign.isValid(ctx.sizKey, ctx.sizBlock) ) {
-    output->logger()->logErrorf(u8"Invalid campaign \"{}\"!",
-                                cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
+    output->logErrorf(u8"Invalid campaign \"{}\"!",
+                      cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
     return;
   }
 
@@ -321,8 +319,8 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
 
   const std::size_t numD = ctx.campaign.numEntries(ctx.numTraces);
   if( numD < 1 ) {
-    output->logger()->logErrorf(u8"No traces for campaign \"{}\"!",
-                                cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
+    output->logErrorf(u8"No traces for campaign \"{}\"!",
+                      cs::CSTR(ctx.campaign.filename.generic_u8string().data()));
     return;
   }
 
@@ -362,7 +360,7 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
 
     // (4.1) Create Attack Matrix ////////////////////////////////////////////
 
-    output->logger()->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
+    output->logTextf(u8"Step 2 [{}]: Build attack matrix.", pstr);
     const AttackMatrix A = buildAttackMatrix(ctx, numD, k);
     if( A.isEmpty() ) {
       output->logError(u8"Unable to build attack matrix!");
@@ -371,8 +369,8 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
 
     // (4.2) Compute Correlation Matrix //////////////////////////////////////
 
-    output->logger()->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
-    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT, output->logger());
+    output->logTextf(u8"Step 3 [{}]: Compute correlation matrix.", pstr);
+    const CorrelationMatrix R = computeCorrelation(A, T, meanT, stddevT, output);
     if( R.isEmpty() ) {
       output->logError(u8"Unable to compute correlation matrix!");
       return;
@@ -399,11 +397,11 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
   for(std::size_t k = 0; k < ctx.sizKey; k++) {
     keystr += std::format(" {:2X}", keyi[k]);
   }
-  output->logger()->logTextf(u8"key ={}", keystr);
+  output->logTextf(u8"key ={}", keystr);
 
   std::string corstr;
   for(std::size_t k = 0; k < ctx.sizKey; k++) {
     corstr += std::format(" {:.3}", keyv[k]);
   }
-  output->logger()->logTextf(u8"cor ={}", corstr);
+  output->logTextf(u8"cor ={}", corstr);
 }
