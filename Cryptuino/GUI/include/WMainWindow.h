@@ -37,6 +37,8 @@ namespace Ui {
   class WMainWindow;
 } // namespace Ui
 
+class Campaign;
+
 class WMainWindow : public QMainWindow {
   Q_OBJECT
 public:
@@ -44,9 +46,12 @@ public:
   ~WMainWindow();
 
 private slots:
+  void clearCampaign();
   void openCampaign();
   void runAnalysis();
 
 private:
+  void setCampaign(const Campaign& campaign);
+
   Ui::WMainWindow *ui{nullptr};
 };

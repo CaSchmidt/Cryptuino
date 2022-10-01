@@ -78,6 +78,15 @@ WMainWindow::~WMainWindow()
 
 ////// private slots /////////////////////////////////////////////////////////
 
+void WMainWindow::clearCampaign()
+{
+  CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
+
+  model->clear();
+  ui->filenameEdit->clear();
+  ui->keyEdit->clear();
+}
+
 void WMainWindow::openCampaign()
 {
   const QString filename =
@@ -86,11 +95,7 @@ void WMainWindow::openCampaign()
     return;
   }
 
-  CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
-
-  model->clear();
-  ui->filenameEdit->clear();
-  ui->keyEdit->clear();
+  clearCampaign();
 
   Campaign campaign;
 
@@ -99,9 +104,7 @@ void WMainWindow::openCampaign()
     return;
   }
 
-  model->set(campaign);
-  ui->filenameEdit->setText(model->filename());
-  ui->keyEdit->setText(model->key());
+  setCampaign(campaign);
 }
 
 void WMainWindow::runAnalysis()
@@ -122,6 +125,7 @@ void WMainWindow::runAnalysis()
   // (3) Output //////////////////////////////////////////////////////////////
 
   cs::WProgressLogger progressLogger(this);
+  progressLogger.setWindowTitle(tr("Progress"));
   progressLogger.show();
 
   cs::DualLogger dualLogger{ui->logBrowser, progressLogger.logger()};
@@ -134,4 +138,15 @@ void WMainWindow::runAnalysis()
   // (X) Done! ///////////////////////////////////////////////////////////////
 
   progressLogger.exec();
+}
+
+////// Private ///////////////////////////////////////////////////////////////
+
+void WMainWindow::setCampaign(const Campaign& campaign)
+{
+  CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
+
+  model->set(campaign);
+  ui->filenameEdit->setText(model->filename());
+  ui->keyEdit->setText(model->key());
 }
