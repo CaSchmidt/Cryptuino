@@ -32,6 +32,10 @@
 #include <QtWidgets/QFileDialog>
 
 #include <cs/Core/QStringUtil.h>
+#include <cs/Logging/DualLogger.h>
+#include <cs/Logging/IProgress.h>
+#include <cs/Logging/OutputContext.h>
+#include <cs/Logging/WProgressLogger.h>
 
 #include "WMainWindow.h"
 #include "ui_WMainWindow.h"
@@ -102,7 +106,11 @@ void WMainWindow::openCampaign()
 
 void WMainWindow::runAnalysis()
 {
+  // (1) Campaign ////////////////////////////////////////////////////////////
+
   const Campaign campaign = CAMPAIGN_MODEL(ui->tracesView->model())->campaign();
+
+  // (2) CPA Context /////////////////////////////////////////////////////////
 
   WAnalysisOptions options(this);
   options.set(campaign);
@@ -110,4 +118,20 @@ void WMainWindow::runAnalysis()
 
   CPAcontext context = options.context();
   context.campaign = campaign;
+
+  // (3) Output //////////////////////////////////////////////////////////////
+
+  cs::WProgressLogger progressLogger(this);
+  progressLogger.show();
+
+  cs::DualLogger dualLogger{ui->logBrowser, progressLogger.logger()};
+  cs::OutputContext  output{&dualLogger, true, progressLogger.progress(), true};
+
+  // (4) Run CPA /////////////////////////////////////////////////////////////
+
+  runCPA(context, &output);
+
+  // (X) Done! ///////////////////////////////////////////////////////////////
+
+  progressLogger.exec();
 }
