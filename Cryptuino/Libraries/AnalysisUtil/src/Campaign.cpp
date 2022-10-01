@@ -87,6 +87,7 @@ void Campaign::add(CampaignEntry& entry)
 void Campaign::clear()
 {
   key.clear();
+  filename.clear();
   entries.clear();
 }
 
