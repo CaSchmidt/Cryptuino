@@ -353,6 +353,7 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
     return;
   }
 
+  output->setProgressRange(0, int(ctx.sizKey));
   for(std::size_t k = 0; k < ctx.sizKey; k++) {
     const std::string pstr =
         std::format("{:{}}/{}",
@@ -389,6 +390,8 @@ void runCPA(const CPAcontext& ctx, const cs::OutputContext *output)
         }
       }
     }
+
+    output->setProgressValue(int(k + 1));
   } // For Each Byte of Key
 
   // (5) Output Result ///////////////////////////////////////////////////////
