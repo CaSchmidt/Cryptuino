@@ -26,7 +26,8 @@ add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/3rdparty/matio1521
 
 format_output_name(matio "matio")
 
-set(ENABLE_QT ON CACHE BOOL "" FORCE)
+set(ENABLE_QT   ON CACHE BOOL "" FORCE)
+set(ENABLE_PLOT ON CACHE BOOL "" FORCE)
 add_subdirectory(${Cryptuino-dev_SOURCE_DIR}/csUtil/csUtil
   ${CMAKE_CURRENT_BINARY_DIR}/csUtil
   )
