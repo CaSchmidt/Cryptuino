@@ -37,7 +37,7 @@ namespace Ui {
   class WMainWindow;
 } // namespace Ui
 
-class Campaign;
+struct Campaign;
 
 class WMainWindow : public QMainWindow {
   Q_OBJECT
