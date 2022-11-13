@@ -81,6 +81,20 @@ QString CampaignModel::key() const
       : QString();
 }
 
+std::filesystem::path CampaignModel::traceFilename(const std::size_t i) const
+{
+  if( i < 0  ||  i >= _campaign.entries.size() ) {
+    return std::filesystem::path{};
+  }
+
+  const CampaignEntry& entry = _campaign.entries[i];
+  if( !entry.exists(_campaign.filename) ) {
+    return std::filesystem::path{};
+  }
+
+  return entry.filename(_campaign.filename);
+}
+
 int CampaignModel::columnCount(const QModelIndex& /*parent*/) const
 {
   return Num_Columns;
