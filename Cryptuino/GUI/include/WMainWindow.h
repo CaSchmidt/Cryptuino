@@ -33,6 +33,8 @@
 
 #include <QtWidgets/QMainWindow>
 
+#include "Plot.h"
+
 namespace Ui {
   class WMainWindow;
 } // namespace Ui
@@ -48,10 +50,12 @@ public:
 private slots:
   void clearCampaign();
   void openCampaign();
+  void plotTrace(const QModelIndex& index);
   void runAnalysis();
 
 private:
   void setCampaign(const Campaign& campaign);
 
+  PlotWidgetPtr _plot{};
   Ui::WMainWindow *ui{nullptr};
 };

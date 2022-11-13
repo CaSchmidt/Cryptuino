@@ -29,20 +29,20 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#include <QtWidgets/QApplication>
+#pragma once
 
-#include "WMainWindow.h"
+#include <filesystem>
+#include <memory>
 
-int main(int argc, char **argv)
-{
-  QApplication app(argc, argv);
+namespace cs {
+  class ILogger;
+};
 
-  WMainWindow *window = new WMainWindow();
-
-  window->show();
-  const int result = app.exec();
-
-  //delete window; // WMainWindow sets 'WA_DeleteOnClose'!
-
-  return result;
+namespace plot {
+  class PlotWidget;
 }
+
+using PlotWidgetPtr = std::unique_ptr<plot::PlotWidget>;
+
+PlotWidgetPtr makeTracePlot(const std::filesystem::path& filename,
+                            const cs::ILogger *logger);

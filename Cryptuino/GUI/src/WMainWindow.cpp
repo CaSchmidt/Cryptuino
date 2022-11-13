@@ -36,6 +36,7 @@
 #include <cs/Logging/IProgress.h>
 #include <cs/Logging/OutputContext.h>
 #include <cs/Logging/WProgressLogger.h>
+#include <Plot/PlotWidget.h>
 
 #include "WMainWindow.h"
 #include "ui_WMainWindow.h"
@@ -52,12 +53,19 @@ WMainWindow::WMainWindow(QWidget *parent, Qt::WindowFlags flags)
 {
   ui->setupUi(this);
 
+  setAttribute(Qt::WA_DeleteOnClose);
+
   // Item Model //////////////////////////////////////////////////////////////
 
   CampaignModel *model = new CampaignModel(ui->tracesView);
   ui->tracesView->setModel(model);
 
   // Signals & Slots /////////////////////////////////////////////////////////
+
+  connect(ui->tracesView, &QTableView::doubleClicked,
+          this, &WMainWindow::plotTrace);
+
+  // Signals & Slots - Menu //////////////////////////////////////////////////
 
   connect(ui->openAction, &QAction::triggered,
           this, &WMainWindow::openCampaign);
@@ -80,6 +88,8 @@ WMainWindow::~WMainWindow()
 
 void WMainWindow::clearCampaign()
 {
+  _plot.reset();
+
   CampaignModel *model = CAMPAIGN_MODEL(ui->tracesView->model());
 
   model->clear();
@@ -107,8 +117,28 @@ void WMainWindow::openCampaign()
   setCampaign(campaign);
 }
 
+void WMainWindow::plotTrace(const QModelIndex& index)
+{
+  if( !index.isValid() ) {
+    return;
+  }
+
+  const std::filesystem::path filename =
+      CAMPAIGN_MODEL(ui->tracesView->model())->traceFilename(std::size_t(index.row()));
+  if( filename.empty() ) {
+    return;
+  }
+
+  _plot = makeTracePlot(filename, ui->logBrowser);
+  if( _plot ) {
+    _plot->show();
+  }
+}
+
 void WMainWindow::runAnalysis()
 {
+  _plot.reset();
+
   // (1) Campaign ////////////////////////////////////////////////////////////
 
   const Campaign campaign = CAMPAIGN_MODEL(ui->tracesView->model())->campaign();
