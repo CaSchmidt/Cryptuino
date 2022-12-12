@@ -90,10 +90,16 @@ PlotWidgetPtr makeTracePlot(const std::filesystem::path& filename,
     if( !trigger.empty()  &&  trigger.size() == trace.size() ) {
       plot_data = TracePlotData::make(QStringLiteral("trigger"), QStringLiteral("V2"),
                                       xStart, xInter, trigger);
-      plot::PlotSeriesHandle h = widget->insert(plot_data.release(), Qt::red);
-      h.activate();
+      widget->insert(plot_data.release(), Qt::red);
     }
   }
+
+  // (4) Configure Axis Labels ///////////////////////////////////////////////
+
+  plot::PlotTheme theme = widget->theme();
+  theme.setAxisLabelFormat(plot::PlotTheme::XAxis, {'g', 3});
+  theme.setAxisLabelFormat(plot::PlotTheme::YAxis, {'g', 3});
+  widget->setTheme(theme);
 
   // Done! ///////////////////////////////////////////////////////////////////
 
