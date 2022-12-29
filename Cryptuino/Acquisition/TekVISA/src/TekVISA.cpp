@@ -49,7 +49,7 @@ TekVISA::~TekVISA() noexcept
   disconnect();
 }
 
-bool TekVISA::connect(const cs::ILogger *logger, const InstrumentOptions& options)
+bool TekVISA::connect(const cs::ILogger *logger)
 {
   ViStatus status;
 

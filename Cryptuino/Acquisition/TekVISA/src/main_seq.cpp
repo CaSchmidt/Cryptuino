@@ -140,10 +140,8 @@ int main(int argc, char **argv)
 
   // (3) Setup ///////////////////////////////////////////////////////////////
 
-  InstrumentOptions instropts;
-
   InstrumentPtr instrument = make_instrument<TekVISA>();
-  if( use_instrument  &&  !instrument->connect(logger, instropts) ) {
+  if( use_instrument  &&  !instrument->connect(logger) ) {
     return EXIT_FAILURE;
   }
 

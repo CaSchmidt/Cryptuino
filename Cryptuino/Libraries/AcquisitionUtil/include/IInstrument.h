@@ -44,23 +44,11 @@ namespace cs {
   class ILogger;
 } // namespace cs
 
-struct InstrumentOptions {
-  enum Coupling {
-    AC = 0,
-    DC,
-    GND
-  };
-
-  InstrumentOptions() noexcept = default;
-
-  Coupling coupling{AC};
-};
-
 class IInstrument {
 public:
   virtual ~IInstrument() noexcept;
 
-  virtual bool connect(const cs::ILogger *logger, const InstrumentOptions& options) = 0;
+  virtual bool connect(const cs::ILogger *logger) = 0;
   virtual void disconnect() = 0;
   virtual bool isConnected() const = 0;
 
