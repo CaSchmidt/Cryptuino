@@ -48,7 +48,7 @@ public:
   TekVISA(const ctor_tag&) noexcept;
   ~TekVISA() noexcept;
 
-  bool connect(const cs::ILogger *logger) final;
+  bool connect(const cs::ILogger *logger, const InstrumentOptions& options) final;
   void disconnect() final;
   bool isConnected() const final;
 

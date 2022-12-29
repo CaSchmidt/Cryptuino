@@ -44,11 +44,23 @@ namespace cs {
   class ILogger;
 } // namespace cs
 
+struct InstrumentOptions {
+  enum Coupling {
+    AC = 0,
+    DC,
+    GND
+  };
+
+  InstrumentOptions() noexcept = default;
+
+  Coupling coupling{AC};
+};
+
 class IInstrument {
 public:
   virtual ~IInstrument() noexcept;
 
-  virtual bool connect(const cs::ILogger *logger) = 0;
+  virtual bool connect(const cs::ILogger *logger, const InstrumentOptions& options) = 0;
   virtual void disconnect() = 0;
   virtual bool isConnected() const = 0;
 
@@ -74,7 +86,7 @@ InstrumentPtr make_instrument(Args&&... args)
   try {
     ptr = std::make_unique<DerivedT>(ctor_tag{}, std::forward<Args>(args)...);
   } catch(...) {
-    return InstrumentPtr();
+    return InstrumentPtr{};
   }
   return ptr;
 }
